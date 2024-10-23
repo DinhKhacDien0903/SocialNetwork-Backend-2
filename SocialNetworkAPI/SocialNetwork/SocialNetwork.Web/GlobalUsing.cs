@@ -1,0 +1,10 @@
+﻿global using Microsoft.EntityFrameworkCore;
+global using SocialNetwork.DataAccess.DataContext;
+global using SocialNetwork.DataAccess.Repositories;
+global using SocialNetwork.Domain.IRepositories;
+global using SocialNetwork.Services.IServices;
+global using SocialNetwork.Services.Services;
+global using System.Text;
+global using Microsoft.AspNetCore.Mvc;
+global using SocialNetwork.DTOs.Request;
+global using SocialNetwork.DTOs.Response;
