@@ -3,7 +3,7 @@
     public class GroupChatMessageStatusEntity
     {
         [Key, Column(Order = 0)]
-        public Guid GroupChatMessageID { get; set; }
+        public string GroupChatMessageID { get; set; }
 
         [Key, Column(Order = 1)]
         public string UserID { get; set; }
@@ -14,9 +14,9 @@
         public DateTime? ReadAt { get; set; }
 
         [ForeignKey("GroupChatMessageID")]
-        public GroupChatMessageEntity GroupChatMessage { get; set; } = new GroupChatMessageEntity();
+        public GroupChatMessageEntity? GroupChatMessage { get; set; }
 
         [ForeignKey("UserID")]
-        public UserEntity User { get; set; } = new UserEntity();
+        public UserEntity? User { get; set; }
     }
 }

@@ -8,7 +8,9 @@ namespace SocialNetwork.DataAccess.Repositories
         public readonly SocialNetworkdDataContext _context;
 
         private readonly UserManager<UserEntity> _userManager;
-        public UserRepository(SocialNetworkdDataContext context, UserManager<UserEntity> userManager) : base(context)
+        public UserRepository(
+            SocialNetworkdDataContext context,
+            UserManager<UserEntity> userManager) : base(context)
         {
             _context = context;
             _userManager = userManager;

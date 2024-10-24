@@ -3,10 +3,10 @@
     public class ImagesOfPostEntity : BaseEntity
     {
         [Key]
-        public Guid ImagesOfPostID { get; set; }
+        public string ImagesOfPostID { get; set; }
 
         [Required]
-        public Guid PostID { get; set; }
+        public string PostID { get; set; }
 
         [StringLength(255)]
         public string ImgUrl { get; set; } = string.Empty;

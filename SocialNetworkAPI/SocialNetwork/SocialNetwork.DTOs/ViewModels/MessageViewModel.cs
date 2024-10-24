@@ -12,5 +12,7 @@
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public List<string> Images { get; set; } = new List<string>();
+
     }
 }

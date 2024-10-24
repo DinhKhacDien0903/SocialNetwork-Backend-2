@@ -3,10 +3,10 @@
     public class GroupChatMessageImageEntity
     {
         [Key]
-        public Guid GroupChatMessageImageID { get; set; }
+        public string GroupChatMessageImageID { get; set; }
 
         [Required]
-        public Guid GroupChatMessageID { get; set; }
+        public string GroupChatMessageID { get; set; }
 
         [Required]
         public string UserID { get; set; }
@@ -17,9 +17,9 @@
         public bool IsDeleted { get; set; } = false;
 
         [ForeignKey("GroupChatMessageID")]
-        public GroupChatMessageEntity GroupChatMessage { get; set; } = new GroupChatMessageEntity(); 
+        public GroupChatMessageEntity? GroupChatMessage { get; set; } 
 
         [ForeignKey("UserID")] 
-        public UserEntity User { get; set; } = new UserEntity(); 
+        public UserEntity? User { get; set; }
     }
 }

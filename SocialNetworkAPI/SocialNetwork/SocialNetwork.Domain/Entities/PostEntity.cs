@@ -3,7 +3,7 @@
     public class PostEntity : BaseEntity
     {
         [Key]
-        public Guid PostID { get; set; }
+        public string PostID { get; set; }
 
         [Required]
         public string UserID { get; set; }
@@ -14,7 +14,7 @@
         public bool IsDelete { get; set; } = false;
 
         [ForeignKey("UserID")]
-        public UserEntity? User { get; set; } = new UserEntity();
+        public UserEntity? User { get; set; }
 
         public ICollection<ImagesOfPostEntity> Images { get; set; } = new List<ImagesOfPostEntity>();
 

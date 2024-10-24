@@ -7,19 +7,39 @@ namespace SocialNetwork.Services.Services
     {
         public readonly IMessageRepository _messageRepository;
 
+        public readonly IMessageImagesRepository _messageImageRepository;
+
         private readonly IMapper _mapper;
         public MessageService(
             IMessageRepository messageRepository,
+            IMessageImagesRepository messageImageRepository,
             IMapper mapper)
         {
             _messageRepository = messageRepository;
+            _messageImageRepository = messageImageRepository;
             _mapper = mapper;
         }
         public async Task<IEnumerable<MessagePersonResponse>> GetAllMessagesAsync(string userId, string receiverId)
         {
-            var messages = await _messageRepository.GetAllMessageByFriendIdAsync(userId, receiverId);
+            try
+            {
+                var messages = await _messageRepository.GetAllMessageByFriendIdAsync(userId, receiverId);
 
-            return _mapper.Map<IEnumerable<MessagePersonResponse>>(messages);
+                var messagesResponse = _mapper.Map<IEnumerable<MessagePersonResponse>>(messages);
+
+                foreach (var item in messagesResponse)
+                {
+                    var images = await _messageImageRepository.GetAllImageByMessageId(item.MessageID);
+
+                    item.Images = images;
+                }
+                return messagesResponse;
+            }
+            catch (Exception e)
+            {
+                var x = e;
+            }
+            return new List<MessagePersonResponse>();
         }
     }
 }

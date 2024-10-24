@@ -3,7 +3,7 @@
     public class EmotionTypeEntity
     {
         [Key]
-        public Guid EmotionTypeID { get; set; }
+        public string EmotionTypeID { get; set; }
 
         [StringLength(20)]
         [Required]

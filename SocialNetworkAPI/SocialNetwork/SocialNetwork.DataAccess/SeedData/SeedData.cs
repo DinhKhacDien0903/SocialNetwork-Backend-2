@@ -97,7 +97,7 @@ namespace SocialNetwork.DataAccess.SeedData
                             // Tạo tin nhắn từ sender đến receiver
                             messages.Add(new MessagesEntity
                             {
-                                MessageID = Guid.NewGuid(),
+                                MessageID = Guid.NewGuid().ToString(),
                                 Content = $"Hello from {sender.UserName} to {receiver.UserName}",
                                 SenderID = sender.Id,
                                 ReciverID = receiver.Id,
@@ -108,7 +108,7 @@ namespace SocialNetwork.DataAccess.SeedData
                             // Tạo tin nhắn phản hồi từ receiver đến sender
                             messages.Add(new MessagesEntity
                             {
-                                MessageID = Guid.NewGuid(),
+                                MessageID = Guid.NewGuid().ToString(),
                                 Content = $"Reply from {receiver.UserName} to {sender.UserName}",
                                 SenderID = receiver.Id,
                                 ReciverID = sender.Id,

@@ -50,15 +50,15 @@ namespace SocialNetwork.Web.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<string> SendMessageToPerson(string recevierId, string message, int symbol)
+        public async Task<string> SendMessageToPerson(SendMessageToPersonRequest param)
         {
             var sender = await ValidateCurrentAccount();
 
-            var reciver = await _userManager.FindByIdAsync(recevierId);
+            var reciver = await _userManager.FindByIdAsync(param.ReciverId);
             
             var sendDate = DateTime.UtcNow.AddHours(7);
 
-            message = message.Trim();
+            param.Content = param.Content.Trim();
 
             if(reciver == null)
             {
@@ -67,13 +67,13 @@ namespace SocialNetwork.Web.Hubs
                 return "";
             }
 
-            if (string.IsNullOrEmpty(message))
+            if (string.IsNullOrEmpty(param.Content) && param.Images.Count == 0)
             {
                 await Clients.Caller.SendAsync("MessageValidateError", "Message cannot be empty");
                 return "";
             }
 
-            if (message.Length > 500)
+            if (param.Content.Length > 500)
             {
                 await Clients.Caller.SendAsync("MessageValidateTooLarge", "Message is too long. Max is 500 characters");
                 return "";
@@ -83,22 +83,40 @@ namespace SocialNetwork.Web.Hubs
             {
                 SenderID = sender.Id,
                 ReciverID = reciver.Id,
-                Content = message,
-                CreatedAt = sendDate
+                Content = param.Content,
+                CreatedAt = sendDate,
+                Images = param.Images
             };
 
-            var messageID = await _chatHubService.AddMessagePerson(messageViewModel);
+            var messageID = await _chatHubService.AddMessagePersonAsync(messageViewModel);
 
-            var recevierMessageViewModel = new RecevierMessageViewModel
+            var listImageViewModel = new List<MessageImageViewModel>();
+
+            foreach(var image in param.Images)
             {
-                MessageID = messageID,
-                SenderID = sender.Id,
-                RecevierID = reciver.Id,
-                Message = message,
-                SendDate = sendDate
-            };
+                listImageViewModel.Add(
+                    new MessageImageViewModel
+                    {
+                        MessageImageID = Guid.NewGuid().ToString(),
+                        MessageID = messageID,
+                        ImageUrl = image
+                    }
+                );
+            }
 
-            await Clients.User(reciver.Id).SendAsync("ReceiveSpecitificMessage", messageID, message, sendDate);
+            await _chatHubService.AddMessageImagesAsync(listImageViewModel);
+
+            //var recevierMessageViewModel = new RecevierMessageViewModel
+            //{
+            //    MessageID = messageID,
+            //    SenderID = sender.Id,
+            //    RecevierID = reciver.Id,
+            //    Message = param.Content,
+            //    SendDate = sendDate,
+            //    Images = param.Images
+            //};
+
+            await Clients.User(reciver.Id).SendAsync("ReceiveSpecitificMessage", messageID, param.Content, sendDate);
 
             return messageID;
         }

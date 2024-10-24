@@ -3,7 +3,7 @@
     public class GroupChatMemberEntity
     {
         [Key, Column(Order = 0)]
-        public Guid GroupChatID { get; set; }
+        public string GroupChatID { get; set; }
 
         [Key, Column(Order = 1)]
         public string UserID { get; set; }
@@ -15,9 +15,9 @@
         public bool IsLeaved { get; set; } = false;
 
         [ForeignKey("GroupChatID")]
-        public GroupChatEntity GroupChat { get; set; } = new GroupChatEntity();
+        public GroupChatEntity? GroupChat { get; set; }
 
         [ForeignKey("UserID")]
-        public UserEntity User { get; set; } = new UserEntity();
+        public UserEntity? User { get; set; }
     }
 }

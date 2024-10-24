@@ -28,13 +28,14 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<MessagesEntity, MessageViewModel>();
             CreateMap<UserEntity, FriendViewModel>();
             CreateMap<MessagesEntity, MessagePersonResponse>();
+            CreateMap<MessageImageEntity, MessageImageViewModel>();
 
             //nguoc lai
             CreateMap<UserViewModel, UserEntity>();
             CreateMap<MessageViewModel, MessagesEntity>();
             CreateMap<FriendViewModel, UserEntity>();
             CreateMap<MessagePersonResponse, MessagesEntity>();
-
+            CreateMap<MessageImageViewModel, MessageImageEntity>();
         }
     }
 }

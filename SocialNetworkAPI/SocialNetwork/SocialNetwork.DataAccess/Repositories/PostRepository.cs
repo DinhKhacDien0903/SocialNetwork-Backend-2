@@ -49,7 +49,7 @@ namespace SocialNetwork.DataAccess.Repositories
         public async Task<PostEntity> GetPostWithImagesAsync(Guid postId)
         {
             return await _context.Posts.Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.PostID == postId);
+                .FirstOrDefaultAsync(p => p.PostID == postId.ToString());
         }
 
         public Task<PostEntity> GetByIDAsync(string id)

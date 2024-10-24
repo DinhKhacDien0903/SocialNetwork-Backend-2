@@ -3,9 +3,7 @@
     public class MessagesEntity:BaseEntity
     {
         [Key]
-        public Guid MessageID { get; set; }
-
-        [Required]
+        public string MessageID { get; set; }
         public string Content { get; set; }
 
         [Required]

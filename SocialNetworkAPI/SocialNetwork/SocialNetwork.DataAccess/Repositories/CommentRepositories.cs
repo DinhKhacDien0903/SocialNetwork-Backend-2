@@ -29,20 +29,20 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<IEnumerable<CommentEntity>> GetCommentsByPostIdAsync(Guid postId)
         {
-            var comments= await _context.Comments.Where(x=>x.PostID==postId && x.ParentCommentID==null && !x.IsDelete).Include(x=>x.User).OrderByDescending(x=>x.CreatedAt).ToListAsync();
+            var comments= await _context.Comments.Where(x=>x.PostID==postId.ToString() && x.ParentCommentID==null && !x.IsDelete).Include(x=>x.User).OrderByDescending(x=>x.CreatedAt).ToListAsync();
             return comments;
         }
 
         public async Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(Guid parentCommentId)
         {
-            var comment=await _context.Comments.Where(x=>x.ParentCommentID==parentCommentId && !x.IsDelete).Include(x=>x.User).OrderBy(x=>x.CreatedAt).ToListAsync(); 
+            var comment=await _context.Comments.Where(x=>x.ParentCommentID==parentCommentId.ToString() && !x.IsDelete).Include(x=>x.User).OrderBy(x=>x.CreatedAt).ToListAsync(); 
             return comment;
         }
 
         
         public async Task<CommentEntity> GetCommentByIdAsync(Guid commentId)
         {
-            var commentById = await _context.Comments.FirstOrDefaultAsync(c => c.CommentID == commentId && !c.IsDelete);
+            var commentById = await _context.Comments.FirstOrDefaultAsync(c => c.CommentID == commentId.ToString() && !c.IsDelete);
             return commentById;
         }
 

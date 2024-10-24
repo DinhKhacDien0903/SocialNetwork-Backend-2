@@ -16,6 +16,13 @@
              return entity;
         }
 
+        public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+
+            return entities;    
+        }
+
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);

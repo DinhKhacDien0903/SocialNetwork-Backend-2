@@ -3,15 +3,15 @@
     public class ReactionPostEntity
     {
         [Key, Column(Order = 0)]
-        public Guid ReactionID { get; set; }
+        public string ReactionID { get; set; }
 
         [Key, Column(Order = 1)]
-        public Guid PostID { get; set; }
+        public string PostID { get; set; }
 
         [ForeignKey("ReactionID")]
-        public ReactionEntity Reaction { get; set; } = new ReactionEntity();
+        public ReactionEntity? Reaction { get; set; }
 
         [ForeignKey("PostID")]
-        public PostEntity Post { get; set; } = new PostEntity();
+        public PostEntity? Post { get; set; }
     }
 }

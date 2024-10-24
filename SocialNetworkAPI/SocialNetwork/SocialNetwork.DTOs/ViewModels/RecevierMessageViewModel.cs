@@ -11,5 +11,7 @@
         public string? Message { get; set; }
 
         public DateTime SendDate { get; set; }
+
+        public List<string> Images { get; set; } = new List<string>();
     }
 }

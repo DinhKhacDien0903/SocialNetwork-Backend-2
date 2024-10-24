@@ -3,15 +3,15 @@
     public class CommentEntity :BaseEntity
     {
         [Key]
-        public Guid CommentID { get; set; }
+        public string CommentID { get; set; }
 
         [Required]
         public string UserID { get; set; }
 
         [Required]
-        public Guid PostID { get; set; }
+        public string PostID { get; set; }
 
-        public Guid? ParentCommentID { get; set; }
+        public string? ParentCommentID { get; set; }
 
         [Required]
         public string Content { get; set; }

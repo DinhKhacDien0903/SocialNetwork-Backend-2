@@ -3,7 +3,7 @@
     public class GroupChatEntity : BaseEntity
     {
         [Key]
-        public Guid GroupChatID { get; set; }
+        public string GroupChatID { get; set; }
 
         [StringLength(50)]
         public string GroupName { get; set; } = "New Group Chat";

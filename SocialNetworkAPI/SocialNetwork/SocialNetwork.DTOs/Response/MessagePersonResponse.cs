@@ -11,5 +11,7 @@
         public string? ReciverID { get; set; }
 
         public int Symbol { get; set; }
+
+        public List<string> Images { get; set; } = new List<string>();
     }
 }
