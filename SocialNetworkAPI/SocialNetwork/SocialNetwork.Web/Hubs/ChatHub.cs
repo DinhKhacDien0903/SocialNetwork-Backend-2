@@ -90,37 +90,48 @@ namespace SocialNetwork.Web.Hubs
 
             var messageID = await _chatHubService.AddMessagePersonAsync(messageViewModel);
 
-            var listImageViewModel = new List<MessageImageViewModel>();
-
-            foreach(var image in param.Images)
+            if (param.Images.Count > 0)
             {
-                listImageViewModel.Add(
-                    new MessageImageViewModel
-                    {
-                        MessageImageID = Guid.NewGuid().ToString(),
-                        MessageID = messageID,
-                        ImageUrl = image
-                    }
-                );
+                var listImageViewModel = new List<MessageImageViewModel>();
+
+                foreach (var image in param.Images)
+                {
+                    listImageViewModel.Add(
+                        new MessageImageViewModel
+                        {
+                            MessageImageID = Guid.NewGuid().ToString(),
+                            MessageID = messageID,
+                            ImageUrl = image
+                        }
+                    );
+                }
+
+                await _chatHubService.AddMessageImagesAsync(listImageViewModel);
             }
 
-            await _chatHubService.AddMessageImagesAsync(listImageViewModel);
+            var messageResponse = new MessagePersonResponse
+            {
+                MessageID = messageID,
+                Content = param.Content,
+                Images = param.Images,
+                SendDate = sendDate,
+                Symbol = param.Symbol
+            }; 
 
-            //var recevierMessageViewModel = new RecevierMessageViewModel
-            //{
-            //    MessageID = messageID,
-            //    SenderID = sender.Id,
-            //    RecevierID = reciver.Id,
-            //    Message = param.Content,
-            //    SendDate = sendDate,
-            //    Images = param.Images
-            //};
-
-            await Clients.User(reciver.Id).SendAsync("ReceiveSpecitificMessage", messageID, param.Content, sendDate);
+            await Clients.User(reciver.Id).SendAsync("ReceiveSpecitificMessage", messageResponse);
 
             return messageID;
         }
 
+        public async Task OnUserTyping(string reciverId)
+        {
+            await Clients.User(reciverId).SendAsync("ReciverTypingNotification", true);
+        }
+
+        public async Task StoppedUserTyping(string reciverId)
+        {
+            await Clients.User(reciverId).SendAsync("ReciverTypingNotification", false);
+        }
 
         private async Task UpdateStatusActiveUser(string userId, bool isActive)
         {

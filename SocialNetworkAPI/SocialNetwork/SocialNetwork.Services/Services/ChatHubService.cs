@@ -27,11 +27,15 @@ namespace SocialNetwork.Services.Services
             var listEntites = _mapper.Map<IEnumerable<MessageImageEntity>>(messageImages);
 
             await _messageImageRepository.AddRangeAsync(listEntites);
+
+            await _messageImageRepository.SaveChangeAsync();
         }
 
         public async Task<string> AddMessagePersonAsync(MessageViewModel messageViewModel)
         {
             var entity = _mapper.Map<MessagesEntity>(messageViewModel);
+
+            entity.MessageID = Guid.NewGuid().ToString();
 
             var message =  await _messageRepository.AddAsync(entity);
 
