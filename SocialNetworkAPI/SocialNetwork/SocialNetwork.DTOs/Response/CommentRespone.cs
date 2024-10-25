@@ -4,15 +4,16 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SocialNetwork.DTOs.Request;
 
-namespace SocialNetwork.DTOs.ViewModels
+namespace SocialNetwork.DTOs.Response
 {
-    public class PostViewModel
+    public class CommentRespone
     {
-        public Guid PostID { get; set; }
+        [Required(ErrorMessage = "UserID is required.")]
 
         public string? UserID { get; set; }
+
+        public Guid PostID { get; set; }
 
         public string? Content { get; set; }
 
@@ -22,7 +23,5 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public DateTime? UpdatedAt { get; set; }
 
-        public List<ImagesOfPostViewModel> Images { get; set; } = new List<ImagesOfPostViewModel>();
     }
-
 }

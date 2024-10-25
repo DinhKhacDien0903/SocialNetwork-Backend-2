@@ -13,7 +13,7 @@ namespace SocialNetwork.Services.IServices
 
         Task<PostViewModel> GetPostByIdAsync(Guid postId);
 
-        Task<PostRequest> CreatePostAsync(PostRequest post);
+        Task<PostViewModel> CreatePostAsync(PostRequest post);
 
         Task<PostViewModel> UpdatePostAsync(PostViewModel post);
 

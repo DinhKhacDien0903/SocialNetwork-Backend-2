@@ -9,9 +9,9 @@
         public Guid CommentID { get; set; }
 
         [ForeignKey("ReactionID")] 
-        public ReactionEntity Reaction { get; set; } = new ReactionEntity(); 
+        public ReactionEntity Reaction { get; set; } 
 
         [ForeignKey("CommentID")] 
-        public CommentEntity Comment { get; set; } = new CommentEntity();
+        public CommentEntity Comment { get; set; } 
     }
 }

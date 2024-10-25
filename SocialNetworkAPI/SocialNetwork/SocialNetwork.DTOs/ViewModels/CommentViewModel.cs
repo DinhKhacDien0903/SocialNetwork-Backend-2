@@ -22,13 +22,11 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public bool IsDelete { get; set; } = false;
 
-        public DateTime CreatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public DateTime? UpdatedAt { get; set; } 
+        public DateTime? UpdatedAt { get; set; }
 
-        public string UserName {  get; set; }
-
-       public List<CommentViewModel> Replies {  get; set; }=new List<CommentViewModel>();
+        public List<CommentViewModel> Replies { get; set; } = new List<CommentViewModel>();
 
     }
 }

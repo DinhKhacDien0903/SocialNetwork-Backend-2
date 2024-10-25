@@ -14,7 +14,7 @@
         public bool IsDeleted { get; set; } = false;
 
         [ForeignKey("UserID")]
-        public UserEntity User { get; set; } = new UserEntity();
+        public UserEntity User { get; set; } 
 
         [ForeignKey("EmotionTypeID")]
         public EmotionTypeEntity EmotionType { get; set; } = new EmotionTypeEntity();

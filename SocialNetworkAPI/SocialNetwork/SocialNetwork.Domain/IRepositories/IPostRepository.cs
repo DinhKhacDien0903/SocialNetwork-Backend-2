@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.Domain.IRepositories
 {
-    public interface IPostRepository
+    public interface IPostRepository : IBaseRepository<PostEntity>
     {
-        Task<IEnumerable<PostEntity>> GetAllAsync();
+        //Task<IEnumerable<PostEntity>> GetAllAsync();
 
-        Task<PostEntity> GetByIDAsync(Guid id);
+        Task<PostEntity> GetByIDPostAsync(Guid id);
 
-        Task AddAsync(PostEntity entity);
+        //Task AddAsync(PostEntity entity);
 
-        void Update(PostEntity entity);
+        //void Update(PostEntity entity);
 
-        void Delete(PostEntity Entity);
+        //void Delete(PostEntity Entity);
 
-        Task SaveChangeAsync();
+        //Task SaveChangeAsync();
 
         Task<IEnumerable<PostEntity>> GetPostsByUserIdAsync(string userId);
-        Task<PostEntity> GetPostWithImagesAsync(Guid postId);
+        //Task<PostEntity> GetPostWithImagesAsync(Guid postId);
     }
 }

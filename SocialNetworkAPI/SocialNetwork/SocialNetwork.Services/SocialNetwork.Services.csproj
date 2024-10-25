@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SocialNetwork.DataAccess\SocialNetwork.DataAccess.csproj" />
     <ProjectReference Include="..\SocialNetwork.DTOs\SocialNetwork.DTOs.csproj" />
+    <ProjectReference Include="..\SocialNetwork.Helpers\SocialNetwork.Helpers.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,16 +10,19 @@ namespace SocialNetwork.Services.Services
 {
     public class PostService : IPostService
     {
-        private readonly IPostRepository _postRepository ;
-        private readonly IMapper _mapper ;
+        private readonly IPostRepository _postRepository;
+        private readonly IMapper _mapper;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
         public PostService(IPostRepository postRepository, IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
         {
-            _postRepository = postRepository; 
+            _postRepository = postRepository;
             _imageRepository = imageRepository;
             _mapper = mapper;
         }
-        public async Task<PostRequest> CreatePostAsync(PostRequest postRequest)
+
+
+
+        public async Task<PostViewModel> CreatePostAsync(PostRequest postRequest)
         {
             if (string.IsNullOrWhiteSpace(postRequest.Content))
             {
@@ -28,16 +31,21 @@ namespace SocialNetwork.Services.Services
 
             try
             {
+                // Ánh xạ từ PostRequest sang PostEntity
                 var postEntity = _mapper.Map<PostEntity>(postRequest);
-
                 Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
 
+                // Thêm bài viết vào repository
                 await _postRepository.AddAsync(postEntity);
+
                 await _postRepository.SaveChangeAsync();
 
                 if (postRequest.Images != null && postRequest.Images.Count > 0)
                 {
-                    foreach (var image in postRequest.Images)
+                    var distinctImages = postRequest.Images.DistinctBy(img => img.ImgUrl).ToList();
+                    postEntity.Images?.Clear(); 
+
+                    foreach (var image in distinctImages)
                     {
                         if (string.IsNullOrWhiteSpace(image.ImgUrl))
                         {
@@ -47,14 +55,13 @@ namespace SocialNetwork.Services.Services
                         var imageEntity = _mapper.Map<ImagesOfPostEntity>(image);
                         imageEntity.PostID = postEntity.PostID; 
 
-                        Console.WriteLine($"Adding Image - PostID: {imageEntity.PostID}, ImgUrl: {imageEntity.ImgUrl}");
-
                         await _imageRepository.AddAsync(imageEntity);
                     }
+
                     await _imageRepository.SaveChangeAsync();
                 }
 
-                return _mapper.Map<PostRequest>(postEntity);
+                return _mapper.Map<PostViewModel>(postEntity);
             }
             catch (DbUpdateException dbEx)
             {
@@ -71,12 +78,9 @@ namespace SocialNetwork.Services.Services
 
 
 
-
-
-
         public async Task<bool> DeletePostAsync(Guid postId)
         {
-            var postEntity = await _postRepository.GetByIDAsync(postId);
+            var postEntity = await _postRepository.GetByIDPostAsync(postId);
             if (postEntity == null)
             {
                 throw new Exception("Không có bài viết tương ứng với postId");
@@ -95,11 +99,10 @@ namespace SocialNetwork.Services.Services
 
         public async Task<PostViewModel> GetPostByIdAsync(Guid postId)
         {
-            // Truyền vào ID mà không cần chuyển đổi thành chuỗi
-            var post = await _postRepository.GetByIDAsync(postId);
+
+            var post = await _postRepository.GetByIDPostAsync(postId);
             if (post == null)
             {
-                // Thay vì ném ngoại lệ, bạn có thể trả về null
                 return null;
             }
             return _mapper.Map<PostViewModel>(post);
@@ -108,7 +111,7 @@ namespace SocialNetwork.Services.Services
 
         public async Task<PostViewModel> UpdatePostAsync(PostViewModel post)
         {
-            var postEntity = await _postRepository.GetByIDAsync(post.PostID);
+            var postEntity = await _postRepository.GetByIDPostAsync(post.PostID);
             if (postEntity == null)
             {
                 throw new Exception("Không tồn tại bài viết");
@@ -121,8 +124,8 @@ namespace SocialNetwork.Services.Services
 
         public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
         {
-            var posts = await _postRepository.GetAllAsync(); // Thay thế bằng phương thức phù hợp để lấy bài viết theo UserID
-            var userPosts = posts.Where(p => p.UserID == userId); // Lọc bài viết theo UserID
+            var posts = await _postRepository.GetAllAsync();
+            var userPosts = posts.Where(p => p.UserID == userId);
             return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
         }
     }

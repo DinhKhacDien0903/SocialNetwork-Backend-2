@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using SocialNetwork.DataAccess.SeedData;
 using SocialNetwork.Domain.Entities;
 using SocialNetwork.DTOs.Authorize;
+using SocialNetwork.Helpers.Hubs;
 using SocialNetwork.Services.AuttoMapper;
 using SocialNetwork.Web.Hubs;
 using SocialNetwork.Web.Middlewares;
@@ -39,7 +40,10 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-
+builder.Services.AddScoped(typeof(IPostHubService), typeof(PostHubService));
+builder.Services.AddScoped(typeof(IReactionPostService), typeof(ReactionPostService));
+builder.Services.AddScoped(typeof(IReactionPostRepository), typeof(ReactionPostRepository));
+builder.Services.AddScoped(typeof(IReactionRepository), typeof(ReactionRepository));
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 
@@ -197,6 +201,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chatPerson");
-
+app.MapHub<PostHub>("/Post");
 app.Run();
 
