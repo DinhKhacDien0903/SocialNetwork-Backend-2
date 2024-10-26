@@ -9,6 +9,7 @@ namespace SocialNetwork.Web.Hubs
     {
         private readonly UserManager<UserEntity> _userManager;  
         private readonly IChatHubService _chatHubService;
+        private const int MAX_MESSAGE_LENGTH = 500;
         public ChatHub(
             UserManager<UserEntity> userManager,
             IChatHubService chatHubService)
@@ -55,72 +56,24 @@ namespace SocialNetwork.Web.Hubs
             var sender = await ValidateCurrentAccount();
 
             var reciver = await _userManager.FindByIdAsync(param.ReciverId);
-            
-            var sendDate = DateTime.UtcNow.AddHours(7);
 
             param.Content = param.Content.Trim();
 
-            if(reciver == null)
+            if ( !await ValidateMessage(param, reciver.Id))
             {
-                await Clients.Caller.SendAsync("UserNotConnected", "User not found!");
-
-                return "";
+                return string.Empty;
             }
 
-            if (string.IsNullOrEmpty(param.Content) && param.Images.Count == 0)
+            var messageId = await SaveMessage(sender.Id, param);
+
+            if (param.Images.Any())
             {
-                await Clients.Caller.SendAsync("MessageValidateError", "Message cannot be empty");
-                return "";
+                await SaveMessageImages(messageId, param.Images);
             }
 
-            if (param.Content.Length > 500)
-            {
-                await Clients.Caller.SendAsync("MessageValidateTooLarge", "Message is too long. Max is 500 characters");
-                return "";
-            }
+            await NotifyReceiver(param.ReciverId, CreateMessageResponse(messageId, param));
 
-            var messageViewModel = new MessageViewModel
-            {
-                SenderID = sender.Id,
-                ReciverID = reciver.Id,
-                Content = param.Content,
-                CreatedAt = sendDate,
-                Images = param.Images
-            };
-
-            var messageID = await _chatHubService.AddMessagePersonAsync(messageViewModel);
-
-            if (param.Images.Count > 0)
-            {
-                var listImageViewModel = new List<MessageImageViewModel>();
-
-                foreach (var image in param.Images)
-                {
-                    listImageViewModel.Add(
-                        new MessageImageViewModel
-                        {
-                            MessageImageID = Guid.NewGuid().ToString(),
-                            MessageID = messageID,
-                            ImageUrl = image
-                        }
-                    );
-                }
-
-                await _chatHubService.AddMessageImagesAsync(listImageViewModel);
-            }
-
-            var messageResponse = new MessagePersonResponse
-            {
-                MessageID = messageID,
-                Content = param.Content,
-                Images = param.Images,
-                SendDate = sendDate,
-                Symbol = param.Symbol
-            }; 
-
-            await Clients.User(reciver.Id).SendAsync("ReceiveSpecitificMessage", messageResponse);
-
-            return messageID;
+            return messageId;
         }
 
         public async Task OnUserTyping(string reciverId)
@@ -155,5 +108,79 @@ namespace SocialNetwork.Web.Hubs
             return user;
         }
 
+        private async Task<bool> ValidateMessage(SendMessageToPersonRequest request, string receiver)
+        {
+            request.Content = request.Content?.Trim();
+
+            if (IsEmptyMessage(request))
+            {
+                await Clients.Caller.SendAsync("MessageValidateError", "Message cannot be empty");
+                return false;
+            }
+
+            if (IsMessageTooLong(request.Content))
+            {
+                await Clients.Caller.SendAsync("MessageValidateTooLarge", $"Message is too long. Max is {MAX_MESSAGE_LENGTH} characters");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsEmptyMessage(SendMessageToPersonRequest request)
+        {
+            return string.IsNullOrEmpty(request.Content)
+                && !request.Images.Any()
+                && request.Symbol == 0;
+        }
+
+        private bool IsMessageTooLong(string content)
+        {
+            return content?.Length > MAX_MESSAGE_LENGTH;
+        }
+
+        private async Task<string> SaveMessage(string senderId, SendMessageToPersonRequest request)
+        {
+            var messageViewModel = new MessageViewModel
+            {
+                SenderID = senderId,
+                ReciverID = request.ReciverId,
+                Content = request.Content,
+                CreatedAt = DateTime.UtcNow.AddHours(7),
+                Images = request.Images,
+                Symbol = request.Symbol
+            };
+
+            return await _chatHubService.AddMessagePersonAsync(messageViewModel);
+        }
+
+        private async Task SaveMessageImages(string messageId, List<string> images)
+        {
+            var messageImages = images.Select(image => new MessageImageViewModel
+            {
+                MessageImageID = Guid.NewGuid().ToString(),
+                MessageID = messageId,
+                ImageUrl = image
+            }).ToList();
+
+            await _chatHubService.AddMessageImagesAsync(messageImages);
+        }
+
+        private MessagePersonResponse CreateMessageResponse(string messageId, SendMessageToPersonRequest request)
+        {
+            return new MessagePersonResponse
+            {
+                MessageID = messageId,
+                Content = request.Content,
+                Images = request.Images,
+                SendDate = DateTime.UtcNow.AddHours(7),
+                Symbol = request.Symbol
+            };
+        }
+
+        private async Task NotifyReceiver(string receiverId, MessagePersonResponse response)
+        {
+            await Clients.User(receiverId).SendAsync("ReceiveSpecitificMessage", response);
+        }
     }
 }

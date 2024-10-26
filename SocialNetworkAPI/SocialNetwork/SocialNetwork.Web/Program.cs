@@ -49,12 +49,15 @@ builder.Services.AddScoped(typeof(IRefreshTokenRepository),typeof(RefreshTokenRe
 builder.Services.AddScoped(typeof(IMessageRepository),typeof(MessageRepository));
 builder.Services.AddScoped(typeof(IRelationshipRepository),typeof(RelationshipRepository));
 builder.Services.AddScoped(typeof(IMessageImagesRepository),typeof(MessageImagesRepository));
+builder.Services.AddScoped(typeof(IReactionRepository),typeof(ReactionRepository));
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
 builder.Services.AddScoped(typeof(IAuthorService), typeof(AuthorService));
 builder.Services.AddScoped(typeof(IChatHubService), typeof(ChatHubService));
+builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
 builder.Services.AddScoped(typeof(IRelationshipService), typeof(RelationshipService));
+builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
 
 
 builder.Services.AddHttpContextAccessor();
@@ -198,6 +201,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chatPerson");
+
+app.MapHub<ReactionHub>("/reactionMessage");
 
 app.Run();
 
