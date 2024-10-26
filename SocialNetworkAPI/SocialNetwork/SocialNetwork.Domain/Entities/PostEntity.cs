@@ -16,9 +16,8 @@
         [ForeignKey("UserID")]
         public UserEntity? User { get; set; }
 
-        public ICollection<ImagesOfPostEntity> Images { get; set; } /*= new List<ImagesOfPostEntity>();*/
+        public ICollection<ImagesOfPostEntity> Images { get; set; } 
 
-        public ICollection<ReactionPostEntity> Reactions { get; set; } /*= new List<ReactionPostEntity>();*/
-
+        public ICollection<ReactionPostEntity> Reactions { get; set; } 
     }
 }

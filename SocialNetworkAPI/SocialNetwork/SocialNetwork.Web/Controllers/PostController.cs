@@ -54,7 +54,7 @@ namespace SocialNetwork.Web.Controllers
             });
         }
 
-        [HttpPost]
+        [HttpPost("CreatePost")]
         public async Task<ActionResult<PostViewModel>> CreatePost([FromBody] PostRequest postViewModel)
         {
             if (!ModelState.IsValid)
