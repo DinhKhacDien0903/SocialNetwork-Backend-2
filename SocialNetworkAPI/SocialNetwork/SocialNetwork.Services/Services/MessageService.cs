@@ -5,18 +5,26 @@ namespace SocialNetwork.Services.Services
 {
     public class MessageService : IMessageService
     {
-        public readonly IMessageRepository _messageRepository;
+        private readonly IMessageRepository _messageRepository;
 
-        public readonly IMessageImagesRepository _messageImageRepository;
+        private readonly IMessageImagesRepository _messageImageRepository;
+
+        private readonly IReactionMessageRepository _reactionMessageRepository;
+
+        private readonly IReactionRepository _reactionRepository;
 
         private readonly IMapper _mapper;
         public MessageService(
             IMessageRepository messageRepository,
             IMessageImagesRepository messageImageRepository,
+            IReactionRepository reactionRepository,
+            IReactionMessageRepository reactionMessageRepository,
             IMapper mapper)
         {
             _messageRepository = messageRepository;
             _messageImageRepository = messageImageRepository;
+            _reactionRepository = reactionRepository;
+            _reactionMessageRepository = reactionMessageRepository;
             _mapper = mapper;
         }
         public async Task<IEnumerable<MessagePersonResponse>> GetAllMessagesAsync(string userId, string receiverId)
@@ -31,14 +39,22 @@ namespace SocialNetwork.Services.Services
                 {
                     var images = await _messageImageRepository.GetAllImageByMessageId(item.MessageID);
 
+                    var reactionId = await _reactionMessageRepository.GetReactionIdByMessageIdAsync(item.MessageID);
+
+                    var emotionType = await _reactionRepository.GetEmotionTypeByReactionIdAsync(reactionId, userId);
+
                     item.Images = images;
+
+                    item.EmotionType = Convert.ToInt32(string.IsNullOrEmpty(emotionType) ? -1 : emotionType);
                 }
+
                 return messagesResponse;
             }
             catch (Exception e)
             {
                 var x = e;
             }
+
             return new List<MessagePersonResponse>();
         }
     }

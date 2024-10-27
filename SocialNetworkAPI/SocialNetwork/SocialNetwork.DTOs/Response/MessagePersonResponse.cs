@@ -10,9 +10,14 @@
 
         public string? ReciverID { get; set; }
 
-        public int Symbol { get; set; }
+        public int? Symbol { get; set; }
+
+        public int? EmotionType { get; set; }
+
+        public int? TotalEmotion { get; set; }
 
         public DateTime? SendDate { get; set; }
+
         public List<string> Images { get; set; } = new List<string>();
     }
 }

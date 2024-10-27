@@ -84,10 +84,11 @@ namespace SocialNetwork.Web.Hubs
 
             var reactiondate = DateTime.UtcNow.AddHours(7);
 
-            await _reactionHubService.AddReaction(param, sender.Id);
+            var reactionId = await _reactionHubService.AddReaction(param, sender.Id);
 
             var reciverReactionResponse = new ReactionMessageResponse
             {
+                ReactionID = reactionId,
                 EmotionType = param.EmotionType,
                 MessageId = param.MessageId,
                 ReciverId = param.ReciverId,
@@ -95,7 +96,7 @@ namespace SocialNetwork.Web.Hubs
                 ReactionAt = reactiondate
             };
 
-            await Clients.User(param.ReciverId).SendAsync("ReceiveReaction", reciverReactionResponse);
+            await Clients.User(param.ReciverId).SendAsync("ReceiveReactionMessage", reciverReactionResponse);
         }
 
     }

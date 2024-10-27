@@ -2,6 +2,6 @@
 {
     public interface IReactionHubService
     {
-        Task AddReaction(ReactionMessageRequest param, string userId);
+        Task<string> AddReaction(ReactionMessageRequest param, string userId);
     }
 }

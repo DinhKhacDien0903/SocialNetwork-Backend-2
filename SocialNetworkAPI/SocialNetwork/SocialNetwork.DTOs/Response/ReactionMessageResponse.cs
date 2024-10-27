@@ -2,6 +2,8 @@
 {
     public class ReactionMessageResponse
     {
+        public string? ReactionID { get; set; }
+
         public string? MessageId { get; set; }
 
         public string? EmotionType { get; set; }
