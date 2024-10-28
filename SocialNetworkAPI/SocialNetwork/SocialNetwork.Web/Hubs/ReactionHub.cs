@@ -78,13 +78,12 @@ namespace SocialNetwork.Web.Hubs
             return user;
         }
 
-        public async Task AddReactionToMessage(ReactionMessageRequest param)
+        public async Task AddOrUpdateReactionToMessage(ReactionMessageRequest param)
         {
-            var sender = await _userManager.GetUserAsync(Context.User);
 
             var reactiondate = DateTime.UtcNow.AddHours(7);
 
-            var reactionId = await _reactionHubService.AddReaction(param, sender.Id);
+            var reactionId = await _reactionHubService.AddOrUpdateReaction(param);
 
             var reciverReactionResponse = new ReactionMessageResponse
             {
@@ -92,7 +91,7 @@ namespace SocialNetwork.Web.Hubs
                 EmotionType = param.EmotionType,
                 MessageId = param.MessageId,
                 ReciverId = param.ReciverId,
-                SenderId = sender.Id,
+                SenderId = param.SenderId,
                 ReactionAt = reactiondate
             };
 

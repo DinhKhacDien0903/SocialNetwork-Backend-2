@@ -123,6 +123,47 @@ namespace SocialNetwork.DataAccess.SeedData
                     await context.SaveChangesAsync();
                 }
             }
+            if (!await context.EmotionTypes.AnyAsync())
+            {
+                var emotionTypes = new List<EmotionTypeEntity>()
+                    {
+                        new EmotionTypeEntity
+                        {
+                            EmotionTypeID = "0",
+                            EmotionName = "Like"
+                        },
+                         new EmotionTypeEntity
+                        {
+                            EmotionTypeID = "1",
+                            EmotionName = "Love"
+                        },
+                        new EmotionTypeEntity
+                        {
+                            EmotionTypeID = "2",
+                            EmotionName = "HaHa"
+                        },
+                        new EmotionTypeEntity
+                        {
+                            EmotionTypeID = "3",
+                            EmotionName = "Wow"
+                        },
+                        new EmotionTypeEntity
+                        {
+                            EmotionTypeID = "4",
+                            EmotionName = "Sad"
+                        },
+                        new EmotionTypeEntity
+                        {
+                            EmotionTypeID = "5",
+                            EmotionName = "Angry"
+                        },
+
+                    };
+
+                context.EmotionTypes.AddRange(emotionTypes);
+
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

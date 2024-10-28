@@ -1,5 +1,7 @@
 ﻿
 
+using SocialNetwork.DTOs.Request;
+
 namespace SocialNetwork.DataAccess.Repositories
 {
     public class ReactionRepository : BaseRepository<ReactionEntity>, IReactionRepository
@@ -13,9 +15,20 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<string> GetEmotionTypeByReactionIdAsync(string reactionId, string userId)
         {
-            return await _context.Reactions.Where(x => x.ReactionID.Equals(reactionId) && x.UserID.Equals(userId))
+            return await _context.Reactions.Where(x => x.ReactionID.Equals(reactionId))
                 .Select(x => x.EmotionTypeID)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<ReactionEntity> GetReactionIdByMessageIdAndUserId(ReactionMessageRequest param)
+        {
+            var result = from reaction in _context.Reactions
+                         join reactionMessage in _context.ReactionMessages
+                         on reaction.ReactionID equals reactionMessage.ReactionID
+                         where reaction.UserID.Equals(param.SenderId) && reactionMessage.MessageID.Equals(param.MessageId)
+                         select reaction;
+
+            return await result.FirstOrDefaultAsync();
         }
     }
 }
