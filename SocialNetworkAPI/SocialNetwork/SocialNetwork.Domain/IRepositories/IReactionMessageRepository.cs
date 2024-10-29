@@ -2,6 +2,6 @@
 {
     public interface IReactionMessageRepository : IBaseRepository<ReactionMessageEntity>
     {
-        Task<string> GetReactionIdByMessageIdAsync(string messageId);
+        Task<List<string>> GetReactionIdByMessageIdAsync(string messageId);
     }
 }

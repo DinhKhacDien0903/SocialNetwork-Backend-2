@@ -13,11 +13,11 @@ namespace SocialNetwork.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<string> GetEmotionTypeByReactionIdAsync(string reactionId, string userId)
+        public async Task<List<string>> GetEmotionTypeByReactionIdAsync(List<string> reactionIds, string userId)
         {
-            return await _context.Reactions.Where(x => x.ReactionID.Equals(reactionId))
+            return await _context.Reactions.Where(x => reactionIds.Contains(x.ReactionID))
                 .Select(x => x.EmotionTypeID)
-                .FirstOrDefaultAsync();
+                .ToListAsync();
         }
 
         public async Task<ReactionEntity> GetReactionIdByMessageIdAndUserId(ReactionMessageRequest param)

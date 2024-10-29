@@ -41,11 +41,12 @@ namespace SocialNetwork.Services.Services
 
                     var reactionId = await _reactionMessageRepository.GetReactionIdByMessageIdAsync(item.MessageID);
 
-                    var emotionType = await _reactionRepository.GetEmotionTypeByReactionIdAsync(reactionId, userId);
+                    var emotionTypes = await _reactionRepository.GetEmotionTypeByReactionIdAsync(reactionId, userId);
 
                     item.Images = images;
 
-                    item.EmotionType = Convert.ToInt32(string.IsNullOrEmpty(emotionType) ? -1 : emotionType);
+                    item.EmotionType = emotionTypes.Select(int.Parse).ToList();
+
                 }
 
                 return messagesResponse;

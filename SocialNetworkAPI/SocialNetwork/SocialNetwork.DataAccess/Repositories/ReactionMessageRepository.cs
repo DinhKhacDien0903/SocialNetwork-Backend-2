@@ -10,11 +10,11 @@ namespace SocialNetwork.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<string> GetReactionIdByMessageIdAsync(string messageId)
+        public async Task<List<string>> GetReactionIdByMessageIdAsync(string messageId)
         {
             return await _context.ReactionMessages.Where(x => x.MessageID.Equals(messageId))
                 .Select(x => x.ReactionID)
-                .FirstOrDefaultAsync();
+                .ToListAsync();
         }
     }
 }

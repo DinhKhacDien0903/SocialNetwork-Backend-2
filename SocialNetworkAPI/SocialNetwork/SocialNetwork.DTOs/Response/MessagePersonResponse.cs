@@ -12,7 +12,7 @@
 
         public int? Symbol { get; set; }
 
-        public int? EmotionType { get; set; }
+        public List<int>? EmotionType { get; set; }
 
         public int? TotalEmotion { get; set; }
 
