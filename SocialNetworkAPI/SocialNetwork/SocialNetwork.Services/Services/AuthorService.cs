@@ -296,7 +296,12 @@ namespace SocialNetwork.Services.Services
                 throw new Exception("HttpContext is not available.");
             }
 
-            httpContext.Response.Cookies.Delete(name);
+            httpContext.Response.Cookies.Delete(name, new CookieOptions
+            {
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                HttpOnly = true,
+            });
         }
 
         public async Task UpdateStatusActiveUser(string userId, bool isActive)

@@ -1,10 +1,11 @@
-﻿using SocialNetwork.DTOs.Request;
+﻿using SocialNetwork.DTOs.DTOs;
+using SocialNetwork.DTOs.Request;
 
 namespace SocialNetwork.Domain.IRepositories
 {
     public interface IReactionRepository : IBaseRepository<ReactionEntity>
     {
-        Task<List<string>> GetEmotionTypeByReactionIdAsync(List<string> reactionId,string userId);
+        Task<List<ReactionByUser>> GetReactionUserByReactionIdAsync(List<string> reactionId,string userId);
 
         Task<ReactionEntity> GetReactionIdByMessageIdAndUserId(ReactionMessageRequest reactionMessage);
     }

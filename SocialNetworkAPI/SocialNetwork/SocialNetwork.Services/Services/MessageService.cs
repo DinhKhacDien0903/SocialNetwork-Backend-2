@@ -41,11 +41,11 @@ namespace SocialNetwork.Services.Services
 
                     var reactionId = await _reactionMessageRepository.GetReactionIdByMessageIdAsync(item.MessageID);
 
-                    var emotionTypes = await _reactionRepository.GetEmotionTypeByReactionIdAsync(reactionId, userId);
+                    var reactions = await _reactionRepository.GetReactionUserByReactionIdAsync(reactionId, userId);
 
                     item.Images = images;
 
-                    item.EmotionType = emotionTypes.Select(int.Parse).ToList();
+                    item.ReactionByUser = reactions;
 
                 }
 

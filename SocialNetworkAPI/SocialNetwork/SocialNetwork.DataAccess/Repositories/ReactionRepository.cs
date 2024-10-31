@@ -1,5 +1,6 @@
 ﻿
 
+using SocialNetwork.DTOs.DTOs;
 using SocialNetwork.DTOs.Request;
 
 namespace SocialNetwork.DataAccess.Repositories
@@ -13,10 +14,15 @@ namespace SocialNetwork.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<List<string>> GetEmotionTypeByReactionIdAsync(List<string> reactionIds, string userId)
+        public async Task<List<ReactionByUser>> GetReactionUserByReactionIdAsync(List<string> reactionIds, string userId)
         {
             return await _context.Reactions.Where(x => reactionIds.Contains(x.ReactionID))
-                .Select(x => x.EmotionTypeID)
+                .Select(x => new ReactionByUser
+                {
+                    UserId = x.UserID,
+                    EmotionType = x.EmotionTypeID,
+                    ReactionId = x.ReactionID,
+                })
                 .ToListAsync();
         }
 

@@ -1,4 +1,6 @@
-﻿namespace SocialNetwork.DTOs.Response
+﻿using SocialNetwork.DTOs.DTOs;
+
+namespace SocialNetwork.DTOs.Response
 {
     public class MessagePersonResponse
     {
@@ -12,7 +14,7 @@
 
         public int? Symbol { get; set; }
 
-        public List<int>? EmotionType { get; set; }
+        public List<ReactionByUser>? ReactionByUser { get; set; }
 
         public int? TotalEmotion { get; set; }
 
