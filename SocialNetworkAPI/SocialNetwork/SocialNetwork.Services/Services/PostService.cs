@@ -1,10 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace SocialNetwork.Services.Services
 {
@@ -12,14 +8,18 @@ namespace SocialNetwork.Services.Services
     {
         private readonly IPostRepository _postRepository ;
         private readonly IMapper _mapper ;
+        private readonly UserManager<UserEntity> _userManager;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
-        public PostService(IPostRepository postRepository, IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
+        public PostService(IPostRepository postRepository,
+            UserManager<UserEntity> userManager
+            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
         {
+            _userManager = userManager;
             _postRepository = postRepository; 
             _imageRepository = imageRepository;
             _mapper = mapper;
         }
-        public async Task<PostRequest> CreatePostAsync(PostRequest postRequest)
+        public async Task<PostRequest> CreatePostAsync(PostRequest postRequest,string userID)
         {
             if (string.IsNullOrWhiteSpace(postRequest.Content))
             {
@@ -29,11 +29,14 @@ namespace SocialNetwork.Services.Services
             try
             {
                 var postEntity = _mapper.Map<PostEntity>(postRequest);
+                postEntity.PostID=Guid.NewGuid().ToString();
 
+                postEntity.UserID=userID;
+               
                 Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
 
                 await _postRepository.AddAsync(postEntity);
-                await _postRepository.SaveChangeAsync();
+                  await _postRepository.SaveChangeAsync();
 
                 if (postRequest.Images != null && postRequest.Images.Count > 0)
                 {
@@ -90,16 +93,15 @@ namespace SocialNetwork.Services.Services
         public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync()
         {
             var posts = await _postRepository.GetAllAsync();
+            
             return _mapper.Map<IEnumerable<PostViewModel>>(posts);
         }
 
         public async Task<PostViewModel> GetPostByIdAsync(Guid postId)
         {
-            // Truyền vào ID mà không cần chuyển đổi thành chuỗi
             var post = await _postRepository.GetByIDAsync(postId);
             if (post == null)
             {
-                // Thay vì ném ngoại lệ, bạn có thể trả về null
                 return null;
             }
             return _mapper.Map<PostViewModel>(post);
@@ -121,8 +123,8 @@ namespace SocialNetwork.Services.Services
 
         public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
         {
-            var posts = await _postRepository.GetAllAsync(); // Thay thế bằng phương thức phù hợp để lấy bài viết theo UserID
-            var userPosts = posts.Where(p => p.UserID == userId); // Lọc bài viết theo UserID
+            var posts = await _postRepository.GetAllAsync(); 
+            var userPosts = posts.Where(p => p.UserID == userId); 
             return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
         }
     }

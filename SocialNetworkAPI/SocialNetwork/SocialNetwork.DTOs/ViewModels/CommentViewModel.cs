@@ -10,25 +10,26 @@ namespace SocialNetwork.DTOs.ViewModels
 {
     public class CommentViewModel
     {
-        public Guid CommentID { get; set; }
+        public string CommentID { get; set; }
 
         public string UserID { get; set; }
 
-        public Guid PostID { get; set; }
+        public string PostID { get; set; }
 
-        public Guid? ParentCommentID { get; set; }
+        //public string? ParentCommentID { get; set; }
 
         public string Content { get; set; }
 
-        public bool IsDelete { get; set; } = false;
+        public string UserName { get; set; }
 
-        public DateTime CreatedAt { get; set; } 
+        //public bool IsDelete { get; set; } = false;
 
-        public DateTime? UpdatedAt { get; set; } 
+        //public DateTime CreatedAt { get; set; } 
 
-        public string UserName {  get; set; }
+        //public DateTime? UpdatedAt { get; set; } 
 
-       public List<CommentViewModel> Replies {  get; set; }=new List<CommentViewModel>();
+
+        //public List<CommentViewModel> Replies {  get; set; }=new List<CommentViewModel>();
 
     }
 }

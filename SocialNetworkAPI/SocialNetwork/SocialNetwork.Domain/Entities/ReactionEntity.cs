@@ -3,7 +3,7 @@
     public class ReactionEntity : BaseEntity
     {
         [Key]
-        public string ReactionID { get; set; }
+        public string ReactionID { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
         public string UserID { get; set; }

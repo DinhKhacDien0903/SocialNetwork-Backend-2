@@ -18,9 +18,17 @@ namespace SocialNetwork.DTOs.ViewModels
         [Required(ErrorMessage = "Content is required.")]
         public string Content { get; set; }
 
-        public bool IsDelete { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedAt { get; set; }
+        public string UserFirstName {  get; set; }
+
+        public string UserLastName {  get; set; }
+
+        public string AvatarUser { get; set; }
+
+        public string CurrentEmotionId { get; set; }
+
+        public string CurrentEmotionName { get; set; }
+
+        public List<ReactionPostViewModel> Reactions {  get; set; }=new List<ReactionPostViewModel>();
 
         public List<ImagesOfPostViewModel> Images { get; set; } = new List<ImagesOfPostViewModel>();
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using SocialNetwork.Domain.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 
 namespace SocialNetwork.DataAccess.DataContext
@@ -135,7 +136,12 @@ namespace SocialNetwork.DataAccess.DataContext
                       .HasForeignKey(c => c.ParentCommentID)
                       .OnDelete(DeleteBehavior.NoAction);  // No cascade delete for parent-child relationship
             });
+           // modelBuilder.Entity<ReactionEntity>()
+           //.HasKey(r => r.ReactionID); // Đảm bảo rằng ReactionID là khóa chính
 
+           // modelBuilder.Entity<ReactionEntity>()
+           //     .Property(r => r.ReactionID)
+           //     .ValueGeneratedOnAdd();
 
 
             modelBuilder.Entity<ReactionGroupChatMessageEntity>(entity =>

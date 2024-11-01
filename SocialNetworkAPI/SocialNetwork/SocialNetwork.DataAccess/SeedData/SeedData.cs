@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace SocialNetwork.DataAccess.SeedData
 {
@@ -9,11 +10,12 @@ namespace SocialNetwork.DataAccess.SeedData
         {
             var context = serviceProvider.GetRequiredService<SocialNetworkdDataContext>();
 
+            // Kiểm tra và tạo người dùng
             if (!userManager.Users.Any())
             {
                 var users = new List<UserEntity>();
 
-                // Seed 10 users
+                // Seed 5 người dùng
                 for (int i = 1; i <= 5; i++)
                 {
                     var user = new UserEntity
@@ -22,9 +24,9 @@ namespace SocialNetwork.DataAccess.SeedData
                         Email = $"user{i}@test.com",
                         FirstName = $"First{i}",
                         LastName = $"Last{i}",
-                        IsActive = i <= 8, // 8 users online, 2 users offline
+                        IsActive = i <= 4, // 4 người dùng online, 1 người offline
                         CreatedAt = DateTime.UtcNow.AddDays(-i),
-                        LastLogin = i <= 8 ? DateTime.UtcNow : (DateTime?)null, // Last login for online users
+                        LastLogin = i <= 4 ? DateTime.UtcNow : (DateTime?)null,
                         EmailConfirmed = true
                     };
 
@@ -36,92 +38,173 @@ namespace SocialNetwork.DataAccess.SeedData
                     }
                 }
 
-                // Save users to the database
-                await context.SaveChangesAsync(); // Ensure users are saved before creating relationships
+                // Lưu người dùng vào cơ sở dữ liệu
+                await context.SaveChangesAsync();
 
                 users = await context.Users.Select(x => x).ToListAsync();
-                // Seed relationships for each user
-                if (!context.Set<RelationshipEntity>().Any())
+
+                // Seed các bài viết
+                if (!context.Set<PostEntity>().Any())
                 {
-                    var relationships = new List<RelationshipEntity>();
+                    var posts = new List<PostEntity>();
+                    var reactionPosts = new List<ReactionPostEntity>();
 
                     foreach (var user in users)
                     {
-                        // Tạo 5 mối quan hệ bạn bè
-                        var friends = users.Where(u => u.Id != user.Id).Take(5).ToList();
-
-                        foreach (var friend in friends)
+                        for (int j = 1; j <= 3; j++)
                         {
-                            // Thêm quan hệ 2 chiều giữa user và bạn
-                            //relationships.Add(new RelationshipEntity
-                            //{
-                            //    UserID = user.Id,
-                            //    FriendID = friend.Id,
-                            //    IsDeleted = false
-                            //});
-
-                            //relationships.Add(new RelationshipEntity
-                            //{
-                            //    UserID = friend.Id,
-                            //    FriendID = user.Id,
-                            //    IsDeleted = false
-                            //});
-                            var x = new RelationshipEntity
+                            var post = new PostEntity
                             {
+                                PostID = Guid.NewGuid().ToString(),
                                 UserID = user.Id,
-                                FriendID = friend.Id,
-                                IsDeleted = false
+                                Content = $"This is post number {j} by {user.UserName}",
+                                IsDelete = false,
+                                Images = new List<ImagesOfPostEntity>()
                             };
 
-                            context.Relationships.Add(x);
-                            await context.SaveChangesAsync();
-                        }
-                    }
-                    // Add relationships to the context and save to the database
-                    //context.Relationships.AddRange(relationships);
-                    //await context.SaveChangesAsync(); // Ensure relationships are saved before creating messages
-                }
-
-                // Seed messages between friends
-                if (!context.Set<MessagesEntity>().Any())
-                {
-                    var messages = new List<MessagesEntity>();
-
-                    foreach (var relationship in context.Set<RelationshipEntity>())
-                    {
-                        var sender = users.FirstOrDefault(u => u.Id == relationship.UserID);
-                        var receiver = users.FirstOrDefault(u => u.Id == relationship.FriendID);
-
-                        if (sender != null && receiver != null)
-                        {
-                            // Tạo tin nhắn từ sender đến receiver
-                            messages.Add(new MessagesEntity
+                            // Thêm hình ảnh cho mỗi bài đăng
+                            for (int k = 1; k <= 2; k++)
                             {
-                                MessageID = Guid.NewGuid().ToString(),
-                                Content = $"Hello from {sender.UserName} to {receiver.UserName}",
-                                SenderID = sender.Id,
-                                ReciverID = receiver.Id,
-                                IsDeleted = false,
-                                CreatedAt = DateTime.UtcNow.AddMinutes(-10)
-                            });
+                                post.Images.Add(new ImagesOfPostEntity
+                                {
+                                    ImagesOfPostID = Guid.NewGuid().ToString(),
+                                    PostID = post.PostID,
+                                    ImgUrl = $"https://example.com/image{k}_{post.PostID}.jpg",
+                                    IsDeleted = false
+                                });
+                            }
 
-                            // Tạo tin nhắn phản hồi từ receiver đến sender
-                            messages.Add(new MessagesEntity
+                            posts.Add(post);
+
+                            // Tạo và lưu phản ứng cho bài đăng
+                            foreach (var emotionType in context.Set<EmotionTypeEntity>().ToList())
                             {
-                                MessageID = Guid.NewGuid().ToString(),
-                                Content = $"Reply from {receiver.UserName} to {sender.UserName}",
-                                SenderID = receiver.Id,
-                                ReciverID = sender.Id,
-                                IsDeleted = false,
-                                CreatedAt = DateTime.UtcNow.AddMinutes(-5)
-                            });
+                                var reaction = new ReactionEntity
+                                {
+                                    ReactionID = Guid.NewGuid().ToString(),
+                                    UserID = user.Id,
+                                    EmotionTypeID = emotionType.EmotionTypeID,
+                                    IsDeleted = false
+                                };
+
+                                await context.Set<ReactionEntity>().AddAsync(reaction);
+                                await context.SaveChangesAsync(); // Lưu lại để ReactionID có trong cơ sở dữ liệu
+
+                                reactionPosts.Add(new ReactionPostEntity
+                                {
+                                    ReactionID = reaction.ReactionID,
+                                    PostID = post.PostID
+                                });
+                            }
                         }
                     }
 
-                    // Add messages to the context and save to the database
-                    context.AddRange(messages);
+                    // Lưu các bài đăng và liên kết ReactionPostEntity
+                    await context.Set<PostEntity>().AddRangeAsync(posts);
+                    await context.Set<ReactionPostEntity>().AddRangeAsync(reactionPosts);
                     await context.SaveChangesAsync();
                 }
+
+
+                // Seed bình luận
+                if (!context.Set<CommentEntity>().Any())
+                {
+                    var comments = new List<CommentEntity>();
+                    var posts = await context.Set<PostEntity>().ToListAsync();
+
+                    foreach (var post in posts)
+                    {
+                        foreach (var user in users)
+                        {
+                            var comment = new CommentEntity
+                            {
+                                CommentID = Guid.NewGuid().ToString(),
+                                UserID = user.Id,
+                                PostID = post.PostID,
+                                Content = $"This is a comment by {user.UserName} on post {post.PostID}",
+                                IsDelete = false,
+                                Replies = new List<CommentEntity>()
+                            };
+
+                            comments.Add(comment);
+
+                            // Tạo trả lời cho bình luận chính
+                            for (int i = 1; i <= 2; i++)
+                            {
+                                var reply = new CommentEntity
+                                {
+                                    CommentID = Guid.NewGuid().ToString(),
+                                    UserID = user.Id,
+                                    PostID = post.PostID,
+                                    ParentCommentID = comment.CommentID,
+                                    Content = $"This is reply {i} to comment {comment.CommentID} by {user.UserName}",
+                                    IsDelete = false
+                                };
+
+                                comment.Replies.Add(reply);
+                                comments.Add(reply);
+                            }
+                        }
+                    }
+
+                    await context.Set<CommentEntity>().AddRangeAsync(comments);
+                    await context.SaveChangesAsync();
+                }
+
+                // Seed phản ứng cho bình luận
+                if (!context.Set<ReactionCommentEntity>().Any())
+                {
+                    var reactionComments = new List<ReactionCommentEntity>();
+                    var comments = await context.Set<CommentEntity>().ToListAsync();
+
+                    foreach (var comment in comments)
+                    {
+                        foreach (var user in users)
+                        {
+                            foreach (var emotionType in await context.Set<EmotionTypeEntity>().ToListAsync())
+                            {
+                                var reaction = new ReactionEntity
+                                {
+                                    ReactionID = Guid.NewGuid().ToString(),
+                                    UserID = user.Id,
+                                    EmotionTypeID = emotionType.EmotionTypeID,
+                                    IsDeleted = false
+                                };
+
+                                await context.Set<ReactionEntity>().AddAsync(reaction);
+
+                                reactionComments.Add(new ReactionCommentEntity
+                                {
+                                    ReactionID = reaction.ReactionID,
+                                    CommentID = comment.CommentID,
+                                    Reaction = reaction,
+                                    Comment = comment
+                                });
+                            }
+                        }
+                    }
+
+                    await context.Set<ReactionCommentEntity>().AddRangeAsync(reactionComments);
+                    await context.SaveChangesAsync();
+                }
+
+                // Seed loại cảm xúc
+
+            }
+            if (!context.Set<EmotionTypeEntity>().Any())
+            {
+                var emotionTypes = new List<EmotionTypeEntity>
+                    {
+                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Like" },
+                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Love" },
+                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Haha" },
+                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Wow" },
+                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Sad" },
+                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Angry" }
+                    };
+
+                await context.Set<EmotionTypeEntity>().AddRangeAsync(emotionTypes);
+                await context.SaveChangesAsync();
             }
         }
     }

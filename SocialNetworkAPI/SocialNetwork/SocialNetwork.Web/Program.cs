@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 using SocialNetwork.DataAccess.SeedData;
 using SocialNetwork.Domain.Entities;
 using SocialNetwork.DTOs.Authorize;
+using SocialNetwork.Helpers.Hubs;
 using SocialNetwork.Services.AuttoMapper;
+using SocialNetwork.Services.Unit;
 using SocialNetwork.Web.Hubs;
 using SocialNetwork.Web.Middlewares;
 
@@ -49,7 +51,8 @@ builder.Services.AddScoped(typeof(IRefreshTokenRepository),typeof(RefreshTokenRe
 builder.Services.AddScoped(typeof(IMessageRepository),typeof(MessageRepository));
 builder.Services.AddScoped(typeof(IRelationshipRepository),typeof(RelationshipRepository));
 builder.Services.AddScoped(typeof(IMessageImagesRepository),typeof(MessageImagesRepository));
-builder.Services.AddScoped(typeof(IReactionRepository),typeof(ReactionRepository));
+builder.Services.AddScoped(typeof(IReactionPostRepository), typeof(ReactionPostRepository));
+builder.Services.AddScoped(typeof(IReactionRepository), typeof(ReactionRepository));
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
@@ -58,6 +61,12 @@ builder.Services.AddScoped(typeof(IChatHubService), typeof(ChatHubService));
 builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
 builder.Services.AddScoped(typeof(IRelationshipService), typeof(RelationshipService));
 builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
+builder.Services.AddScoped<IPostHubService, PostHubService>();
+builder.Services.AddScoped(typeof(IReactionPostService), typeof(ReactionPostService));
+
+
+
+builder.Services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
 
 
 builder.Services.AddHttpContextAccessor();
@@ -202,6 +211,7 @@ app.MapControllers();
 
 app.MapHub<ChatHub>("/chatPerson");
 
+    
 app.MapHub<ReactionHub>("/reactionMessage");
 
 app.Run();

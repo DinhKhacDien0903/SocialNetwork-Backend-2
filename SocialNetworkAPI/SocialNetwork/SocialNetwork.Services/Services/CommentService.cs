@@ -1,74 +1,73 @@
-﻿using SocialNetwork.DTOs.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Azure.Core;
+using SocialNetwork.Services.Unit;
 
-namespace SocialNetwork.Services.Services
-{                               
-    public class CommentService : ICommentService
+public class CommentService : ICommentService
+{
+    private readonly ICommentRepositories _commentRepositories;
+    private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
+
+
+    public CommentService(ICommentRepositories commentRepositories, IMapper mapper, IUnitOfWork unitOfWork)
     {
-        private readonly ICommentRepositories _commentRepositories;
-        private readonly IMapper _mapper;
+        _commentRepositories = commentRepositories;
+        _mapper = mapper;
+        _unitOfWork = unitOfWork;
+    }
 
-        public CommentService(ICommentRepositories  commentRepositories, IMapper mapper)
-        {
-            _commentRepositories = commentRepositories;
-            _mapper = mapper;
-        }
-        public async Task<CommentViewModel> AddCommentAsycn(CommentViewModel commentViewModel)
-        {
-            var comments =  _mapper.Map<CommentEntity>(commentViewModel);
-            var result= await _commentRepositories.AddCommentAsync(comments);
-            return _mapper.Map<CommentViewModel>(result);   
+    public async Task<CommentViewModel> AddCommentAsync(CommentRequest commentRequest)
+    {
+        if (string.IsNullOrEmpty(commentRequest.Content))
+            throw new ArgumentException("Content cannot be empty.");
+        
 
-        }
-       
+        var commentEntity = _mapper.Map<CommentEntity>(commentRequest);
+        commentEntity.CommentID = Guid.NewGuid().ToString();
+        await _commentRepositories.AddCommentAsync(commentEntity);
+        await _unitOfWork.SaveChangesAsync();
+        return _mapper.Map<CommentViewModel>(commentRequest);
+    }
 
-        public async Task DeleteCommentAsycn(Guid commentId)
-        {
-           var comment= await _commentRepositories.GetCommentByIdAsync(commentId);
-            if (comment == null)
-            {
-                throw new Exception("comment not found");
-            }
-            comment.IsDelete = true;
-            await _commentRepositories.UpdateAsycn(comment);
-        }
-            
-        public async Task<IEnumerable<CommentViewModel>> GetCommentByPostIdAsycn(Guid postId)
-        {
-            var commentById=await _commentRepositories.GetCommentsByPostIdAsync(postId);
 
-            var commentViewModel= _mapper.Map<IEnumerable<CommentViewModel>>(commentById);
-            //foreach (var comment in commentById)
-            //{
-            //    var replies= await _commentRepositories.GetRepliesByCommentIdAsync(comment.CommentID);
-            //    comment.Replies= _mapper.Map<List<CommentViewModel>>(replies);
-            //}
-            return commentViewModel;
-        }
+    public async Task DeleteCommentAsync(string commentId)
+    {
+        await _commentRepositories.DeleteCommentAsync(commentId);
+    }
 
-        public async Task<IEnumerable<CommentViewModel>> GetRepliesByCommentIdAsycn(Guid parentCommentId)
-        {
-            var repliesByComment=await _commentRepositories.GetRepliesByCommentIdAsync(parentCommentId);
-            return _mapper.Map<IEnumerable<CommentViewModel>>(parentCommentId);
-        }
 
-        public async Task<CommentViewModel> UpdateCommentAsycm(Guid commentId, CommentViewModel comment)
-        {
-            var commentEntity = await _commentRepositories.GetCommentByIdAsync(comment.CommentID);
-            if (commentEntity == null)
-            {
-                throw new Exception("Comment not found");
-            }
+    public async Task<IEnumerable<CommentViewModel>> GetAllCommentAsync()
+    {
+        var comments = await _commentRepositories.GetAllAsync();
+        return _mapper.Map<IEnumerable<CommentViewModel>>(comments);
+    }
 
-            commentEntity.Content = comment.Content;
-            commentEntity.UpdatedAt = DateTime.UtcNow;
+    public async Task<CommentViewModel> GetCommentByIdAsync(string commentId)
+    {
+        var comment = await _commentRepositories.GetCommentByIdAsync(commentId);
+        if (comment == null)
+            throw new KeyNotFoundException("Comment not found.");
 
-            var updatedComment = await _commentRepositories.UpdateAsycn(commentEntity);
-            return _mapper.Map<CommentViewModel>(updatedComment);
-        }
+        return _mapper.Map<CommentViewModel>(comment);
+    }
+
+    public async Task<IEnumerable<CommentViewModel>> GetCommentByPostIdAsync(string postId)
+    {
+        var comments = await _commentRepositories.GetCommentsByPostIdAsync(postId);
+        return _mapper.Map<IEnumerable<CommentViewModel>>(comments);
+    }
+
+    public async Task<IEnumerable<CommentViewModel>> GetRepliesByCommentIdAsync(string parentCommentId)
+    {
+        var replies = await _commentRepositories.GetRepliesByCommentIdAsync(parentCommentId);
+        return _mapper.Map<IEnumerable<CommentViewModel>>(replies);
+    }
+
+    public async Task UpdateCommentAsync(CommentViewModel commentViewModel)
+    {
+        var comment = await _commentRepositories.GetCommentByIdAsync(commentViewModel.CommentID);
+        if (comment == null)
+            throw new KeyNotFoundException("Comment not found.");
+         _mapper.Map(commentViewModel, comment);
+        await _commentRepositories.UpdateCommentAsync(comment);
     }
 }

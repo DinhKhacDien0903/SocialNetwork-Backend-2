@@ -1,84 +1,92 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using SocialNetwork.DTOs.ViewModels;
+﻿    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using SocialNetwork.Domain.Entities;
+    using SocialNetwork.DTOs.ViewModels;
+    using System.Security.Claims;
 
-namespace SocialNetwork.Web.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PostController : ControllerBase
+    namespace SocialNetwork.Web.Controllers
     {
-        private readonly IPostService _postService;
-
-        public PostController(IPostService postService)
+        [Route("api/[controller]")]
+        [ApiController]
+        public class PostController : ControllerBase
         {
-            _postService = postService;
-        }
+            private readonly IPostService _postService;
+            private readonly IPostHubService _postHubService;
 
-        // Lấy tất cả các bài viết
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts()
-        {
-            var posts = await _postService.GetAllPostsAsync();
-            return Ok(posts);
-        }
-
-        // Lấy bài viết theo ID
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PostViewModel>> GetPostById(Guid id)
-        {
-            var post = await _postService.GetPostByIdAsync(id);
-            if (post == null)
+            public PostController(IPostService postService, IPostHubService postHubService)
             {
-                return NotFound("Bài viết không tồn tại.");
+                _postService = postService;
+                _postHubService = postHubService;
             }
-            return Ok(post);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<PostRequest>> CreatePost(PostRequest postViewModel)
-        {
-            if (!ModelState.IsValid)
+            [HttpGet("All")]
+            public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts()
             {
-                return BadRequest(ModelState);
+                //var lastName=UserInforEntity.
+                var posts = await _postService.GetAllPostsAsync();
+                return Ok(posts);
             }
 
-            var createdPost = await _postService.CreatePostAsync(postViewModel);
-            return Ok(createdPost);
-        }
 
-
-
-        // Cập nhật bài viết
-        [HttpPut("{id}")]
-        public async Task<ActionResult<PostViewModel>> UpdatePost(Guid id, [FromBody] PostViewModel postViewModel)
-        {
-            if (!ModelState.IsValid)
+            [HttpGet("{id}")]
+            public async Task<ActionResult<PostViewModel>> GetPostById(Guid id)
             {
-                return BadRequest(ModelState);
+                var post = await _postService.GetPostByIdAsync(id);
+                if (post == null)
+                {
+                    return NotFound("Bài viết không tồn tại.");
+                }
+                return Ok(post);
             }
 
-            postViewModel.PostID = id; // Đảm bảo ID trong URL và body khớp nhau
-            var updatedPost = await _postService.UpdatePostAsync(postViewModel);
-            if (updatedPost == null)
+            [HttpPost]
+            public async Task<ActionResult<PostRequest>> CreatePost(PostRequest postViewModel)
             {
-                return NotFound("Bài viết không tồn tại.");
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var createdPost = await _postService.CreatePostAsync(postViewModel, userId);
+
+                await _postHubService.SendPostAsycn(createdPost);
+
+                return Ok(createdPost);
             }
 
-            return Ok(updatedPost);
-        }
-
-        // Xóa bài viết (soft delete)
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePost(Guid id)
-        {
-            var result = await _postService.DeletePostAsync(id);
-            if (!result)
+            [HttpPut("{id}")]
+            public async Task<ActionResult<PostViewModel>> UpdatePost(Guid id, [FromBody] PostViewModel postViewModel)
             {
-                return NotFound("Bài viết không tồn tại.");
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                postViewModel.PostID = id;
+                var updatedPost = await _postService.UpdatePostAsync(postViewModel);
+
+                if (updatedPost == null)
+                {
+                    return NotFound("Bài viết không tồn tại.");
+                }
+
+                //await _postHubService.SendUpdateAsycn(updatedPost);
+
+                return Ok(updatedPost);
             }
 
-            return NoContent();
+            [HttpDelete("{id}")]
+            public async Task<ActionResult> DeletePost(Guid id)
+            {
+                var result = await _postService.DeletePostAsync(id);
+                if (!result)
+                {
+                    return NotFound("Bài viết không tồn tại.");
+                }
+
+                //await _postHubService.SendDeleteAsycn(id);
+
+                return NoContent();
+            }
         }
     }
-}

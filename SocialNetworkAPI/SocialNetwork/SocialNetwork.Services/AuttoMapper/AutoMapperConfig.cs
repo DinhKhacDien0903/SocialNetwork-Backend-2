@@ -10,17 +10,27 @@ namespace SocialNetwork.Services.AuttoMapper
             //CreateMap<UserEntity, UserViewModel>();
             //CreateMap<UserViewModel, UserEntity>();
 
+
+            //post
             CreateMap<PostEntity, PostViewModel>().ReverseMap();
             CreateMap<PostEntity, PostRequest>().ReverseMap();
-            //CreateMap<PostViewModel,PostRequest>.ReverseMap();
-            
+
+            //image
             CreateMap<ImagesOfPostEntity, ImagesOfPostViewModel>().ReverseMap();
 
-            CreateMap<PostViewModel, PostEntity>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+            //comment
+            CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
+            CreateMap<CommentEntity, CommentRequest>().ReverseMap();
+            CreateMap<CommentEntity, CommentRespone>().ReverseMap();
+            CreateMap<CommentViewModel,CommentRequest>().ReverseMap();
 
-            CreateMap<ImagesOfPostViewModel, ImagesOfPostEntity>();
-            CreateMap<CommentViewModel,CommentEntity>().ReverseMap();
+            //reactionPost
+            CreateMap<ReactionPostEntity, ReactionPostViewModel>().ReverseMap();
+            CreateMap<ReactionPostEntity, ReactionRequest>().ReverseMap();
+
+            //reaction
+            CreateMap<ReactionEntity, ReactionRequest>().ReverseMap();
+            CreateMap<ReactionPostViewModel, ReactionEntity>().ReverseMap();
 
             //xuoi
 
