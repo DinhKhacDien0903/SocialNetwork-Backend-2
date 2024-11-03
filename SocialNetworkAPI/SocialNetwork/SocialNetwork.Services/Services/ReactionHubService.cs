@@ -45,6 +45,24 @@ namespace SocialNetwork.Services.Services
             }
         }
 
+        public async Task RemoveReactionByReactionIdAync(string reactionId)
+        {
+            try
+            {
+
+                var currentReaction = await _reactionRepository.GetByIDAsync(reactionId);
+
+                _reactionRepository.Delete(currentReaction);
+
+                await _reactionRepository.SaveChangeAsync();
+
+            }
+            catch(Exception e)
+            {
+                throw new Exception("Error when remove reaction to database" + e.Message);
+            }
+        }
+
         private async Task<string> AddReactionAsync(ReactionMessageRequest param)
         {
             var reactionID = Guid.NewGuid().ToString();

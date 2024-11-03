@@ -13,5 +13,7 @@
         public string? SenderId { get; set; }
 
         public DateTime? ReactionAt { get; set; }
+
+        public bool? IsRemove { get; set; }
     }
 }

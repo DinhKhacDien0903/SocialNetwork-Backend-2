@@ -78,9 +78,8 @@ namespace SocialNetwork.Web.Hubs
             return user;
         }
 
-        public async Task AddOrUpdateReactionToMessage(ReactionMessageRequest param)
+        public async Task<string> AddOrUpdateReactionToMessage(ReactionMessageRequest param)
         {
-
             var reactiondate = DateTime.UtcNow.AddHours(7);
 
             var reactionId = await _reactionHubService.AddOrUpdateReaction(param);
@@ -93,6 +92,24 @@ namespace SocialNetwork.Web.Hubs
                 ReciverId = param.ReciverId,
                 SenderId = param.SenderId,
                 ReactionAt = reactiondate
+            };
+
+            await Clients.User(param.ReciverId).SendAsync("ReceiveReactionMessage", reciverReactionResponse);
+
+            return reactionId;
+        }
+
+        public async Task RemoveReactionToMessage(ReactionMessageRequest param, string reactionId)
+        {
+
+            await _reactionHubService.RemoveReactionByReactionIdAync(reactionId);
+
+            var reciverReactionResponse = new ReactionMessageResponse
+            {
+                ReactionID = reactionId,
+                MessageId = param.MessageId,
+                ReciverId = param.ReciverId,
+                IsRemove = true
             };
 
             await Clients.User(param.ReciverId).SendAsync("ReceiveReactionMessage", reciverReactionResponse);
