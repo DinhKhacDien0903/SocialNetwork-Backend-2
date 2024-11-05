@@ -7,7 +7,7 @@
 
         [Key, Column(Order = 1)]
         public string PostID { get; set; }
-
+        //public bool IsDeleted { get; set; } = false;
         [ForeignKey("ReactionID")]
         public ReactionEntity? Reaction { get; set; }
 

@@ -1,14 +1,13 @@
-﻿using System;
+﻿using SocialNetwork.DTOs.ViewModels;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SocialNetwork.DTOs.Request;
 
-namespace SocialNetwork.DTOs.ViewModels
+namespace SocialNetwork.DTOs.Response
 {
-    public class PostViewModel
+    public class PostResponse
     {
         public string PostID { get; set; }
 
@@ -20,15 +19,6 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public string LastName { get; set; }
 
-        public string AvatarUser { get; set; }
-
-        public string CurrentEmotionId { get; set; }
-
-        public string CurrentEmotionName { get; set; }
-
-        public List<ReactionPostViewModel> Reactions {  get; set; }=new List<ReactionPostViewModel>();
-
         public List<ImagesOfPostViewModel> Images { get; set; } = new List<ImagesOfPostViewModel>();
     }
-
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SocialNetwork.DTOs.Response;
 using System.Security.Claims;
 
 namespace SocialNetwork.Services.Services
@@ -9,17 +10,24 @@ namespace SocialNetwork.Services.Services
         private readonly IPostRepository _postRepository ;
         private readonly IMapper _mapper ;
         private readonly UserManager<UserEntity> _userManager;
+        private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
+
         public PostService(IPostRepository postRepository,
-            UserManager<UserEntity> userManager
+            UserManager<UserEntity> userManager,IUserRepository userRepository
             , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
         {
             _userManager = userManager;
+            _userRepository = userRepository;
             _postRepository = postRepository; 
             _imageRepository = imageRepository;
             _mapper = mapper;
         }
-        public async Task<PostRequest> CreatePostAsync(PostRequest postRequest,string userID)
+
+
+
+
+        public async Task<PostResponse> CreatePostAsync(PostRequest postRequest, string userID)
         {
             if (string.IsNullOrWhiteSpace(postRequest.Content))
             {
@@ -29,14 +37,13 @@ namespace SocialNetwork.Services.Services
             try
             {
                 var postEntity = _mapper.Map<PostEntity>(postRequest);
-                postEntity.PostID=Guid.NewGuid().ToString();
+                postEntity.PostID = Guid.NewGuid().ToString(); 
+                postEntity.UserID = userID; 
 
-                postEntity.UserID=userID;
-               
                 Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
 
                 await _postRepository.AddAsync(postEntity);
-                  await _postRepository.SaveChangeAsync();
+                await _postRepository.SaveChangeAsync();
 
                 if (postRequest.Images != null && postRequest.Images.Count > 0)
                 {
@@ -48,7 +55,7 @@ namespace SocialNetwork.Services.Services
                         }
 
                         var imageEntity = _mapper.Map<ImagesOfPostEntity>(image);
-                        imageEntity.PostID = postEntity.PostID; 
+                        imageEntity.PostID = postEntity.PostID;
 
                         Console.WriteLine($"Adding Image - PostID: {imageEntity.PostID}, ImgUrl: {imageEntity.ImgUrl}");
 
@@ -57,7 +64,17 @@ namespace SocialNetwork.Services.Services
                     await _imageRepository.SaveChangeAsync();
                 }
 
-                return _mapper.Map<PostRequest>(postEntity);
+                var user = await _userRepository.GetByIDAsync(userID);
+                if (user == null)
+                {
+                    throw new Exception("User not found.");
+                }
+
+                var postResponse = _mapper.Map<PostResponse>(postEntity);
+                postResponse.FirstName = user?.FirstName;
+                postResponse.LastName = user?.LastName;
+
+                return postResponse;
             }
             catch (DbUpdateException dbEx)
             {
@@ -75,9 +92,7 @@ namespace SocialNetwork.Services.Services
 
 
 
-
-
-        public async Task<bool> DeletePostAsync(Guid postId)
+        public async Task<bool> DeletePostAsync(string postId)
         {
             var postEntity = await _postRepository.GetByIDAsync(postId);
             if (postEntity == null)
@@ -90,14 +105,16 @@ namespace SocialNetwork.Services.Services
             return true;
         }
 
+    
+
         public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync()
         {
             var posts = await _postRepository.GetAllAsync();
-            
+            //var user=_userRepository.get
             return _mapper.Map<IEnumerable<PostViewModel>>(posts);
         }
 
-        public async Task<PostViewModel> GetPostByIdAsync(Guid postId)
+        public async Task<PostViewModel> GetPostByIdAsync(string postId)
         {
             var post = await _postRepository.GetByIDAsync(postId);
             if (post == null)

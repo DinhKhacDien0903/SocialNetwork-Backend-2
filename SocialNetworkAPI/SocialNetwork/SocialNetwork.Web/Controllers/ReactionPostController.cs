@@ -8,43 +8,43 @@ namespace SocialNetwork.Web.Controllers
     [ApiController]
     public class ReactionPostController : ControllerBase
     {
-        private readonly IReactionPostService _reactionPostService;
+        //private readonly IReactionPostService _reactionPostService;
 
-        public ReactionPostController(IReactionPostService reactionPostService)
-        {
-            _reactionPostService = reactionPostService;
-        }
+        //public ReactionPostController(IReactionPostService reactionPostService)
+        //{
+        //    _reactionPostService = reactionPostService;
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> AddReaction(ReactionRequest model)
-        {
-            await _reactionPostService.AddReactionAsycn(model);
-            return Ok(model);
-        }
-
-
-        [HttpPut("{post}")]
-        public async Task<IActionResult> UpdateReaction(ReactionPostViewModel model)
-        {
-            await _reactionPostService.UpdateReactionAsync(model);
-            return Ok(model);
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> AddReaction(ReactionRequest model)
+        //{
+        //    await _reactionPostService.AddReactionAsycn(model);
+        //    return Ok(model);
+        //}
 
 
-        [HttpGet("{postId}")]
-        public async Task<IActionResult> GetReactionByPostId(string postId)
-        {
-            var reaction=await _reactionPostService.GetReactionByPostIdAsync(postId);
-            return Ok(reaction);
-        }
+        //[HttpPut("{post}")]
+        //public async Task<IActionResult> UpdateReaction(ReactionPostViewModel model)
+        //{
+        //    await _reactionPostService.UpdateReactionAsync(model);
+        //    return Ok(model);
+        //}
 
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteReation(string reactionId, string postId)
-        {
-            await _reactionPostService.DeleteReactionAsycn(reactionId,postId);
-            return Ok();
-        }
+        //[HttpGet("{postId}")]
+        //public async Task<IActionResult> GetReactionByPostId(string postId)
+        //{
+        //    var reaction=await _reactionPostService.GetReactionByPostIdAsync(postId);
+        //    return Ok(reaction);
+        //}
+
+
+        //[HttpDelete]
+        //public async Task<IActionResult> DeleteReation(string reactionId, string postId)
+        //{
+        //    await _reactionPostService.DeleteReactionAsycn(reactionId,postId);
+        //    return Ok();
+        //}
 
 
     }

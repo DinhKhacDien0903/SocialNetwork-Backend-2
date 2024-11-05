@@ -14,6 +14,7 @@ namespace SocialNetwork.DTOs.Request
 
         public string EmotionTypeID { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
+        public string EmotionName {  get; set; }
+
     }
 }

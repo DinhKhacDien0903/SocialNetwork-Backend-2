@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.DTOs.ViewModels;
+using System.Security.Claims;
 
 namespace SocialNetwork.Web.Controllers
 {
@@ -21,23 +22,18 @@ namespace SocialNetwork.Web.Controllers
             var comment = await _commentService.GetAllCommentAsync();
             return Ok(comment);
         }
-        [HttpGet("Post/{postId}")]
+
+
+
+        [HttpGet("{postId}")]
         public async Task<IActionResult> GetCommentByPostId(string postId)
         {
-            var commnet = await _commentService.GetCommentByIdAsync(postId);
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var commnet = await _commentService.GetCommentByPostIdAsync(postId);
             return Ok(commnet);
         }
 
-        [HttpGet("{commentId}")]
-        public async Task<IActionResult> GetCommentById(string commentId)
-        {
-            var comment = await _commentService.GetCommentByIdAsync(commentId);
-            if (comment == null)
-            {
-                return NotFound();
-            }
-            return Ok(comment);
-        }
 
         [HttpGet("replies/{parentCommentId}")]
         public async Task<IActionResult> GetRepliesByCommentId(string parentCommentId)
@@ -47,16 +43,17 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddComment(CommentRequest commentRequest)
+        public async Task<ActionResult<CommentViewModel>> AddComment(CommentRequest commentRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var addComment = await _commentService.AddCommentAsync(commentRequest);
-            //return CreatedAtAction(nameof(GetCommentById), new { commentId = addComment.CommentID }, addComment);
-            return Ok(addComment);
+            var addComment = await _commentService.AddCommentAsync(commentRequest,userId);
+            return CreatedAtAction(nameof(AddComment), new { commentId = addComment.CommentID }, addComment);
+            //return Ok(addComment);
         }
 
         [HttpPut]
@@ -77,6 +74,13 @@ namespace SocialNetwork.Web.Controllers
             await _commentService.DeleteCommentAsync(id);
             return NoContent();
 
+        }
+
+        [HttpGet("count/{postId}")]
+        public async Task<IActionResult> GetCommentCount(string postId)
+        {
+            var count = await _commentService.GetCommentCountByPostIdAsync(postId);
+            return Ok(new { count });
         }
 
     }

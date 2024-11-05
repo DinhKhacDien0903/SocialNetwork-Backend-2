@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SocialNetwork.DTOs.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace SocialNetwork.Services.IServices
     public interface IPostHubService
     {
 
-        Task SendPostAsycn(PostRequest postViewModel);
+        Task SendPostAsync(PostResponse postViewModel);
 
         Task SendUpdateAsycn(PostRequest updateViewModel);
 

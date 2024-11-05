@@ -8,9 +8,9 @@ namespace SocialNetwork.Services.IServices
 {
     public interface IReactionPostService
     {
-        Task AddReactionAsycn(ReactionRequest model);
-        Task<IEnumerable<ReactionPostViewModel>> GetReactionByPostIdAsync(string PostId);
-        Task DeleteReactionAsycn(string reactionId, string postId);
-        Task UpdateReactionAsync(ReactionPostViewModel model);
+        Task<bool> AddReactionAsync(string postId, string userId, string emotionTypeId);
+        Task<bool> RemoveReactionAsync(string postId, string userId);
+        Task<IEnumerable<ReactionPostEntity>> GetAllReactionsByPostIdAsync(string postId);
+         Task<IEnumerable<EmotionTypeEntity>> GetAllEmotionTypesAsync();
     }
 }

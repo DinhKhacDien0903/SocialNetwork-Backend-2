@@ -1,4 +1,5 @@
-﻿using SocialNetwork.DTOs.Response;
+﻿using SocialNetwork.DataAccess.Repositories;
+using SocialNetwork.DTOs.Response;
 using SocialNetwork.DTOs.ViewModels;
 
 namespace SocialNetwork.Services.AuttoMapper
@@ -14,6 +15,7 @@ namespace SocialNetwork.Services.AuttoMapper
             //post
             CreateMap<PostEntity, PostViewModel>().ReverseMap();
             CreateMap<PostEntity, PostRequest>().ReverseMap();
+            CreateMap<PostEntity, PostResponse>().ReverseMap();
 
             //image
             CreateMap<ImagesOfPostEntity, ImagesOfPostViewModel>().ReverseMap();
@@ -27,11 +29,12 @@ namespace SocialNetwork.Services.AuttoMapper
             //reactionPost
             CreateMap<ReactionPostEntity, ReactionPostViewModel>().ReverseMap();
             CreateMap<ReactionPostEntity, ReactionRequest>().ReverseMap();
+            CreateMap<EmotionRequest,EmotionTypeEntity>().ReverseMap();
 
             //reaction
             CreateMap<ReactionEntity, ReactionRequest>().ReverseMap();
             CreateMap<ReactionPostViewModel, ReactionEntity>().ReverseMap();
-
+            CreateMap<ReactionRepository,ReactionPostEntity>().ReverseMap();
             //xuoi
 
             CreateMap<UserEntity, UserViewModel>();

@@ -20,74 +20,52 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task AddAsync(PostEntity entity)
         {
+            entity.User = await _context.Users.FindAsync(entity.UserID);
             await _context.Posts.AddAsync(entity);
         }
 
-        public async Task<PostEntity> GetByIDAsync(Guid id)
-        {
-            return await _context.Posts.FindAsync(id);
-        }
+       
 
-        //public async Task<IEnumerable<PostViewModel>> GetAllAsync()
-        //{
-        //    var post = await _context.Posts.Include(x => x.User).Select(x => new PostViewModel
-        //    {
-        //        UserID = x.UserID,
-        //        Content = x.Content,
-        //        UserLastName = x.User.LastName,
-        //        UserFirstName = x.User.FirstName,
-        //        AvatarUser = x.User.AvatarUrl,
-        //        CurrentEmotionId = x.Reaction.FirstOrDefault()?.EmotionType?.EmotionTypeID,
-        //        CurrentEmotionName = x.Reaction.FirstOrDefault()?.EmotionType?.EmotionName,
-        //        Reactions = x.Reaction.Select(r => new ReactionPostViewModel
-        //        {
-        //            ReactionID = r.ReactionID,
-        //            EmotionTypeID = r.EmotionType.EmotionTypeID,
-        //            EmotionTypeName = r.EmotionType.EmotionName
-        //        }).ToList(),
-        //        //CreatedAt = x.CreatedAt,
-        //    }).ToListAsync();
-        //    //var post= await  _context.Posts.ToListAsync();
-        //    return post;
-        //}
-
+       
 
         public async Task<IEnumerable<PostViewModel>> GetAllAsync()
         {
+            //var user=await _context.Users.FindAsync(enti)
             var posts = await _context.Posts
                 .Include(x => x.User)
-                .Include(x => x.Reaction) 
-                .ThenInclude(r => r.EmotionType) 
+                .Include(x => x.Reaction)
+                .ThenInclude(r => r.EmotionType)
+                .OrderByDescending(x => x.CreatedAt)
                 .Select(x => new PostViewModel
                 {
-                    PostID = Guid.Parse(x.PostID), 
+                    PostID = x.PostID,
                     UserID = x.UserID,
                     Content = x.Content,
-                    UserLastName = x.User.LastName,
-                    UserFirstName = x.User.FirstName,
+                    LastName = x.User.LastName,
+                    FirstName = x.User.FirstName,
                     AvatarUser = x.User.AvatarUrl,
-
                     CurrentEmotionId = x.Reaction.Any() ? x.Reaction.First().EmotionType.EmotionTypeID : null,
                     CurrentEmotionName = x.Reaction.Any() ? x.Reaction.First().EmotionType.EmotionName : null,
                     Reactions = x.Reaction.Select(r => new ReactionPostViewModel
                     {
                         ReactionID = r.ReactionID,
-                        EmotionTypeID = r.EmotionType.EmotionTypeID,
-                        EmotionTypeName = r.EmotionType.EmotionName
+                        EmotionTypeID = r.EmotionType.EmotionTypeID
                     }).ToList(),
-
-
-                    //CreatedAt = x.CreatedAt,
-                    //Images = x.Images.Select(img => new ImagesOfPostViewModel
-                    //{
-                    //    ImageUrl = img.ImageUrl 
-                    //}).ToList(),
+                    // Uncomment nếu cần kiểm tra phần Images
+                    // Images = x.Images.Select(img => new ImagesOfPostViewModel
+                    // {
+                    //     ImageUrl = img.ImageUrl 
+                    // }).ToList(),
                 })
                 .ToListAsync();
 
+            foreach (var post in posts)
+            {
+                Console.WriteLine($"PostID: {post.PostID}, UserLastName: {post.LastName}, UserFirstName: {post.FirstName}");
+            }
+
             return posts;
         }
-
 
 
         public void Update(PostEntity entity)
@@ -111,14 +89,21 @@ namespace SocialNetwork.DataAccess.Repositories
                 .FirstOrDefaultAsync(p => p.PostID == postId.ToString());
         }
 
-        public Task<PostEntity> GetByIDAsync(string id)
+        public async Task<PostEntity> GetByIDAsync(string id)
         {
-            throw new NotImplementedException();
+            return await _context.Posts.FindAsync(id);
         }
 
-        public void Delete(PostEntity Entity)
+        public async void Delete(PostEntity Entity)
         {
-            throw new NotImplementedException();
+           var post=await GetByIDAsync(Entity.PostID);
+            if (post != null)
+            {
+                post.IsDelete = true;
+                _context.Posts.Update(post);
+                await _context.SaveChangesAsync();
+            }
+
         }
     }
 }

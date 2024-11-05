@@ -3,7 +3,7 @@
     public class ImagesOfPostEntity : BaseEntity
     {
         [Key]
-        public string ImagesOfPostID { get; set; }
+        public string ImagesOfPostID { get; set; }=Guid.NewGuid().ToString();
 
         [Required]
         public string PostID { get; set; }

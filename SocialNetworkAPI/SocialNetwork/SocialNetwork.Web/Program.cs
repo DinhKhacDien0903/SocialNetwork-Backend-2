@@ -39,6 +39,7 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentRepositories, CommentRepositories>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
@@ -53,6 +54,7 @@ builder.Services.AddScoped(typeof(IRelationshipRepository),typeof(RelationshipRe
 builder.Services.AddScoped(typeof(IMessageImagesRepository),typeof(MessageImagesRepository));
 builder.Services.AddScoped(typeof(IReactionPostRepository), typeof(ReactionPostRepository));
 builder.Services.AddScoped(typeof(IReactionRepository), typeof(ReactionRepository));
+builder.Services.AddScoped(typeof(IEmotionTypeRepository), typeof(EmotionTypeRepository));
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
@@ -210,6 +212,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chatPerson");
+
+app.MapHub<PostHub>("/postHub");
 
     
 app.MapHub<ReactionHub>("/reactionMessage");

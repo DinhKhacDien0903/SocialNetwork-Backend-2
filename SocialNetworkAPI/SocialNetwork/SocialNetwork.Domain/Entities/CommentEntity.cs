@@ -3,7 +3,7 @@
     public class CommentEntity :BaseEntity
     {
         [Key]
-        public string CommentID { get; set; }/*=Guid.NewGuid().ToString();*/    
+        public string CommentID { get; set; }  
 
         [Required]
         public string UserID { get; set; }
@@ -19,10 +19,10 @@
         public bool IsDelete { get; set; } = false;
 
         [ForeignKey("UserID")]
-        public UserEntity User { get; set; }  
+        public UserEntity? User { get; set; }  
 
         [ForeignKey("PostID")]
-        public PostEntity Post { get; set; } 
+        public PostEntity? Post { get; set; } 
 
         [ForeignKey("ParentCommentID")]
         public CommentEntity? ParentComment { get; set; } 

@@ -11,8 +11,10 @@ namespace SocialNetwork.Domain.IRepositories
     public interface IPostRepository
     {
         Task<IEnumerable<PostViewModel>> GetAllAsync();
+        //Task<IEnumerable<EmotionRequest>> GetAllEmotionAsync();
 
-        Task<PostEntity> GetByIDAsync(Guid id);
+
+        Task<PostEntity> GetByIDAsync(string id);
 
         Task AddAsync(PostEntity entity);
 
@@ -23,6 +25,6 @@ namespace SocialNetwork.Domain.IRepositories
         Task SaveChangeAsync();
 
         Task<IEnumerable<PostEntity>> GetPostsByUserIdAsync(string userId);
-        Task<PostEntity> GetPostWithImagesAsync(Guid postId);
+        //Task<PostEntity> GetPostWithImagesAsync(string postId);
     }
 }

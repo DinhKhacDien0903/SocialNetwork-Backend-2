@@ -2,87 +2,83 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using SocialNetwork.Domain.Entities;
+using SocialNetwork.Helpers.Hubs;
 
 namespace SocialNetwork.Services.Services
 {
     public class ReactionPostService : IReactionPostService
     {
         private readonly IReactionPostRepository _reactionPost;
-        private readonly IReactionRepository _reaction;
         private readonly IMapper _mapper;
-
-        public ReactionPostService(IMapper mapper, IReactionPostRepository reactionPost, IReactionRepository reaction)
+        private readonly IHubContext<PostHub> _hubContext;
+        private readonly IEmotionTypeRepository _emotionTypeRepository;
+        public ReactionPostService(IMapper mapper,
+            IReactionPostRepository reactionPost,
+            IEmotionTypeRepository emotionTypeRepository,
+            IHubContext<PostHub> hubContext
+            )
         {
             _mapper = mapper;
+            _hubContext = hubContext;
+            _emotionTypeRepository = emotionTypeRepository;
             _reactionPost = reactionPost;
-            _reaction = reaction;
         }
 
-        public async Task AddReactionAsycn(ReactionRequest model)
+        public async Task<bool> AddReactionAsync(string postId, string userId, string emotionTypeId)
         {
-            //var hasUserReaction = await _reactionPost.UserHasReactionAsync(model.UserID, model.PostID);
-            //if (hasUserReaction)
-            //{
-            //    throw new Exception("User has already reacted to the post.");
-            //}
+            var emotion = await _reactionPost.GetByPostIdAndUserIdAsync(postId, userId);
+            if (emotion != null)
+            {
+                emotion.Reaction.EmotionTypeID = emotionTypeId;
+                await _reactionPost.UpdateAsync(emotion);
+                return true;
+            }
+            var reaction = new ReactionEntity
+            {
+                UserID = userId,
+                EmotionTypeID = emotionTypeId,
+                IsDeleted = false
+            };
+            var newEmotion = new ReactionPostEntity
+            {
+                ReactionID = Guid.NewGuid().ToString(),
+                PostID = postId,
+                Reaction=reaction,
+                //Reaction = new ReactionEntity
+                //{
+                //    UserID = userId,
+                //    EmotionTypeID = emotionTypeId,
+                //    IsDeleted = false
+                //}
+            };
+            await _reactionPost.AddAsync(newEmotion);
+            await _hubContext.Clients.All.SendAsync("ReceiveReaction", postId, userId, emotionTypeId);
 
-            // Tạo ReactionEntity và thêm vào cơ sở dữ liệu
-            var reaction = _mapper.Map<ReactionEntity>(model);
-            await _reaction.AddAsync(reaction);
-
-            // Tạo ReactionPostEntity với ReactionID được sinh ra tự động
-            var reactionPost = _mapper.Map<ReactionPostEntity>(model);
-            reactionPost.ReactionID = reaction.ReactionID; // Gán ReactionID đã được sinh ra
-
-            await _reactionPost.AddReactionAsync(reactionPost);
+            return true;
         }
 
-        public async Task<IEnumerable<ReactionPostViewModel>> GetReactionByPostIdAsync(string postId)
+        public async Task<IEnumerable<EmotionTypeEntity>> GetAllEmotionTypesAsync()
         {
-            var reactions = await _reactionPost.GetReactionsByPostIdAsync(postId);
-            if (reactions == null)
-            {
-                throw new Exception($"No reactions found for postId: {postId}");
-            }
-
-            return _mapper.Map<IEnumerable<ReactionPostViewModel>>(reactions);
+            return await _emotionTypeRepository.GetAllAsync();
         }
 
-        public async Task DeleteReactionAsycn(string reactionId, string postId)
+        public async Task<IEnumerable<ReactionPostEntity>> GetAllReactionsByPostIdAsync(string postId)
         {
-            var reactionPost = await _reactionPost.GetReactionsByPostIdAsync(reactionId);
-            if (reactionPost == null)
-            {
-                throw new Exception($"Reaction with id {reactionId} for post {reactionId} not found.");
-            }
+            return await _reactionPost.GetAllReactionsByPostIdAsync(postId);
 
-            await _reactionPost.DeleteReactionAsync(reactionId, postId);
         }
 
-        public async Task UpdateReactionAsync(ReactionPostViewModel model)
+        public async Task<bool> RemoveReactionAsync(string postId, string userId)
         {
-            var existingReactionPost = await _reactionPost.GetReactionsByPostIdAsync(model.PostID);
-
-            if (existingReactionPost == null)
+            var emotion=await _reactionPost.GetByPostIdAndUserIdAsync(postId,userId);
+            if (emotion != null)
             {
-                throw new Exception($"Reaction with id {model.ReactionID} for post {model.PostID} not found.");
+                await _reactionPost.DeleteAsync(emotion);
+                return true;
             }
-
-            var reactionPost = existingReactionPost.FirstOrDefault(s => s.ReactionID == model.ReactionID);
-
-
-            var reactionEntity = reactionPost.Reaction;
-
-            if (reactionEntity != null)
-            {
-                _mapper.Map(reactionEntity, model);
-                await _reaction.UpdateAsync(reactionEntity);
-            }
-
-            var reactionPostAuto = _mapper.Map<ReactionPostEntity>(model);
-            await _reactionPost.UpdateReactionAsync(reactionPostAuto);
+            return false;
         }
-
     }
 }

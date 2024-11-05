@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using SocialNetwork.Helpers.Hubs;
+using SocialNetwork.DTOs.Response;
 
 namespace SocialNetwork.Services.Services
 {
@@ -23,9 +24,10 @@ namespace SocialNetwork.Services.Services
         }
 
 
-        public async Task SendPostAsycn(PostRequest postViewModel)
+        public async Task SendPostAsync(PostResponse post)
         {
-            await _hubContext.Clients.All.SendAsync("ReceivePost", postViewModel);
+            Console.WriteLine($"PostHubService - UserFirstName: {post.LastName}, UserLastName: {post.FirstName}");
+            await _hubContext.Clients.All.SendAsync("ReceivePost", post);
         }
 
         public async Task SendUpdateAsycn(PostRequest updateViewModel)

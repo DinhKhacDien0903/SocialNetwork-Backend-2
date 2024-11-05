@@ -12,24 +12,21 @@ namespace SocialNetwork.DTOs.ViewModels
     {
         public string CommentID { get; set; }
 
-        public string UserID { get; set; }
-
         public string PostID { get; set; }
 
-        //public string? ParentCommentID { get; set; }
+        public string? ParentCommentID { get; set; }
 
         public string Content { get; set; }
 
-        public string UserName { get; set; }
+        public string FirstName { get; set; }
 
-        //public bool IsDelete { get; set; } = false;
+        public string LastName { get; set; }
 
-        //public DateTime CreatedAt { get; set; } 
+        public string? AvatarUrl { get; set; }
 
-        //public DateTime? UpdatedAt { get; set; } 
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-
-        //public List<CommentViewModel> Replies {  get; set; }=new List<CommentViewModel>();
+        //public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }

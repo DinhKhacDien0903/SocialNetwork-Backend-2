@@ -18,6 +18,7 @@
 
         public ICollection<ImagesOfPostEntity> Images { get; set; } = new List<ImagesOfPostEntity>();
         public ICollection<ReactionEntity> Reaction { get; set; } = new List<ReactionEntity>();
+        public ICollection<CommentEntity> Comments { get; set; } = new List<CommentEntity>();
 
 
     }

@@ -193,18 +193,18 @@ namespace SocialNetwork.DataAccess.SeedData
             }
             if (!context.Set<EmotionTypeEntity>().Any())
             {
-                var emotionTypes = new List<EmotionTypeEntity>
-                    {
-                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Like" },
-                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Love" },
-                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Haha" },
-                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Wow" },
-                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Sad" },
-                        new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Angry" }
-                    };
+                    var emotionTypes = new List<EmotionTypeEntity>
+                        {
+                            new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Like" },
+                            new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Love" },
+                            new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Haha" },
+                            new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Wow" },
+                            new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Sad" },
+                            new EmotionTypeEntity { EmotionTypeID = Guid.NewGuid().ToString(), EmotionName = "Angry" }
+                        };
 
-                await context.Set<EmotionTypeEntity>().AddRangeAsync(emotionTypes);
-                await context.SaveChangesAsync();
+                    await context.Set<EmotionTypeEntity>().AddRangeAsync(emotionTypes);
+                    await context.SaveChangesAsync();
             }
         }
     }
