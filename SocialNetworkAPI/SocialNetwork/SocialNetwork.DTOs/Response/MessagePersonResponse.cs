@@ -21,5 +21,9 @@ namespace SocialNetwork.DTOs.Response
         public DateTime? SendDate { get; set; }
 
         public List<string> Images { get; set; } = new List<string>();
+
+        public bool? IsDelete { get; set; }
+
+        public DateTime? UpdateAt { get; set; }
     }
 }

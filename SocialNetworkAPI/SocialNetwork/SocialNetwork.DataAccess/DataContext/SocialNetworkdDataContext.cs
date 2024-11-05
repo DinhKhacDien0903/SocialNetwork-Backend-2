@@ -180,19 +180,18 @@ namespace SocialNetwork.DataAccess.DataContext
                 // Composite primary key
                 entity.HasKey(rm => new { rm.ReactionID, rm.MessageID });
 
-                // Foreign key relationship with ReactionEntity - No action
+                // Foreign key relationship with ReactionEntity - Cascade delete
                 entity.HasOne(rm => rm.Reaction)
                       .WithMany()
                       .HasForeignKey(rm => rm.ReactionID)
-                      .OnDelete(DeleteBehavior.NoAction);  // No action on delete
+                      .OnDelete(DeleteBehavior.Cascade);  // Cascade delete on Reaction deletion
 
-                // Foreign key relationship with MessageEntity - Cascade delete
+                // Foreign key relationship with MessageEntity - No action
                 entity.HasOne(rm => rm.Message)
                       .WithMany()
                       .HasForeignKey(rm => rm.MessageID)
-                      .OnDelete(DeleteBehavior.Cascade);  // Cascade delete on Message deletion
+                      .OnDelete(DeleteBehavior.NoAction);  // No action on Message deletion
             });
-
 
             modelBuilder.Entity<ReactionCommentEntity>(entity =>
             {

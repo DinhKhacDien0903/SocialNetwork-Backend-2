@@ -35,6 +35,8 @@ namespace SocialNetwork.Services.Services
         {
             var entity = _mapper.Map<MessagesEntity>(messageViewModel);
 
+            entity.UpdatedAt = entity.CreatedAt;
+
             entity.MessageID = Guid.NewGuid().ToString();
 
             var message =  await _messageRepository.AddAsync(entity);
@@ -44,6 +46,24 @@ namespace SocialNetwork.Services.Services
             await _messageRepository.SaveChangeAsync();
 
             return messageID;
+        }
+
+        public async Task RemoveMessage(string messageId)
+        {
+            (await _messageRepository.GetByIDAsync(messageId)).IsDeleted = true;
+
+            await _messageRepository.SaveChangeAsync();
+        }
+
+        public async Task UpdateMessage(UpdateMessageRequest param, DateTime updateDatetime)
+        {
+            var currentMessage = await _messageRepository.GetByIDAsync(param.MessageId);
+
+            currentMessage.Content = param.Content;
+
+            currentMessage.UpdatedAt = updateDatetime;
+
+            await _messageRepository.SaveChangeAsync();
         }
 
         public async Task UpdateStatusActiveUser(string userId, bool isActive)

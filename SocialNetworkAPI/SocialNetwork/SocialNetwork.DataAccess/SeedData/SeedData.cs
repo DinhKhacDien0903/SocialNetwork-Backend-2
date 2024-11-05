@@ -95,6 +95,8 @@ namespace SocialNetwork.DataAccess.SeedData
                         if (sender != null && receiver != null)
                         {
                             // Tạo tin nhắn từ sender đến receiver
+                            var sendDate = DateTime.UtcNow.AddMinutes(-10);
+                            var receiverDate = DateTime.UtcNow.AddMinutes(-5);
                             messages.Add(new MessagesEntity
                             {
                                 MessageID = Guid.NewGuid().ToString(),
@@ -102,7 +104,8 @@ namespace SocialNetwork.DataAccess.SeedData
                                 SenderID = sender.Id,
                                 ReciverID = receiver.Id,
                                 IsDeleted = false,
-                                CreatedAt = DateTime.UtcNow.AddMinutes(-10)
+                                CreatedAt = sendDate,
+                                UpdatedAt = sendDate
                             });
 
                             // Tạo tin nhắn phản hồi từ receiver đến sender
@@ -113,7 +116,8 @@ namespace SocialNetwork.DataAccess.SeedData
                                 SenderID = receiver.Id,
                                 ReciverID = sender.Id,
                                 IsDeleted = false,
-                                CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                                CreatedAt = receiverDate,
+                                UpdatedAt = receiverDate
                             });
                         }
                     }
