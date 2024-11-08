@@ -80,7 +80,7 @@ namespace SocialNetwork.Web.Hubs
 
         public async Task<string> AddOrUpdateReactionToMessage(ReactionMessageRequest param)
         {
-            var reactiondate = DateTime.UtcNow.AddHours(7);
+            var reactiondate = DateTime.UtcNow;
 
             var reactionId = await _reactionHubService.AddOrUpdateReaction(param);
 

@@ -113,11 +113,11 @@ namespace SocialNetwork.Web.Hubs
         }
 
 
-        public async Task UpdateMessage(UpdateMessageRequest param)
+        public async Task<string> UpdateMessage(UpdateMessageRequest param)
         {
             if(!string.IsNullOrEmpty(param.MessageId) && !string.IsNullOrEmpty(param.Content))
             {
-                var updateDatetime = DateTime.UtcNow.AddHours(7);
+                var updateDatetime = DateTime.UtcNow;
 
                 await _chatHubService.UpdateMessage(param, updateDatetime);
 
@@ -126,10 +126,13 @@ namespace SocialNetwork.Web.Hubs
                     MessageID = param.MessageId,
                     Content = param.Content,
                     UpdateAt = updateDatetime,
+                    ReactionByUser = param.ReactionByUser
                 };
 
                 await NotifyReceiverAsync(param.ReciverId, response);
+
             }
+            return param.MessageId;
         }
 
         private async Task<IdentityUser> ValidateCurrentAccount()
@@ -182,7 +185,7 @@ namespace SocialNetwork.Web.Hubs
 
         private async Task<string> SaveMessage(string senderId, SendMessageToPersonRequest request)
         {
-            var sendDatetime = DateTime.UtcNow.AddMinutes(-10);
+            var sendDatetime = DateTime.UtcNow;
 
             var messageViewModel = new MessageViewModel
             {
@@ -216,7 +219,7 @@ namespace SocialNetwork.Web.Hubs
                 MessageID = messageId,
                 Content = request.Content,
                 Images = request.Images,
-                SendDate = DateTime.UtcNow.AddHours(7),
+                SendDate = DateTime.UtcNow,
                 Symbol = request.Symbol
             };
         }
