@@ -39,6 +39,12 @@ namespace SocialNetwork.Services.Services
         {
             await _hubContext.Clients.All.SendAsync("ReceiveDeletePost", Id);
         }
+
+        public async Task SendCommentAsycn(CommentRespone commentRespone)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveComment", commentRespone);
+
+        }
     }
 }
 

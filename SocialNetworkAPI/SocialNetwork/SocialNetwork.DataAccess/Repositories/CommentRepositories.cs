@@ -1,4 +1,5 @@
 ﻿using SocialNetwork.DataAccess.Repositories;
+using SocialNetwork.DTOs.Response;
 using SocialNetwork.DTOs.ViewModels;
 
 public class CommentRepositories : ICommentRepositories
@@ -41,13 +42,13 @@ public class CommentRepositories : ICommentRepositories
         return await _context.Comments.FindAsync(commentId);
     }
 
-    public async Task<IEnumerable<CommentViewModel>> GetCommentsByPostIdAsync(string postId)
+    public async Task<IEnumerable<CommentRespone>> GetCommentsByPostIdAsync(string postId)
     {
-        return await _context.Comments
+        var comments= await _context.Comments
             .Include(x => x.User)
             .Where(x => x.PostID == postId && !x.IsDelete)
             .OrderByDescending(x => x.CreatedAt)
-            .Select(x=> new CommentViewModel
+            .Select(x=> new CommentRespone
             {
                 CommentID=x.CommentID,
                 PostID=x.PostID,
@@ -56,20 +57,23 @@ public class CommentRepositories : ICommentRepositories
                 FirstName=x.User.FirstName,
                 LastName=x.User.LastName,
                 AvatarUrl=x.User.AvatarUrl,
-                CreatedAt=x.User.CreatedAt, 
+                CreatedAt=x.User.CreatedAt,
             })
             .ToListAsync();
+
+        var newComment = NewComments(comments);
+        return newComment;
     }
 
-    public async Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(string parentCommentId)
-    {
-        return await _context.Comments
-            .Where(x => x.ParentCommentID == parentCommentId && !x.IsDelete)
-            .Include(x => x.User)
-            .Include(x=>x.Replies)
-            .OrderByDescending(x => x.CreatedAt)
-            .ToListAsync();
-    }
+    //public async Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(string parentCommentId)
+    //{
+    //    return await _context.Comments
+    //        .Where(x => x.ParentCommentID == parentCommentId && !x.IsDelete)
+    //        .Include(x => x.User)
+    //        .Include(x=>x.C)
+    //        .OrderByDescending(x => x.CreatedAt)
+    //        .ToListAsync();
+    //}
 
     public async Task UpdateCommentAsync(CommentEntity comment)
     {
@@ -81,5 +85,29 @@ public class CommentRepositories : ICommentRepositories
     {
         var count=await _context.Comments.CountAsync(x=>x.PostID==postId&&!x.IsDelete);
         return count;
+    }
+
+    private List<CommentRespone> NewComments(List<CommentRespone> comments)
+    {
+        var commentMap = comments.ToDictionary(c => c.CommentID, c => c);
+        var nestedComments = new List<CommentRespone>();
+
+        foreach (var comment in comments)
+        {
+            if (!string.IsNullOrEmpty(comment.ParentCommentID) && commentMap.ContainsKey(comment.ParentCommentID))
+            {
+                var parentId = comment.ParentCommentID;
+                comment.ParentCommentID = null; // Loại bỏ ParentCommentId sau khi lồng
+                commentMap[parentId].Children.Add(comment);
+            }
+            else
+            {
+                comment.ParentCommentID = null; // Loại bỏ ParentCommentId nếu không có cha
+                nestedComments.Add(comment);
+            }
+        }
+
+        return nestedComments;
+
     }
 }

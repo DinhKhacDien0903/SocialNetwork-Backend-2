@@ -123,7 +123,7 @@ namespace SocialNetwork.DataAccess.SeedData
                                 PostID = post.PostID,
                                 Content = $"This is a comment by {user.UserName} on post {post.PostID}",
                                 IsDelete = false,
-                                Replies = new List<CommentEntity>()
+                                Children = new List<CommentEntity>()
                             };
 
                             comments.Add(comment);
@@ -141,7 +141,7 @@ namespace SocialNetwork.DataAccess.SeedData
                                     IsDelete = false
                                 };
 
-                                comment.Replies.Add(reply);
+                                comment.Children.Add(reply);
                                 comments.Add(reply);
                             }
                         }

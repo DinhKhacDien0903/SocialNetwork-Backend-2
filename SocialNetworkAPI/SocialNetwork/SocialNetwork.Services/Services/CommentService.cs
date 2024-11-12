@@ -47,10 +47,11 @@ public class CommentService : ICommentService
         comment.LastName = user?.LastName;
         comment.FirstName=user?.FirstName;
 
-        await _hubContext.Clients.Group(commentRequest.PostID).SendAsync("ReceiveComment", comment);
+        //await _hubContext.Clients.Group(commentRequest.PostID).SendAsync("ReceiveComment", comment);
 
         return comment;
 
+    
     }
 
 
@@ -87,11 +88,11 @@ public class CommentService : ICommentService
         return await _commentRepositories.GetCommentCountByPostIdAsync(postId);
     }
 
-    public async Task<IEnumerable<CommentViewModel>> GetRepliesByCommentIdAsync(string parentCommentId)
-    {
-        var replies = await _commentRepositories.GetRepliesByCommentIdAsync(parentCommentId);
-        return _mapper.Map<IEnumerable<CommentViewModel>>(replies);
-    }
+    //public async Task<IEnumerable<CommentViewModel>> GetRepliesByCommentIdAsync(string parentCommentId)
+    //{
+    //    var replies = await _commentRepositories.GetRepliesByCommentIdAsync(parentCommentId);
+    //    return _mapper.Map<IEnumerable<CommentViewModel>>(replies);
+    //}
 
     public async Task UpdateCommentAsync(CommentViewModel commentViewModel)
     {

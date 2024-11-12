@@ -132,7 +132,7 @@ namespace SocialNetwork.DataAccess.DataContext
 
                 // Configure self-referencing relationship for ParentComment
                 entity.HasOne(c => c.ParentComment)
-                      .WithMany(c => c.Replies)
+                      .WithMany(c => c.Children)
                       .HasForeignKey(c => c.ParentCommentID)
                       .OnDelete(DeleteBehavior.NoAction);  // No cascade delete for parent-child relationship
             });

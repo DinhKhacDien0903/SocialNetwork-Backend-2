@@ -16,6 +16,6 @@ namespace SocialNetwork.Services.IServices
 
         Task SendDeleteAsycn(Guid Id);
 
-
+        Task SendCommentAsycn(CommentRespone commentRespone);
     }
 }

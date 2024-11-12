@@ -30,6 +30,8 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task DeleteAsync(ReactionPostEntity reactionPost)
         {
+            reactionPost.Post=await _context.Posts.FindAsync(reactionPost.PostID);
+            reactionPost.Reaction = await _context.Reactions.FindAsync(reactionPost.ReactionID);
             reactionPost.Reaction.IsDeleted = true;
             _context.ReactionPosts.Update(reactionPost);
             await _context.SaveChangesAsync();

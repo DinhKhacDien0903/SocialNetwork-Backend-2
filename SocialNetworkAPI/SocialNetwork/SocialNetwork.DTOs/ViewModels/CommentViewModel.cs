@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SocialNetwork.DTOs.Response;
 
 namespace SocialNetwork.DTOs.ViewModels
 {
@@ -25,6 +26,8 @@ namespace SocialNetwork.DTOs.ViewModels
         public string? AvatarUrl { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public List<CommentRespone> Children { get; set; } = new List<CommentRespone>();
 
         //public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 

@@ -10,7 +10,7 @@ namespace SocialNetwork.Services.IServices
     {
         Task<IEnumerable<CommentViewModel>> GetAllCommentAsync();
         Task<IEnumerable<CommentViewModel>> GetCommentByPostIdAsync(string postId);
-        Task<IEnumerable<CommentViewModel>> GetRepliesByCommentIdAsync(string parentCommentId);
+        //Task<IEnumerable<CommentViewModel>> GetRepliesByCommentIdAsync(string parentCommentId);
         Task<CommentViewModel> GetCommentByIdAsync(string commentId);
         Task<CommentViewModel> AddCommentAsync(CommentRequest comment, string userId);
         Task DeleteCommentAsync(string commentId);

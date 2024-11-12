@@ -27,6 +27,6 @@
         [ForeignKey("ParentCommentID")]
         public CommentEntity? ParentComment { get; set; } 
 
-        public ICollection<CommentEntity> Replies {  get; set; }=new List<CommentEntity>();
+        public ICollection<CommentEntity> Children {  get; set; }=new List<CommentEntity>();
     }
 }

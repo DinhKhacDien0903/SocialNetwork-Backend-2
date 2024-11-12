@@ -76,5 +76,20 @@ namespace SocialNetwork.Helpers.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, postId);
         }
+
+        public async Task SendCommentAsync(CommentRespone comment)
+        {
+            try
+            {
+                // Gửi bình luận đến tất cả các client trong phòng của bài đăng
+                await Clients.Group(comment.PostID.ToString()).SendAsync("ReceiveComment", comment);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in SendCommentAsync", ex);
+            }
+        }
+
+
     }
 }

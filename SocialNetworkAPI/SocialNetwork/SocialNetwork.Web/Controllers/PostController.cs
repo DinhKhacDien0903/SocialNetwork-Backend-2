@@ -48,13 +48,9 @@ namespace SocialNetwork.Web.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var createdPost = await _postService.CreatePostAsync(postViewModel, userId);
-
             //await _postHubService.SendPostAsync(createdPost);
-
-            //return Ok(createdPost);
             return CreatedAtAction(nameof(CreatePost), new { postId = createdPost.PostID }, createdPost);
         }
 
@@ -75,7 +71,6 @@ namespace SocialNetwork.Web.Controllers
             }
 
             //await _postHubService.SendUpdateAsycn(updatedPost);
-
             return Ok(updatedPost);
         }
 
@@ -87,9 +82,6 @@ namespace SocialNetwork.Web.Controllers
             {
                 return NotFound("Bài viết không tồn tại.");
             }
-
-            //await _postHubService.SendDeleteAsycn(id);
-
             return NoContent();
         }
 
@@ -117,7 +109,6 @@ namespace SocialNetwork.Web.Controllers
             {
                 return BadRequest("error add reaction");
             }
-            //await _postHubService.se
             return Ok();
         }
 
@@ -130,8 +121,5 @@ namespace SocialNetwork.Web.Controllers
             var result=await _reactionPostService.RemoveReactionAsync(postId,userId);
             return result ? Ok() : NotFound("no have reaction remove");
         }
-
-       
-
     }
 }

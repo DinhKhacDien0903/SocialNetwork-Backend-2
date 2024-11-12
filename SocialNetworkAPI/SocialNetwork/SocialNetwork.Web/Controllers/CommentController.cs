@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SocialNetwork.DTOs.ViewModels;
+using SocialNetwork.Helpers.Hubs;
 using System.Security.Claims;
 
 namespace SocialNetwork.Web.Controllers
@@ -9,11 +11,13 @@ namespace SocialNetwork.Web.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
+        private readonly IHubContext<PostHub> _postHubContext;
         private readonly ICommentService _commentService;
 
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService, IHubContext<PostHub> postHubContext)
         {
             _commentService = commentService;
+            _postHubContext = postHubContext;
         }
 
         [HttpGet]
@@ -35,12 +39,12 @@ namespace SocialNetwork.Web.Controllers
         }
 
 
-        [HttpGet("replies/{parentCommentId}")]
-        public async Task<IActionResult> GetRepliesByCommentId(string parentCommentId)
-        {
-            var replies = await _commentService.GetRepliesByCommentIdAsync(parentCommentId);
-            return Ok(replies);
-        }
+        //[HttpGet("replies/{parentCommentId}")]
+        //public async Task<IActionResult> GetRepliesByCommentId(string parentCommentId)
+        //{
+        //    var replies = await _commentService.GetRepliesByCommentIdAsync(parentCommentId);
+        //    return Ok(replies);
+        //}
 
         [HttpPost]
         public async Task<ActionResult<CommentViewModel>> AddComment(CommentRequest commentRequest)
@@ -52,6 +56,8 @@ namespace SocialNetwork.Web.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var addComment = await _commentService.AddCommentAsync(commentRequest,userId);
+            await _postHubContext.Clients.Group(addComment.PostID.ToString())
+            .SendAsync("ReceiveComment", addComment);
             return CreatedAtAction(nameof(AddComment), new { commentId = addComment.CommentID }, addComment);
             //return Ok(addComment);
         }
