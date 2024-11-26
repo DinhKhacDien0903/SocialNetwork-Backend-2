@@ -39,7 +39,7 @@ namespace SocialNetwork.Services.Services
             var existingReaction = await _reactionPost.GetIdAndUserIdAsync(postId, userId);
             var user = await _userRepository.GetByIDAsync(userId);
             //var post =await _postRepository.GetByIDAsync(postId);
-            var emoName = await _reactionRepository.GetByIDAsync(emotionTypeId);
+            var emoName = await _reactionRepository.GetByID2Async(emotionTypeId);
             var reactionRequest = new ReactionRequest
             {
                 PostID = postId,
@@ -64,9 +64,9 @@ namespace SocialNetwork.Services.Services
             //new
             var reactionNew = new ReactionEntity
             {
-                ReactionID=Guid.NewGuid().ToString(),
+                ReactionID = Guid.NewGuid().ToString(),
                 UserID = userId,
-                User= await _userRepository.GetByIDAsync(userId),
+                User = await _userRepository.GetByIDAsync(userId),
                 EmotionTypeID = emotionTypeId,
                 IsDeleted = false
             };
@@ -74,22 +74,23 @@ namespace SocialNetwork.Services.Services
             var newReactionPost = new ReactionPostEntity
             {
                 //ReactionID = Guid.NewGuid().ToString(),
-                Post=await _postRepository.GetByIDAsync(postId),
+                Post = await _postRepository.GetByIDAsync(postId),
                 PostID = postId,
                 Reaction = reactionNew,
-                ReactionID= reactionNew.ReactionID
-                
+                ReactionID = reactionNew.ReactionID
+
             };
 
             await _reactionPost.AddAsync(newReactionPost);
 
-           
 
-            
+
+
 
             await _postHubService.SendReactionAddAsycn(reactionRequest);
             return reactionRequest;
         }
+
 
 
         public async Task<IEnumerable<EmotionTypeEntity>> GetAllEmotionTypesAsync()
@@ -105,7 +106,7 @@ namespace SocialNetwork.Services.Services
 
         public async Task<bool> RemoveReactionAsync(string postId, string userId)
         {
-            var emotion=await _reactionPost.GetIdAndUserIdAsync(postId,userId);
+            var emotion = await _reactionPost.GetIdAndUserIdAsync(postId, userId);
             if (emotion != null)
             {
                 await _reactionPost.DeleteAsync(emotion);

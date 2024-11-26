@@ -21,9 +21,9 @@ namespace SocialNetwork.DataAccess.SeedData
                         Email = $"user{i}@test.com",
                         FirstName = $"First{i}",
                         LastName = $"Last{i}",
-                        IsActive = i <= 8,
+                        IsActive = i <= 4,
                         CreatedAt = DateTime.UtcNow.AddDays(-i),
-                        LastLogin = i <= 8 ? DateTime.UtcNow : (DateTime?)null,
+                        LastLogin = i <= 4 ? DateTime.UtcNow : (DateTime?)null,
                         EmailConfirmed = true
                     };
 

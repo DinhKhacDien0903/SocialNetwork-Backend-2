@@ -39,7 +39,7 @@ namespace SocialNetwork.Services.Services
 
                 return await AddReactionAsync(param);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new Exception("Error when add reaction to database " + e.Message);
             }
@@ -57,7 +57,7 @@ namespace SocialNetwork.Services.Services
                 await _reactionRepository.SaveChangeAsync();
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new Exception("Error when remove reaction to database" + e.Message);
             }

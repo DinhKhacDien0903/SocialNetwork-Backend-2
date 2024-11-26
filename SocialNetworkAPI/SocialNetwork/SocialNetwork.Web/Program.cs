@@ -56,6 +56,7 @@ builder.Services.AddScoped(typeof(IReactionBaseRepository<ReactionPostEntity, Re
 //builder.Services.AddScoped(typeof(IReactionBaseRepository<ReactionCommentEntity, ReactionCommentEntity>), typeof(ReactionCommentRepositories));
 builder.Services.AddScoped(typeof(IReactionRepository), typeof(ReactionRepository));
 builder.Services.AddScoped(typeof(IEmotionTypeRepository), typeof(EmotionTypeRepository));
+builder.Services.AddScoped(typeof(IReactionMessageRepository), typeof(ReactionMessageRepository));
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
