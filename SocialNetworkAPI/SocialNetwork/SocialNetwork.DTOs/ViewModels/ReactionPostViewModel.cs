@@ -14,6 +14,6 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public string EmotionTypeID { get; set; }
 
-
+        public string EmotionName { get; set; }
     }
 }

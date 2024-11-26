@@ -26,8 +26,11 @@ namespace SocialNetwork.Services.Services
 
         public async Task SendPostAsync(PostResponse post)
         {
-            Console.WriteLine($"PostHubService - UserFirstName: {post.LastName}, UserLastName: {post.FirstName}");
             await _hubContext.Clients.All.SendAsync("ReceivePost", post);
+            foreach (var image in post.Images)
+            {
+                Console.WriteLine("image",image);
+            }
         }
 
         public async Task SendUpdateAsycn(PostRequest updateViewModel)
@@ -40,9 +43,27 @@ namespace SocialNetwork.Services.Services
             await _hubContext.Clients.All.SendAsync("ReceiveDeletePost", Id);
         }
 
-        public async Task SendCommentAsycn(CommentRespone commentRespone)
+        public async Task SendCommentAsycn(CommentViewModel commentRespone)
         {
             await _hubContext.Clients.All.SendAsync("ReceiveComment", commentRespone);
+
+        }
+        public async Task SendReactionAddAsycn(ReactionRequest reactionRequest)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveReaction", reactionRequest);
+        }
+        public async Task SendReactionUpdateAsycn(ReactionRequest reactionRequest)
+        {
+            await _hubContext.Clients.All.SendAsync("updateEmotion", reactionRequest);
+        }
+
+        public async Task SendDeleteReactionAsycn(string userId, string postId)
+        {
+            await _hubContext.Clients.All.SendAsync("cancelReleasedEmotion", new
+            {
+                PostID=postId,
+                UserID=userId
+            });
 
         }
     }

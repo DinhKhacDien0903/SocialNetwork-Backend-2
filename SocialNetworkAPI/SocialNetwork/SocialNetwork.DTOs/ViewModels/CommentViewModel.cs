@@ -27,7 +27,7 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public List<CommentRespone> Children { get; set; } = new List<CommentRespone>();
+        public List<CommentViewModel> Children { get; set; } = new List<CommentViewModel>();
 
         //public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 

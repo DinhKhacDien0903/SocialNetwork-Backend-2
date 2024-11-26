@@ -13,11 +13,13 @@ namespace SocialNetwork.Web.Controllers
     {
         private readonly IHubContext<PostHub> _postHubContext;
         private readonly ICommentService _commentService;
+        //private readonly IReactionCommentService _reactionComment;
 
         public CommentController(ICommentService commentService, IHubContext<PostHub> postHubContext)
         {
             _commentService = commentService;
             _postHubContext = postHubContext;
+            //_reactionComment = reactionComment;
         }
 
         [HttpGet]
@@ -32,10 +34,14 @@ namespace SocialNetwork.Web.Controllers
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetCommentByPostId(string postId)
         {
-            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var commnet = await _commentService.GetCommentByPostIdAsync(postId);
-            return Ok(commnet);
+            return Ok(new
+            {
+                numberOfComment = commnet.NumberOfComment,
+                comment = commnet.Comment
+            });
         }
 
 
@@ -88,6 +94,38 @@ namespace SocialNetwork.Web.Controllers
             var count = await _commentService.GetCommentCountByPostIdAsync(postId);
             return Ok(new { count });
         }
+
+        //[HttpGet("AllEmotion")]
+        //public async Task<ActionResult<IEnumerable<EmotionRequest>>> GetAllEmotion()
+        //{
+        //    var emotions = await _reactionComment.GetAllEmotionTypesAsync();
+        //    return Ok(emotions);
+        //}
+
+        //[HttpPut("emotion/{postId}")]
+        //public async Task<IActionResult> AddEmotion(string postId, EmotionRequest emotionRequest)
+        //{
+
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        //    var result = await _reactionComment.AddReactionAsync(postId, userId, emotionRequest.EmotionTypeID);
+
+        //    if (result == null)
+        //    {
+        //        return BadRequest("error add reaction");
+        //    }
+        //    return Ok();
+        //}
+
+        //[HttpDelete("emotion/{postId}")]
+
+        //public async Task<IActionResult> CancelReleaseEmotion(string postId)
+        //{
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        //    var result = await _reactionComment.RemoveReactionAsync(postId, userId);
+        //    return result ? Ok() : NotFound("no have reaction remove");
+        //}
 
     }
 

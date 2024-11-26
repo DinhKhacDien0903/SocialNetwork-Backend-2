@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using SocialNetwork.DTOs.Request;
 using SocialNetwork.DTOs.Response;
 using SocialNetwork.DTOs.ViewModels;
 
@@ -55,15 +56,18 @@ namespace SocialNetwork.Helpers.Hubs
             catch (Exception ex)
             {
                 throw new Exception("Error in sendDelete");
-
             }
         }
 
-        public async Task SendReaction(string postId, string userId, string emotionTypeId)
-        {
-            await Clients.All.SendAsync("ReceiveReaction", postId, userId, emotionTypeId);
-        }
+        //public async Task SendReaction(ReactionRequest reactionRequest)
+        //{
+        //    await Clients.All.SendAsync("ReceiveReaction", reactionRequest);
+        //}
 
+        public async Task RemoveReaction(string postId, string userId)
+        {
+            await Clients.All.SendAsync("ReceiveRemoveReaction", postId, userId);
+        }
 
 
 
@@ -77,7 +81,7 @@ namespace SocialNetwork.Helpers.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, postId);
         }
 
-        public async Task SendCommentAsync(CommentRespone comment)
+        public async Task SendCommentAsync(CommentViewModel comment)
         {
             try
             {

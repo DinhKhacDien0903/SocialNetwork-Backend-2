@@ -11,7 +11,7 @@ namespace SocialNetwork.Domain.IRepositories
     public interface ICommentRepositories
     {
         Task<IEnumerable<CommentEntity>> GetAllAsync();
-        Task<IEnumerable<CommentRespone>> GetCommentsByPostIdAsync(string postId);
+        Task<CommentResultViewModel> GetCommentsByPostIdAsync(string postId);
         //Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(string parentCommentId);
         Task<CommentEntity> GetCommentByIdAsync(string commentId);
         Task AddCommentAsync(CommentEntity comment);

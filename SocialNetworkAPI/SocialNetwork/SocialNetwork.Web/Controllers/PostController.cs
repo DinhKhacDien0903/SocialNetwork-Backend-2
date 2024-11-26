@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using SocialNetwork.Domain.Entities;
+using SocialNetwork.DTOs.Request;
 using SocialNetwork.DTOs.ViewModels;
 using System.Security.Claims;
 
@@ -26,10 +28,19 @@ namespace SocialNetwork.Web.Controllers
         public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts()
         {
             var posts = await _postService.GetAllPostsAsync();
+
+
+
             return Ok(posts);
         }
 
-       
+        [HttpGet("AllPostUserId")]
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync(string userId)
+        {
+            var posts = await _postService.GetPostsByUserIdAsync(userId);
+            return Ok(posts);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<PostViewModel>> GetPostById(string id)
         {
@@ -42,7 +53,7 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PostResponse>> CreatePost(PostRequest postViewModel)
+        public async Task<ActionResult<PostResponse>> CreatePost( PostRequest postViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -50,7 +61,7 @@ namespace SocialNetwork.Web.Controllers
             }
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var createdPost = await _postService.CreatePostAsync(postViewModel, userId);
-            //await _postHubService.SendPostAsync(createdPost);
+            await _postHubService.SendPostAsync(createdPost);
             return CreatedAtAction(nameof(CreatePost), new { postId = createdPost.PostID }, createdPost);
         }
 
@@ -105,21 +116,22 @@ namespace SocialNetwork.Web.Controllers
 
             var result = await _reactionPostService.AddReactionAsync(postId, userId, emotionRequest.EmotionTypeID);
 
-            if (!result)
+            if (result == null)
             {
                 return BadRequest("error add reaction");
             }
-            return Ok();
+            return Ok(result);
         }
 
         [HttpDelete("emotion/{postId}")]
 
         public async Task<IActionResult> CancelReleaseEmotion(string postId)
         {
-            var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;    
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var result=await _reactionPostService.RemoveReactionAsync(postId,userId);
-            return result ? Ok() : NotFound("no have reaction remove");
+            var result = await _reactionPostService.RemoveReactionAsync(postId, userId);
+            if (!result) return BadRequest("Failed to delete reaction");
+            return Ok(new { PostID = postId, UserID = userId });
         }
     }
 }

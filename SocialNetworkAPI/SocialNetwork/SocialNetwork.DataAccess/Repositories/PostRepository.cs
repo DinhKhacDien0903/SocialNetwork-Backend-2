@@ -3,6 +3,7 @@ using SocialNetwork.DTOs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,16 +25,17 @@ namespace SocialNetwork.DataAccess.Repositories
             await _context.Posts.AddAsync(entity);
         }
 
-       
 
-       
+
+
 
         public async Task<IEnumerable<PostViewModel>> GetAllAsync()
         {
-            //var user=await _context.Users.FindAsync(enti)
             var posts = await _context.Posts
-                .Include(x => x.User)
-                .Include(x => x.Reaction)
+            .Include(x => x.User)
+            .Include(x => x.Images)
+            .Include(x => x.Reactions)
+                .ThenInclude(rp => rp.Reaction)
                 .ThenInclude(r => r.EmotionType)
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => new PostViewModel
@@ -43,21 +45,30 @@ namespace SocialNetwork.DataAccess.Repositories
                     Content = x.Content,
                     LastName = x.User.LastName,
                     FirstName = x.User.FirstName,
-                    AvatarUser = x.User.AvatarUrl,
-                    CurrentEmotionId = x.Reaction.Any() ? x.Reaction.First().EmotionType.EmotionTypeID : null,
-                    CurrentEmotionName = x.Reaction.Any() ? x.Reaction.First().EmotionType.EmotionName : null,
-                    Reactions = x.Reaction.Select(r => new ReactionPostViewModel
+                    AvatarUrl = x.User.AvatarUrl,
+
+                    EmotionTypeID = x.Reactions.Any(x => !x.Reaction.IsDeleted) ? x.Reactions.First().Reaction.EmotionType.EmotionTypeID : null,
+                    EmotionName = x.Reactions.Any(x => !x.Reaction.IsDeleted) ? x.Reactions.First().Reaction.EmotionType.EmotionName : null,
+
+                    Reactions = x.Reactions
+                    .Where(x => !x.Reaction.IsDeleted)
+                    .Select(rp => new ReactionPostViewModel
                     {
-                        ReactionID = r.ReactionID,
-                        EmotionTypeID = r.EmotionType.EmotionTypeID
+                        ReactionID = rp.ReactionID,
+                        EmotionTypeID = rp.Reaction.EmotionType.EmotionTypeID,
+                        EmotionName = rp.Reaction.EmotionType.EmotionName,
+                        UserID = rp.Reaction.UserID
                     }).ToList(),
-                    // Uncomment nếu cần kiểm tra phần Images
-                    // Images = x.Images.Select(img => new ImagesOfPostViewModel
-                    // {
-                    //     ImageUrl = img.ImageUrl 
-                    // }).ToList(),
+
+                    Images = x.Images
+                    .Where(x => !x.IsDeleted)
+                    .Select(img => new ImagesOfPostViewModel
+                    {
+                        ImgUrl = img.ImgUrl
+                    }).ToList(),
                 })
                 .ToListAsync();
+
 
             foreach (var post in posts)
             {
@@ -78,10 +89,45 @@ namespace SocialNetwork.DataAccess.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<PostEntity>> GetPostsByUserIdAsync(string userId)
-        {
-            return await _context.Posts.Where(p => p.UserID == userId).ToListAsync();
-        }
+        //public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
+        //{
+        //    var postUser = await _context.Posts
+        //         .Include(x => x.User)
+        //         .Include(x => x.Images)
+        //             .ThenInclude(x => x.ImgUrl)
+        //         .Include(x => x.Reactions)
+        //             .ThenInclude(x => x.Reaction)
+        //             .ThenInclude(x => x.EmotionType)
+        //             .Where(x => !x.IsDelete && x.UserID==userId )
+        //             .OrderByDescending(x => x.CreatedAt)
+        //             .Select(x => new PostViewModel
+        //             {
+        //                 PostID = x.PostID,
+        //                 UserID = x.UserID,
+        //                 Content = x.Content,
+        //                 FirstName = x.User.FirstName,
+        //                 LastName = x.User.LastName,
+        //                 AvatarUrl = x.User.AvatarUrl,
+
+        //                 Reactions = x.Reactions
+        //                 .Where(r => !r.Reaction.IsDeleted)
+        //                 .Select(r => new ReactionPostViewModel
+        //                 {
+        //                     ReactionID = r.ReactionID,
+        //                     UserID = r.Reaction.UserID,
+        //                     EmotionTypeID = r.Reaction.EmotionTypeID,
+        //                     EmotionName = r.Reaction.EmotionType.EmotionName
+        //                 }).ToList(),
+        //                 Images = x.Images.Where(x => !x.IsDeleted)
+        //                  .Select(i => new ImagesOfPostViewModel
+        //                  {
+        //                      ImgUrl = i.ImgUrl,
+        //                  }).ToList()
+        //             }).ToListAsync();
+
+        //    return postUser;
+
+        //}
 
         public async Task<PostEntity> GetPostWithImagesAsync(Guid postId)
         {
@@ -96,7 +142,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async void Delete(PostEntity Entity)
         {
-           var post=await GetByIDAsync(Entity.PostID);
+            var post = await GetByIDAsync(Entity.PostID);
             if (post != null)
             {
                 post.IsDelete = true;

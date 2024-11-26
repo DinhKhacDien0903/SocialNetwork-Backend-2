@@ -3,11 +3,11 @@
     public class ReactionPostEntity
     {
         [Key, Column(Order = 0)]
-        public string ReactionID { get; set; }
+        public string? ReactionID { get; set; }
 
         [Key, Column(Order = 1)]
-        public string PostID { get; set; }
-        //public bool IsDeleted { get; set; } = false;
+        public string? PostID { get; set; }
+
         [ForeignKey("ReactionID")]
         public ReactionEntity? Reaction { get; set; }
 

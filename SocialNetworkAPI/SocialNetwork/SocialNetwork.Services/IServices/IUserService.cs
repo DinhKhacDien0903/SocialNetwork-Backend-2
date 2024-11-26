@@ -17,5 +17,8 @@ namespace SocialNetwork.Services.IServices
         Task<UserViewModel>GetUserInforAsync(string userId);
 
         Task<IEnumerable<FriendViewModel>> GetFriendOnlinesAsync(string userId);
+
+
+        //Task<IEnumerable<>>
     }
 }

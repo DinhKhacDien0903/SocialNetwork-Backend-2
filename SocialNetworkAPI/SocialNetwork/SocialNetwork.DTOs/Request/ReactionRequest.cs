@@ -10,11 +10,21 @@ namespace SocialNetwork.DTOs.Request
     {
         public string PostID { get; set; }
 
+        //public string ReactionID { get; set; }
+
         public string UserID { get; set; }
 
         public string EmotionTypeID { get; set; }
 
         public string EmotionName {  get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string? AvatarUrl { get; set; }
+
+        //public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }

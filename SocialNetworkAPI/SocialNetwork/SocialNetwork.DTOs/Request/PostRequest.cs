@@ -14,5 +14,7 @@ namespace SocialNetwork.DTOs.Request
         public string Content { get; set; }
 
         public List<ImagesOfPostViewModel> Images { get; set; } = new List<ImagesOfPostViewModel>();
+        //public List<string> Images { get; set; }
+
     }
 }

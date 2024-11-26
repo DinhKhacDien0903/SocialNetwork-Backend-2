@@ -52,7 +52,8 @@ builder.Services.AddScoped(typeof(IRefreshTokenRepository),typeof(RefreshTokenRe
 builder.Services.AddScoped(typeof(IMessageRepository),typeof(MessageRepository));
 builder.Services.AddScoped(typeof(IRelationshipRepository),typeof(RelationshipRepository));
 builder.Services.AddScoped(typeof(IMessageImagesRepository),typeof(MessageImagesRepository));
-builder.Services.AddScoped(typeof(IReactionPostRepository), typeof(ReactionPostRepository));
+builder.Services.AddScoped(typeof(IReactionBaseRepository<ReactionPostEntity, ReactionPostEntity>), typeof(ReactionPostRepository));
+//builder.Services.AddScoped(typeof(IReactionBaseRepository<ReactionCommentEntity, ReactionCommentEntity>), typeof(ReactionCommentRepositories));
 builder.Services.AddScoped(typeof(IReactionRepository), typeof(ReactionRepository));
 builder.Services.AddScoped(typeof(IEmotionTypeRepository), typeof(EmotionTypeRepository));
 
@@ -65,6 +66,7 @@ builder.Services.AddScoped(typeof(IRelationshipService), typeof(RelationshipServ
 builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
 builder.Services.AddScoped<IPostHubService, PostHubService>();
 builder.Services.AddScoped(typeof(IReactionPostService), typeof(ReactionPostService));
+//builder.Services.AddScoped(typeof(IReactionCommentService), typeof(ReactionCommentService));
 
 
 

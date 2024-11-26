@@ -76,11 +76,16 @@ public class CommentService : ICommentService
         return _mapper.Map<CommentViewModel>(comment);
     }
 
-    public async Task<IEnumerable<CommentViewModel>> GetCommentByPostIdAsync(string postId)
+    public async Task<CommentResultViewModel> GetCommentByPostIdAsync(string postId)
     {
         var comments = await _commentRepositories.GetCommentsByPostIdAsync(postId);
 
-        return _mapper.Map<IEnumerable<CommentViewModel>>(comments);
+        return new CommentResultViewModel
+        {
+            Comment = comments.Comment,
+            NumberOfComment = comments.NumberOfComment,
+
+        };
     }
 
     public async Task<int> GetCommentCountByPostIdAsync(string postId)

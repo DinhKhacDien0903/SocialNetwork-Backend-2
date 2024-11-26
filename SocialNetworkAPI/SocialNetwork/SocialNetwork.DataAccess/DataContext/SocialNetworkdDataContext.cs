@@ -219,8 +219,26 @@ namespace SocialNetwork.DataAccess.DataContext
             });
 
 
+            //modelBuilder.Entity<ImagesOfPostEntity>(entity =>
+            //{
+            //    entity.HasKey(e => e.ImagesOfPostID);
+            //    entity.Property(e => e.ImagesOfPostID).ValueGeneratedNever(); // Hoặc GeneratedOnAdd nếu database tự sinh
+            //    entity.HasOne<PostEntity>()
+            //          .WithMany(p => p.Images)
+            //          .HasForeignKey(e => e.PostID)
+            //          .OnDelete(DeleteBehavior.Cascade);
+            //});
+            modelBuilder.Entity<ReactionPostEntity>()
+          .HasOne(rp => rp.Post)
+          .WithMany(p => p.Reactions)
+          .HasForeignKey(rp => rp.PostID)
+          .OnDelete(DeleteBehavior.Cascade);
 
-
+            modelBuilder.Entity<ReactionPostEntity>()
+                .HasOne(rp => rp.Reaction)
+                .WithMany()
+                .HasForeignKey(rp => rp.ReactionID)
+                .OnDelete(DeleteBehavior.NoAction); // Đặt 
 
 
             modelBuilder.Entity<UserRoleEntity>()

@@ -13,11 +13,13 @@ namespace SocialNetwork.DTOs.Response
 
         public string UserID { get; set; }
 
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
+        public string? AvatarUrl { get; set; }
 
         public List<ImagesOfPostViewModel> Images { get; set; } = new List<ImagesOfPostViewModel>();
     }

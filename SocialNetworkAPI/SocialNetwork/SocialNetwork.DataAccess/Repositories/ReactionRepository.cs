@@ -27,7 +27,12 @@ namespace SocialNetwork.DataAccess.Repositories
                 return reaction;
             }
 
-            public async Task UpdateAsync(ReactionEntity entity)
+        public async Task<EmotionTypeEntity> GetByIDAsync(string id)
+        {
+            return await _context.EmotionTypes.FindAsync(id);
+        }
+
+        public async Task UpdateAsync(ReactionEntity entity)
             {
                 _context.Reactions.Update(entity);
                 await _context.SaveChangesAsync();

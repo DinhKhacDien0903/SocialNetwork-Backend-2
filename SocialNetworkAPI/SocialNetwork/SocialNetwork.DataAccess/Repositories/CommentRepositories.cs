@@ -42,13 +42,15 @@ public class CommentRepositories : ICommentRepositories
         return await _context.Comments.FindAsync(commentId);
     }
 
-    public async Task<IEnumerable<CommentRespone>> GetCommentsByPostIdAsync(string postId)
+    
+
+    public async Task<CommentResultViewModel> GetCommentsByPostIdAsync(string postId)
     {
         var comments= await _context.Comments
             .Include(x => x.User)
             .Where(x => x.PostID == postId && !x.IsDelete)
             .OrderByDescending(x => x.CreatedAt)
-            .Select(x=> new CommentRespone
+            .Select(x=> new CommentViewModel
             {
                 CommentID=x.CommentID,
                 PostID=x.PostID,
@@ -62,8 +64,16 @@ public class CommentRepositories : ICommentRepositories
             .ToListAsync();
 
         var newComment = NewComments(comments);
-        return newComment;
+        var numberOfComment = comments.Count;
+        return new CommentResultViewModel
+        {
+            NumberOfComment = numberOfComment,
+            Comment = newComment
+        };
     }
+
+
+ 
 
     //public async Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(string parentCommentId)
     //{
@@ -87,10 +97,10 @@ public class CommentRepositories : ICommentRepositories
         return count;
     }
 
-    private List<CommentRespone> NewComments(List<CommentRespone> comments)
+    private List<CommentViewModel> NewComments(List<CommentViewModel> comments)
     {
         var commentMap = comments.ToDictionary(c => c.CommentID, c => c);
-        var nestedComments = new List<CommentRespone>();
+        var nestedComments = new List<CommentViewModel>();
 
         foreach (var comment in comments)
         {

@@ -36,45 +36,42 @@ namespace SocialNetwork.Services.Services
 
             try
             {
-                var postEntity = _mapper.Map<PostEntity>(postRequest);
-                postEntity.PostID = Guid.NewGuid().ToString(); 
-                postEntity.UserID = userID; 
-
-                Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
-
-                await _postRepository.AddAsync(postEntity);
-                await _postRepository.SaveChangeAsync();
-
-                if (postRequest.Images != null && postRequest.Images.Count > 0)
-                {
-                    foreach (var image in postRequest.Images)
+                    var postEntity = _mapper.Map<PostEntity>(postRequest);
+                    postEntity.PostID = Guid.NewGuid().ToString(); 
+                    postEntity.UserID = userID;
+                    postEntity.User = await _userRepository.GetByIDAsync(userID);
+                    if (postEntity.User == null)
                     {
-                        if (string.IsNullOrWhiteSpace(image.ImgUrl))
+                        throw new Exception("User not found.");
+                    }
+                    Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
+
+                    await _postRepository.AddAsync(postEntity);
+                    await _postRepository.SaveChangeAsync();
+
+                    if (postRequest.Images != null && postRequest.Images.Count > 0)
+                    {
+                        foreach (var image in postRequest.Images)
                         {
-                            throw new ArgumentException("Image URL cannot be null or empty.");
-                        }
+                            if (string.IsNullOrWhiteSpace(image.ImgUrl))
+                            {
+                                throw new ArgumentException("Image URL cannot be null or empty.");
+                            }
 
                         var imageEntity = _mapper.Map<ImagesOfPostEntity>(image);
+                        
                         imageEntity.PostID = postEntity.PostID;
+                        //await _imageRepository.AddAsync(imageEntity);
 
-                        Console.WriteLine($"Adding Image - PostID: {imageEntity.PostID}, ImgUrl: {imageEntity.ImgUrl}");
-
-                        await _imageRepository.AddAsync(imageEntity);
+                        }
                     }
-                    await _imageRepository.SaveChangeAsync();
-                }
 
-                var user = await _userRepository.GetByIDAsync(userID);
-                if (user == null)
-                {
-                    throw new Exception("User not found.");
-                }
 
-                var postResponse = _mapper.Map<PostResponse>(postEntity);
-                postResponse.FirstName = user?.FirstName;
-                postResponse.LastName = user?.LastName;
-
-                return postResponse;
+                    var postResponse = _mapper.Map<PostResponse>(postEntity);
+                    postResponse.FirstName = postEntity.User?.FirstName;
+                    postResponse.LastName = postEntity.User?.LastName;
+                    postRequest.Images = postResponse.Images;
+                    return postResponse;
             }
             catch (DbUpdateException dbEx)
             {
@@ -110,7 +107,10 @@ namespace SocialNetwork.Services.Services
         public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync()
         {
             var posts = await _postRepository.GetAllAsync();
+
             //var user=_userRepository.get
+
+
             return _mapper.Map<IEnumerable<PostViewModel>>(posts);
         }
 

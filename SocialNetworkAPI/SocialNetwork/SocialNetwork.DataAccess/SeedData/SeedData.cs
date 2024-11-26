@@ -10,12 +10,10 @@ namespace SocialNetwork.DataAccess.SeedData
         {
             var context = serviceProvider.GetRequiredService<SocialNetworkdDataContext>();
 
-            // Kiểm tra và tạo người dùng
             if (!userManager.Users.Any())
             {
                 var users = new List<UserEntity>();
 
-                // Seed 5 người dùng
                 for (int i = 1; i <= 5; i++)
                 {
                     var user = new UserEntity
@@ -24,7 +22,7 @@ namespace SocialNetwork.DataAccess.SeedData
                         Email = $"user{i}@test.com",
                         FirstName = $"First{i}",
                         LastName = $"Last{i}",
-                        IsActive = i <= 4, // 4 người dùng online, 1 người offline
+                        IsActive = i <= 4, 
                         CreatedAt = DateTime.UtcNow.AddDays(-i),
                         LastLogin = i <= 4 ? DateTime.UtcNow : (DateTime?)null,
                         EmailConfirmed = true
@@ -38,12 +36,10 @@ namespace SocialNetwork.DataAccess.SeedData
                     }
                 }
 
-                // Lưu người dùng vào cơ sở dữ liệu
                 await context.SaveChangesAsync();
 
                 users = await context.Users.Select(x => x).ToListAsync();
 
-                // Seed các bài viết
                 if (!context.Set<PostEntity>().Any())
                 {
                     var posts = new List<PostEntity>();

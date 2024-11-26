@@ -6,5 +6,6 @@
         Task<ReactionEntity> GetByIdAsync(string reactionId);
         Task UpdateAsync(ReactionEntity entity);
         //Task DeleteAsync(Guid UserId ,Guid reactionId);
+        Task<EmotionTypeEntity> GetByIDAsync(string id);
     }
 }

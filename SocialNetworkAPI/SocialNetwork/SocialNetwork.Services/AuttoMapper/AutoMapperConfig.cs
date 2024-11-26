@@ -23,9 +23,9 @@ namespace SocialNetwork.Services.AuttoMapper
             //comment
             CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
             CreateMap<CommentEntity, CommentRequest>().ReverseMap();
-            CreateMap<CommentEntity, CommentRespone>().ReverseMap();
+            CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
             CreateMap<CommentViewModel,CommentRequest>().ReverseMap();
-            CreateMap<CommentRespone,CommentViewModel>().ReverseMap();
+            CreateMap<CommentViewModel, CommentViewModel>().ReverseMap();
 
 
             //reactionPost

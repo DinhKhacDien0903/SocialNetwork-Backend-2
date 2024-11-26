@@ -1,4 +1,5 @@
-﻿using SocialNetwork.DTOs.Response;
+﻿using SocialNetwork.DTOs.Request;
+using SocialNetwork.DTOs.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,12 @@ namespace SocialNetwork.Services.IServices
 
         Task SendDeleteAsycn(Guid Id);
 
-        Task SendCommentAsycn(CommentRespone commentRespone);
+        Task SendCommentAsycn(CommentViewModel commentRespone);
+
+        Task SendReactionAddAsycn(ReactionRequest reactionRequest);
+
+        Task SendReactionUpdateAsycn(ReactionRequest reactionRequest);
+
+        Task SendDeleteReactionAsycn(string userId, string postId);
     }
 }
