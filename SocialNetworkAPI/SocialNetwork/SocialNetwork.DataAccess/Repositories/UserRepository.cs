@@ -44,6 +44,19 @@ namespace SocialNetwork.DataAccess.Repositories
             return userIfor;
         }
 
+        public async Task<IEnumerable<UserEntity>> SearchUserAsync(string query)
+        {
+            var userSearch=await _context.Users.Where(x=>x.FirstName.ToLower().Contains(query)
+                            ||x.LastName.ToLower().Contains(query)|| 
+                            (x.FirstName.ToLower()+x.LastName.ToLower()).Contains(query)).ToListAsync()  ;
+            //if(userSearch == null)
+            //{
+
+            //}
+
+            return userSearch;
+        }
+
         public async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             var user = await _userManager.FindByIdAsync(userId);

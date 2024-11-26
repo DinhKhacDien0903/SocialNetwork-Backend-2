@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SocialNetwork.DTOs.Response;
+using System.Security.Claims;
 
 namespace SocialNetwork.Services.Services
 {
@@ -12,14 +9,25 @@ namespace SocialNetwork.Services.Services
     {
         private readonly IPostRepository _postRepository ;
         private readonly IMapper _mapper ;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
-        public PostService(IPostRepository postRepository, IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
+
+        public PostService(IPostRepository postRepository,
+            UserManager<UserEntity> userManager,IUserRepository userRepository
+            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
         {
+            _userManager = userManager;
+            _userRepository = userRepository;
             _postRepository = postRepository; 
             _imageRepository = imageRepository;
             _mapper = mapper;
         }
-        public async Task<PostRequest> CreatePostAsync(PostRequest postRequest)
+
+
+
+
+        public async Task<PostResponse> CreatePostAsync(PostRequest postRequest, string userID)
         {
             if (string.IsNullOrWhiteSpace(postRequest.Content))
             {
@@ -28,33 +36,42 @@ namespace SocialNetwork.Services.Services
 
             try
             {
-                var postEntity = _mapper.Map<PostEntity>(postRequest);
-
-                Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
-
-                await _postRepository.AddAsync(postEntity);
-                await _postRepository.SaveChangeAsync();
-
-                if (postRequest.Images != null && postRequest.Images.Count > 0)
-                {
-                    foreach (var image in postRequest.Images)
+                    var postEntity = _mapper.Map<PostEntity>(postRequest);
+                    postEntity.PostID = Guid.NewGuid().ToString(); 
+                    postEntity.UserID = userID;
+                    postEntity.User = await _userRepository.GetByIDAsync(userID);
+                    if (postEntity.User == null)
                     {
-                        if (string.IsNullOrWhiteSpace(image.ImgUrl))
+                        throw new Exception("User not found.");
+                    }
+                    Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
+
+                    await _postRepository.AddAsync(postEntity);
+                    await _postRepository.SaveChangeAsync();
+
+                    if (postRequest.Images != null && postRequest.Images.Count > 0)
+                    {
+                        foreach (var image in postRequest.Images)
                         {
-                            throw new ArgumentException("Image URL cannot be null or empty.");
-                        }
+                            if (string.IsNullOrWhiteSpace(image.ImgUrl))
+                            {
+                                throw new ArgumentException("Image URL cannot be null or empty.");
+                            }
 
                         var imageEntity = _mapper.Map<ImagesOfPostEntity>(image);
-                        imageEntity.PostID = postEntity.PostID; 
+                        
+                        imageEntity.PostID = postEntity.PostID;
+                        //await _imageRepository.AddAsync(imageEntity);
 
-                        Console.WriteLine($"Adding Image - PostID: {imageEntity.PostID}, ImgUrl: {imageEntity.ImgUrl}");
-
-                        await _imageRepository.AddAsync(imageEntity);
+                        }
                     }
-                    await _imageRepository.SaveChangeAsync();
-                }
 
-                return _mapper.Map<PostRequest>(postEntity);
+
+                    var postResponse = _mapper.Map<PostResponse>(postEntity);
+                    postResponse.FirstName = postEntity.User?.FirstName;
+                    postResponse.LastName = postEntity.User?.LastName;
+                    postRequest.Images = postResponse.Images;
+                    return postResponse;
             }
             catch (DbUpdateException dbEx)
             {
@@ -72,9 +89,7 @@ namespace SocialNetwork.Services.Services
 
 
 
-
-
-        public async Task<bool> DeletePostAsync(Guid postId)
+        public async Task<bool> DeletePostAsync(string postId)
         {
             var postEntity = await _postRepository.GetByIDAsync(postId);
             if (postEntity == null)
@@ -87,19 +102,23 @@ namespace SocialNetwork.Services.Services
             return true;
         }
 
+    
+
         public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync()
         {
             var posts = await _postRepository.GetAllAsync();
+
+            //var user=_userRepository.get
+
+
             return _mapper.Map<IEnumerable<PostViewModel>>(posts);
         }
 
-        public async Task<PostViewModel> GetPostByIdAsync(Guid postId)
+        public async Task<PostViewModel> GetPostByIdAsync(string postId)
         {
-            // Truyền vào ID mà không cần chuyển đổi thành chuỗi
             var post = await _postRepository.GetByIDAsync(postId);
             if (post == null)
             {
-                // Thay vì ném ngoại lệ, bạn có thể trả về null
                 return null;
             }
             return _mapper.Map<PostViewModel>(post);
@@ -121,8 +140,8 @@ namespace SocialNetwork.Services.Services
 
         public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
         {
-            var posts = await _postRepository.GetAllAsync(); // Thay thế bằng phương thức phù hợp để lấy bài viết theo UserID
-            var userPosts = posts.Where(p => p.UserID == userId); // Lọc bài viết theo UserID
+            var posts = await _postRepository.GetAllAsync(); 
+            var userPosts = posts.Where(p => p.UserID == userId); 
             return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
         }
     }

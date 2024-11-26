@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using SocialNetwork.Domain.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 
 namespace SocialNetwork.DataAccess.DataContext
@@ -131,11 +132,16 @@ namespace SocialNetwork.DataAccess.DataContext
 
                 // Configure self-referencing relationship for ParentComment
                 entity.HasOne(c => c.ParentComment)
-                      .WithMany(c => c.Replies)
+                      .WithMany(c => c.Children)
                       .HasForeignKey(c => c.ParentCommentID)
                       .OnDelete(DeleteBehavior.NoAction);  // No cascade delete for parent-child relationship
             });
+           // modelBuilder.Entity<ReactionEntity>()
+           //.HasKey(r => r.ReactionID); // Đảm bảo rằng ReactionID là khóa chính
 
+           // modelBuilder.Entity<ReactionEntity>()
+           //     .Property(r => r.ReactionID)
+           //     .ValueGeneratedOnAdd();
 
 
             modelBuilder.Entity<ReactionGroupChatMessageEntity>(entity =>
@@ -212,8 +218,26 @@ namespace SocialNetwork.DataAccess.DataContext
             });
 
 
+            //modelBuilder.Entity<ImagesOfPostEntity>(entity =>
+            //{
+            //    entity.HasKey(e => e.ImagesOfPostID);
+            //    entity.Property(e => e.ImagesOfPostID).ValueGeneratedNever(); // Hoặc GeneratedOnAdd nếu database tự sinh
+            //    entity.HasOne<PostEntity>()
+            //          .WithMany(p => p.Images)
+            //          .HasForeignKey(e => e.PostID)
+            //          .OnDelete(DeleteBehavior.Cascade);
+            //});
+            modelBuilder.Entity<ReactionPostEntity>()
+          .HasOne(rp => rp.Post)
+          .WithMany(p => p.Reactions)
+          .HasForeignKey(rp => rp.PostID)
+          .OnDelete(DeleteBehavior.Cascade);
 
-
+            modelBuilder.Entity<ReactionPostEntity>()
+                .HasOne(rp => rp.Reaction)
+                .WithMany()
+                .HasForeignKey(rp => rp.ReactionID)
+                .OnDelete(DeleteBehavior.NoAction); // Đặt 
 
 
             modelBuilder.Entity<UserRoleEntity>()

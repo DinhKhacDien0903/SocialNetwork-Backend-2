@@ -1,4 +1,5 @@
-﻿using SocialNetwork.DTOs.Response;
+﻿using SocialNetwork.DataAccess.Repositories;
+using SocialNetwork.DTOs.Response;
 using SocialNetwork.DTOs.ViewModels;
 
 namespace SocialNetwork.Services.AuttoMapper
@@ -10,18 +11,32 @@ namespace SocialNetwork.Services.AuttoMapper
             //CreateMap<UserEntity, UserViewModel>();
             //CreateMap<UserViewModel, UserEntity>();
 
+
+            //post
             CreateMap<PostEntity, PostViewModel>().ReverseMap();
             CreateMap<PostEntity, PostRequest>().ReverseMap();
-            //CreateMap<PostViewModel,PostRequest>.ReverseMap();
-            
+            CreateMap<PostEntity, PostResponse>().ReverseMap();
+
+            //image
             CreateMap<ImagesOfPostEntity, ImagesOfPostViewModel>().ReverseMap();
 
-            CreateMap<PostViewModel, PostEntity>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+            //comment
+            CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
+            CreateMap<CommentEntity, CommentRequest>().ReverseMap();
+            CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
+            CreateMap<CommentViewModel,CommentRequest>().ReverseMap();
+            CreateMap<CommentViewModel, CommentViewModel>().ReverseMap();
 
-            CreateMap<ImagesOfPostViewModel, ImagesOfPostEntity>();
-            CreateMap<CommentViewModel,CommentEntity>().ReverseMap();
 
+            //reactionPost
+            CreateMap<ReactionPostEntity, ReactionPostViewModel>().ReverseMap();
+            CreateMap<ReactionPostEntity, ReactionRequest>().ReverseMap();
+            CreateMap<EmotionRequest,EmotionTypeEntity>().ReverseMap();
+
+            //reaction
+            CreateMap<ReactionEntity, ReactionRequest>().ReverseMap();
+            CreateMap<ReactionPostViewModel, ReactionEntity>().ReverseMap();
+            CreateMap<ReactionRepository,ReactionPostEntity>().ReverseMap();
             //xuoi
 
             CreateMap<UserEntity, UserViewModel>();

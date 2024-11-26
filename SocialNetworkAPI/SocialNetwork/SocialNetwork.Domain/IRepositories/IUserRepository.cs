@@ -11,5 +11,7 @@ namespace SocialNetwork.Domain.IRepositories
         Task UpdateStatusActiveUser(string userId, bool isActive);
 
         Task<UserEntity> GetUserInfor(string userId);
+
+        Task<IEnumerable<UserEntity>> SearchUserAsync(string query);
     }
 }

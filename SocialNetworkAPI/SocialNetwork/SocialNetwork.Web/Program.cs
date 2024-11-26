@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 using SocialNetwork.DataAccess.SeedData;
 using SocialNetwork.Domain.Entities;
 using SocialNetwork.DTOs.Authorize;
+using SocialNetwork.Helpers.Hubs;
 using SocialNetwork.Services.AuttoMapper;
+using SocialNetwork.Services.Unit;
 using SocialNetwork.Web.Hubs;
 using SocialNetwork.Web.Middlewares;
 
@@ -37,6 +39,7 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentRepositories, CommentRepositories>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
@@ -45,12 +48,14 @@ builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
-builder.Services.AddScoped(typeof(IRefreshTokenRepository),typeof(RefreshTokenRepository));
-builder.Services.AddScoped(typeof(IMessageRepository),typeof(MessageRepository));
-builder.Services.AddScoped(typeof(IRelationshipRepository),typeof(RelationshipRepository));
-builder.Services.AddScoped(typeof(IMessageImagesRepository),typeof(MessageImagesRepository));
-builder.Services.AddScoped(typeof(IReactionRepository),typeof(ReactionRepository));
-builder.Services.AddScoped(typeof(IReactionMessageRepository),typeof(ReactionMessageRepository));
+builder.Services.AddScoped(typeof(IRefreshTokenRepository), typeof(RefreshTokenRepository));
+builder.Services.AddScoped(typeof(IMessageRepository), typeof(MessageRepository));
+builder.Services.AddScoped(typeof(IRelationshipRepository), typeof(RelationshipRepository));
+builder.Services.AddScoped(typeof(IMessageImagesRepository), typeof(MessageImagesRepository));
+builder.Services.AddScoped(typeof(IReactionBaseRepository<ReactionPostEntity, ReactionPostEntity>), typeof(ReactionPostRepository));
+//builder.Services.AddScoped(typeof(IReactionBaseRepository<ReactionCommentEntity, ReactionCommentEntity>), typeof(ReactionCommentRepositories));
+builder.Services.AddScoped(typeof(IReactionRepository), typeof(ReactionRepository));
+builder.Services.AddScoped(typeof(IEmotionTypeRepository), typeof(EmotionTypeRepository));
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
@@ -59,6 +64,13 @@ builder.Services.AddScoped(typeof(IChatHubService), typeof(ChatHubService));
 builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
 builder.Services.AddScoped(typeof(IRelationshipService), typeof(RelationshipService));
 builder.Services.AddScoped(typeof(IReactionHubService), typeof(ReactionHubService));
+builder.Services.AddScoped<IPostHubService, PostHubService>();
+builder.Services.AddScoped(typeof(IReactionPostService), typeof(ReactionPostService));
+//builder.Services.AddScoped(typeof(IReactionCommentService), typeof(ReactionCommentService));
+
+
+
+builder.Services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
 
 
 builder.Services.AddHttpContextAccessor();
@@ -74,7 +86,7 @@ builder.Services.AddAuthentication(options =>
 {
     opt.Cookie.Name = "token";
 })
-    
+
     .AddJwtBearer(opt =>
 {
     opt.TokenValidationParameters = new TokenValidationParameters
@@ -154,7 +166,7 @@ builder.Logging.AddDebug();
 var app = builder.Build();
 
 //seed data
-using(var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
@@ -167,7 +179,8 @@ using(var scope = app.Services.CreateScope())
         await dbContext.Database.MigrateAsync();
 
         await SeedData.Initialize(services, userManager);
-    }catch(Exception e)
+    }
+    catch (Exception e)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(e, "An error occurred while seeding the database");
@@ -202,6 +215,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<ChatHub>("/chatPerson");
+
+app.MapHub<PostHub>("/postHub");
+
 
 app.MapHub<ReactionHub>("/reactionMessage");
 

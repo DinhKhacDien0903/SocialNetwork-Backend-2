@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.DTOs.ViewModels
 {
-    public class ImagesOfPostViewModel
+    public class CommentResultViewModel
     {
-        //public Guid PostID { get; set; }
-        public string ImgUrl { get; set; }
-       
+        public IEnumerable<CommentViewModel>? Comment { get; set; }
+        public int NumberOfComment {  get; set; }
     }
 }
