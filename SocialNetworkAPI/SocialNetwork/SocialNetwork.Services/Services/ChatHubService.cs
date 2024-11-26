@@ -1,8 +1,4 @@
-﻿
-
-using SocialNetwork.DataAccess.Repositories;
-
-namespace SocialNetwork.Services.Services
+﻿namespace SocialNetwork.Services.Services
 {
     public class ChatHubService : IChatHubService
     {
@@ -31,7 +27,7 @@ namespace SocialNetwork.Services.Services
             await _messageImageRepository.SaveChangeAsync();
         }
 
-        public async Task<string> AddMessagePersonAsync(MessageViewModel messageViewModel)
+        public async Task<MessageViewModel> AddMessagePersonAsync(MessageViewModel messageViewModel)
         {
             var entity = _mapper.Map<MessagesEntity>(messageViewModel);
 
@@ -41,11 +37,11 @@ namespace SocialNetwork.Services.Services
 
             var message =  await _messageRepository.AddAsync(entity);
 
-            var messageID = message.MessageID;
+            messageViewModel.MessageID = message.MessageID;
 
             await _messageRepository.SaveChangeAsync();
 
-            return messageID;
+            return messageViewModel;
         }
 
         public async Task RemoveMessage(string messageId)

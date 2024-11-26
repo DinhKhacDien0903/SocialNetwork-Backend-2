@@ -18,7 +18,7 @@ namespace SocialNetwork.DTOs.Response
 
         public int? TotalEmotion { get; set; }
 
-        public DateTime? SendDate { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         public List<string> Images { get; set; } = new List<string>();
 

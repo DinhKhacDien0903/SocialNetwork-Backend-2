@@ -53,7 +53,7 @@ namespace SocialNetwork.Web.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<string> SendMessageToPerson(SendMessageToPersonRequest param)
+        public async Task<MessageViewModel> SendMessageToPerson(SendMessageToPersonRequest param)
         {
             
             var sender = await ValidateCurrentAccount();
@@ -66,19 +66,19 @@ namespace SocialNetwork.Web.Hubs
 
             if ( !await ValidateMessage(param, reciver.Id))
             {
-                return string.Empty;
+                return MessageViewModel.Empty;
             }
 
-            var messageId = await SaveMessage(sender.Id, param);
+            var message = await SaveMessage(sender.Id, param);
 
             if (param.Images.Any())
             {
-                await SaveMessageImages(messageId, param.Images);
+                await SaveMessageImages(message.MessageID, param.Images);
             }
 
-            await NotifyReceiverAsync(param.ReciverId, CreateMessageResponse(messageId, param));
+            await NotifyReceiverAsync(param.ReciverId, CreateMessageResponse(message, param));
 
-            return messageId;
+            return message;
         }
 
         public async Task OnUserTyping(string reciverId)
@@ -183,7 +183,7 @@ namespace SocialNetwork.Web.Hubs
             return content?.Length > MAX_MESSAGE_LENGTH;
         }
 
-        private async Task<string> SaveMessage(string senderId, SendMessageToPersonRequest request)
+        private async Task<MessageViewModel> SaveMessage(string senderId, SendMessageToPersonRequest request)
         {
             var sendDatetime = DateTime.UtcNow;
 
@@ -212,14 +212,14 @@ namespace SocialNetwork.Web.Hubs
             await _chatHubService.AddMessageImagesAsync(messageImages);
         }
 
-        private MessagePersonResponse CreateMessageResponse(string messageId, SendMessageToPersonRequest request)
+        private MessagePersonResponse CreateMessageResponse(MessageViewModel message, SendMessageToPersonRequest request)
         {
             return new MessagePersonResponse
             {
-                MessageID = messageId,
+                MessageID = message.MessageID,
                 Content = request.Content,
                 Images = request.Images,
-                SendDate = DateTime.UtcNow,
+                CreatedAt = message.CreatedAt,
                 Symbol = request.Symbol
             };
         }
