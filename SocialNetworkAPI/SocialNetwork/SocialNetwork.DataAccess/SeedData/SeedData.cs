@@ -24,7 +24,8 @@ namespace SocialNetwork.DataAccess.SeedData
                         IsActive = i <= 4,
                         CreatedAt = DateTime.UtcNow.AddDays(-i),
                         LastLogin = i <= 4 ? DateTime.UtcNow : (DateTime?)null,
-                        EmailConfirmed = true
+                        EmailConfirmed = true,
+                        AvatarUrl = "https://res.cloudinary.com/dlran3qvj/image/upload/v1732701622/file_1732701619587.jpg"
                     };
 
                     var result = await userManager.CreateAsync(user, "P@ssw0rd!");
@@ -287,7 +288,7 @@ namespace SocialNetwork.DataAccess.SeedData
                         new EmotionTypeEntity
                         {
                             EmotionTypeID = "2",
-                            EmotionName = "HaHa"
+                            EmotionName = "Haha"
                         },
                         new EmotionTypeEntity
                         {
