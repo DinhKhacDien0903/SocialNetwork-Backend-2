@@ -84,8 +84,8 @@ namespace SocialNetwork.DataAccess.Repositories
                 {
                     result.TotalPage = total / pageSize;
                     result.TotalCount = total;
-                    
-                    if(total % pageSize != 0)
+
+                    if (total % pageSize != 0)
                     {
                         result.TotalPage++;
                     }
@@ -93,6 +93,53 @@ namespace SocialNetwork.DataAccess.Repositories
                 else
                 {
                     result.Conversations = await combinedConversations
+                            .Skip(pageIndex * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<BaseSearchFriendRespone> GetFriendsAsync(string userId, string searchText, int pageIndex, int pageSize, bool isTotalCount)
+        {
+            try
+            {
+                var result = new BaseSearchFriendRespone();
+
+                //Get all friends of current user util unfriend
+                var friends = from rl in _context.Relationships
+                              join u in _context.Users on rl.FriendID equals u.Id
+                              where rl.UserID == userId &&
+                              !rl.IsDeleted &&
+                              (string.IsNullOrEmpty(searchText) || string.Concat(u.LastName.ToLower(), u.FirstName.ToLower()).Contains(searchText.ToLower()))
+                              select new FriendResponse
+                              {
+                                  Id = rl.FriendID,
+                                  FirstName = u.FirstName ?? "",
+                                  LastName = u.LastName ?? "",
+                                  AvatarUrl = u.AvatarUrl ?? "",
+                              };
+
+                var total = friends.Count();
+
+                if (isTotalCount)
+                {
+                    result.TotalPage = total / pageSize;
+                    result.TotalCount = total;
+
+                    if (total % pageSize != 0)
+                    {
+                        result.TotalPage++;
+                    }
+                }
+                else
+                {
+                    result.Friends = await friends
                             .Skip(pageIndex * pageSize)
                             .Take(pageSize)
                             .ToListAsync();
