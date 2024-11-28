@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace SocialNetwork.DTOs.ViewModels
+﻿namespace SocialNetwork.DTOs.ViewModels
 {
     public class FriendViewModel
     {

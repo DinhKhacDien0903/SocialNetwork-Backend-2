@@ -69,6 +69,30 @@ namespace SocialNetwork.Web.Controllers
                 return BadRequest(e.Message);
             }
         }
+        
+        [Authorize]
+        [HttpGet("getFriends")]
+        public async Task<IActionResult> GetFriendsAsync([FromQuery] SearchConversation search)
+            {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var conversation = await _conversationService.GetFriendsAsync(userId, search);
+
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Get all conversation success",
+                    Data = conversation
+                });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
         [Authorize]
         [HttpPost("createGroupChat")]

@@ -17,5 +17,12 @@ namespace SocialNetwork.Services.Services
 
             return conversation;
         }
+
+        public async Task<BaseSearchFriendRespone> GetFriendsAsync(string userId, SearchConversation searchParam)
+        {
+            var friends = await _conversationRepository.GetFriendsAsync(userId, searchParam.TextSearch, searchParam.PageIndex, searchParam.PageSize, searchParam.IsTotalCount);
+
+            return friends;
+        }
     }
 }
