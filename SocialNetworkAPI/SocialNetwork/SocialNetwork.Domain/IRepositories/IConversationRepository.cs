@@ -1,4 +1,4 @@
-﻿using SocialNetwork.DTOs.Response;
+using SocialNetwork.DTOs.Response;
 
 namespace SocialNetwork.Domain.IRepositories
 {

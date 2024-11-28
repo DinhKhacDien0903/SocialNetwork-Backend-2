@@ -49,7 +49,7 @@ namespace SocialNetwork.Web.Controllers
         [Authorize]
         [HttpGet("getAllConversation")]
         public async Task<IActionResult> GetAllConversationAsync([FromQuery] SearchConversation search)
-            {
+        {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -69,11 +69,11 @@ namespace SocialNetwork.Web.Controllers
                 return BadRequest(e.Message);
             }
         }
-        
+
         [Authorize]
         [HttpGet("getFriends")]
         public async Task<IActionResult> GetFriendsAsync([FromQuery] SearchConversation search)
-            {
+        {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -100,7 +100,7 @@ namespace SocialNetwork.Web.Controllers
         {
             try
             {
-                if(_groupChatService.ValidateGroupChat(request))
+                if (_groupChatService.ValidateGroupChat(request))
                 {
                     return BadRequest(new BaseResponse
                     {

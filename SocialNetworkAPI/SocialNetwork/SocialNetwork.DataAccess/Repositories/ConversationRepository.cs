@@ -84,8 +84,8 @@ namespace SocialNetwork.DataAccess.Repositories
                 {
                     result.TotalPage = total / pageSize;
                     result.TotalCount = total;
-                    
-                    if(total % pageSize != 0)
+
+                    if (total % pageSize != 0)
                     {
                         result.TotalPage++;
                     }
@@ -131,8 +131,8 @@ namespace SocialNetwork.DataAccess.Repositories
                 {
                     result.TotalPage = total / pageSize;
                     result.TotalCount = total;
-                    
-                    if(total % pageSize != 0)
+
+                    if (total % pageSize != 0)
                     {
                         result.TotalPage++;
                     }
