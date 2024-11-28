@@ -48,13 +48,13 @@ namespace SocialNetwork.Web.Controllers
 
         [Authorize]
         [HttpGet("getAllConversation")]
-        public async Task<IActionResult> GetAllConversationAsync()
-        {
+        public async Task<IActionResult> GetAllConversationAsync([FromQuery] SearchConversation search)
+            {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                var conversation = await _conversationService.GetAllConversationAsync(userId, SearchConversation.Empty);
+                var conversation = await _conversationService.GetAllConversationAsync(userId, search);
 
                 return Ok(new BaseResponse
                 {

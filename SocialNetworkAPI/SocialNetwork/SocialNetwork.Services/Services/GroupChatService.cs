@@ -27,7 +27,7 @@ namespace SocialNetwork.Services.Services
 
             entity.UpdatedAt = time;
 
-            entity.Avatar = request.Avatar ?? "https://res.cloudinary.com/dkkgmzpqd/image/upload/v1628580134/GroupChat/default-avatar.png";
+            entity.Avatar = request.Avatar ?? "https://res.cloudinary.com/dlran3qvj/image/upload/v1732701622/file_1732701619587.jpg";
 
             var groupChat = await _groupChatRepository.CreateGroupChatAsync(userId, entity, request.Members);
 

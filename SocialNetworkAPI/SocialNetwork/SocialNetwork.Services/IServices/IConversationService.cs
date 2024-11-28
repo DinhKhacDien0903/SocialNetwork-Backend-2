@@ -4,6 +4,6 @@ namespace SocialNetwork.Services.IServices
 {
     public interface IConversationService
     {
-        Task<IEnumerable<LatestConversationsResponse>> GetAllConversationAsync(string userId, SearchConversation searchParam);
+        Task<BaseSearchConversationResponse> GetAllConversationAsync(string userId, SearchConversation searchParam);
     }
 }

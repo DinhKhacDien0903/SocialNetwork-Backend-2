@@ -1,9 +1,10 @@
-﻿using SocialNetwork.DTOs.Response;
+﻿using SocialNetwork.DTOs.Request;
+using SocialNetwork.DTOs.Response;
 
 namespace SocialNetwork.Domain.IRepositories
 {
     public interface IConversationRepository
     {
-        public Task<IEnumerable<LatestConversationsResponse>> GetAllConversationAsync(string userId, string searchText, int skip, int take);
+        public Task<BaseSearchConversationResponse> GetAllConversationAsync(string userId, string searchText, int pageIndex, int pageSize, bool isTotalCount);
     }
 }

@@ -2,8 +2,10 @@
 {
     public class BasePagging
     {
-        public int Skip { get; set; } = 0;
+        public int PageIndex { get; set; } = 0;
 
-        public int Take { get; set; } = int.MaxValue;
+        public int PageSize { get; set; } = 10;
+
+        public bool IsTotalCount { get; set; } = false;
     }
 }

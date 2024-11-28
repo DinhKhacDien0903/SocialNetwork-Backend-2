@@ -50,5 +50,7 @@
         /// The last message in the conversation
         /// </summary>
         public string Message { get; set; } = string.Empty;
+
+        public DateTime? LastMessageCreated { get; set; }
     }
 }
