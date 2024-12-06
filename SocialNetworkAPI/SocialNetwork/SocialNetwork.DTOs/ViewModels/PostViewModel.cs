@@ -22,9 +22,11 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public string? AvatarUrl { get; set; }
 
-        public string? EmotionTypeID { get; set; }
+        //public string? EmotionTypeID { get; set; }
 
-        public string? EmotionName { get; set; }
+        //public string? EmotionName { get; set; }
+
+        public EmotionViewModel UserReaction {  get; set; }
 
         public List<ReactionPostViewModel>? Reactions {  get; set; }=new List<ReactionPostViewModel>();
 

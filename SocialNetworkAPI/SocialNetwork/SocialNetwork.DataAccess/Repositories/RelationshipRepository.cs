@@ -12,7 +12,7 @@ namespace SocialNetwork.DataAccess.Repositories
         }
         public async Task<IEnumerable<string>> GetFriendIdByUserId(string userId)
         {
-            return await _context.Relationships.Where(x => x.UserID == userId).Select(x => x.FriendID).ToListAsync();
+            return await _context.Relationships.Where(x => x.UserID == userId&& !x.IsDeleted).Select(x => x.FriendID).ToListAsync();/*|| x.FriendID == userId*/
         }
     }
 }

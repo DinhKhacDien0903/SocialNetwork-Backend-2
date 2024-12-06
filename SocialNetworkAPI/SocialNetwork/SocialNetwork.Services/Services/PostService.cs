@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.DTOs.Response;
+using SocialNetwork.Services.IServices;
 using System.Security.Claims;
 
 namespace SocialNetwork.Services.Services
@@ -12,16 +13,21 @@ namespace SocialNetwork.Services.Services
         private readonly UserManager<UserEntity> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
-
+        private readonly INotificationService _notificationservice;
+        private readonly IRelationshipRepository _relationshipRepository;
+        private readonly IPostHubService _postHubService;
         public PostService(IPostRepository postRepository,
-            UserManager<UserEntity> userManager,IUserRepository userRepository
-            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
+            UserManager<UserEntity> userManager, IUserRepository userRepository
+            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper, INotificationService notificationservice, IRelationshipRepository relationshipRepository, IPostHubService postHubService)
         {
             _userManager = userManager;
             _userRepository = userRepository;
-            _postRepository = postRepository; 
+            _postRepository = postRepository;
             _imageRepository = imageRepository;
             _mapper = mapper;
+            _notificationservice = notificationservice;
+            _relationshipRepository = relationshipRepository;
+            _postHubService = postHubService;
         }
 
 
@@ -71,7 +77,42 @@ namespace SocialNetwork.Services.Services
                     postResponse.FirstName = postEntity.User?.FirstName;
                     postResponse.LastName = postEntity.User?.LastName;
                     postRequest.Images = postResponse.Images;
-                    return postResponse;
+
+
+
+                //Friends
+                var friends = await _relationshipRepository.GetFriendIdByUserId(userID);
+
+                var friendToNotify = friends.Where(x=>x!=userID).ToList();
+
+                if (friends.Any())
+                {
+                    // Nội dung thông báo
+                    var content = $"{postEntity.User.FirstName} {postEntity.User.LastName} vừa đăng một bài viết mới.";
+
+
+                    var notification = new NotificationViewModel
+                    {
+                        Content = content,
+                        Type = "New_Post",
+                        UserId = userID,
+                        //friendId= friendToNotify,
+                        //PostId = postEntity.PostID,
+                        //CreatedAt = DateTime.UtcNow
+                    };
+
+
+                    // Tạo thông báo trong cơ sở dữ liệu
+                    await _notificationservice.CreateNotificationAsync(notification, friendToNotify);
+
+                    // Gửi thông báo qua SignalR đến danh sách bạn bè
+                    await _postHubService.SendNotificationToMultipleUsers(friendToNotify, notification);
+                }
+
+                await _postHubService.SendPostAsync(postResponse);
+
+
+                return postResponse;
             }
             catch (DbUpdateException dbEx)
             {
@@ -104,9 +145,10 @@ namespace SocialNetwork.Services.Services
 
     
 
-        public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync()
+        public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync(string userId)
         {
-            var posts = await _postRepository.GetAllAsync();
+
+            var posts = await _postRepository.GetAllAsync(userId);
 
             //var user=_userRepository.get
 
@@ -140,7 +182,7 @@ namespace SocialNetwork.Services.Services
 
         public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
         {
-            var posts = await _postRepository.GetAllAsync(); 
+            var posts = await _postRepository.GetAllAsync(userId); 
             var userPosts = posts.Where(p => p.UserID == userId); 
             return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
         }

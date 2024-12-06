@@ -10,7 +10,7 @@ namespace SocialNetwork.Services.IServices
 {
     public interface IPostService
     {
-        Task<IEnumerable<PostViewModel>> GetAllPostsAsync();
+        Task<IEnumerable<PostViewModel>> GetAllPostsAsync(string userId);
         //Task<IEnumerable<EmotionRequest>> GetAllEmotionAsync();
 
         Task<PostViewModel> GetPostByIdAsync(string postId);

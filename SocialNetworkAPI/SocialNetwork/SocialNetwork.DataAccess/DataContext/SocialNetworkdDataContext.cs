@@ -35,6 +35,7 @@ namespace SocialNetwork.DataAccess.DataContext
         public DbSet<ReactionCommentEntity> ReactionComments { get; set; }
         public DbSet<ReactionMessageEntity> ReactionMessages { get; set; }
         public DbSet<ReactionGroupChatMessageEntity> ReactionGroupChatMessages { get; set; }
+        public DbSet<NotificationEntity> Notification { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -136,14 +137,24 @@ namespace SocialNetwork.DataAccess.DataContext
                       .HasForeignKey(c => c.ParentCommentID)
                       .OnDelete(DeleteBehavior.NoAction);  // No cascade delete for parent-child relationship
             });
-           // modelBuilder.Entity<ReactionEntity>()
-           //.HasKey(r => r.ReactionID); // Đảm bảo rằng ReactionID là khóa chính
+            // modelBuilder.Entity<ReactionEntity>()
+            //.HasKey(r => r.ReactionID); // Đảm bảo rằng ReactionID là khóa chính
 
-           // modelBuilder.Entity<ReactionEntity>()
-           //     .Property(r => r.ReactionID)
-           //     .ValueGeneratedOnAdd();
+            // modelBuilder.Entity<ReactionEntity>()
+            //     .Property(r => r.ReactionID)
+            //     .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<NotificationEntity>()
+      .HasOne(n => n.User)
+      .WithMany()
+      .HasForeignKey(n => n.UserId)
+      .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<NotificationEntity>()
+                .HasOne(n => n.Receiver)
+                .WithMany()
+                .HasForeignKey(n => n.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<ReactionGroupChatMessageEntity>(entity =>
             {
                 // Composite primary key

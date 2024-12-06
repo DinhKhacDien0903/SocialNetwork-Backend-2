@@ -9,9 +9,12 @@ namespace SocialNetwork.Web.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userServices;
-        public UserController(IUserService userServices)
+        private readonly INotificationService _notificationService;
+
+        public UserController(IUserService userServices, INotificationService notificationService = null)
         {
             _userServices = userServices;
+            _notificationService = notificationService;
         }
 
         [Authorize(Roles = ApplicationRoleModel.User)]
@@ -79,5 +82,57 @@ namespace SocialNetwork.Web.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [Authorize]
+        [HttpGet("SearchUser")]
+        public async Task<IActionResult> GetSearchUserAsync(string userSearch)
+        {
+            try
+            {
+                var user = await _userServices.SearchUserByNameAsync(userSearch);
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Get search user success",
+                    Data = user
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("notifications")]
+        public async Task<IActionResult> GetNotification()
+       {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var notification = await _notificationService.GetUserNotificationAsync(userId);
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Get Notification is success",
+                    Data = notification
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [Authorize]
+        [HttpPut("{id}/mark-read")]
+        public async Task<IActionResult> MarkAsRead(string id)
+        {
+            await _notificationService.MarkNotificationAsync(id);
+            return Ok(new { Success = true });
+        }
+
     }
 }

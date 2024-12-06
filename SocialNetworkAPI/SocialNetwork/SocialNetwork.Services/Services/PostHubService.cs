@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using SocialNetwork.Helpers.Hubs;
 using SocialNetwork.DTOs.Response;
+using Microsoft.AspNetCore.Identity;
 
 namespace SocialNetwork.Services.Services
 {
@@ -17,20 +18,20 @@ namespace SocialNetwork.Services.Services
     public class PostHubService : IPostHubService
     {
         private readonly IHubContext<PostHub> _hubContext;
+        private readonly UserManager<UserEntity> _userManager;
 
-        public PostHubService(IHubContext<PostHub> hubContext)
+
+        public PostHubService(IHubContext<PostHub> hubContext, UserManager<UserEntity> userManager)
         {
             _hubContext = hubContext;
+            _userManager = userManager;
         }
 
 
         public async Task SendPostAsync(PostResponse post)
         {
             await _hubContext.Clients.All.SendAsync("ReceivePost", post);
-            foreach (var image in post.Images)
-            {
-                Console.WriteLine("image",image);
-            }
+           
         }
 
         public async Task SendUpdateAsycn(PostRequest updateViewModel)
@@ -66,6 +67,14 @@ namespace SocialNetwork.Services.Services
             });
 
         }
+        public async Task SendNotificationToMultipleUsers(List<string> userIds, NotificationViewModel notification)
+        {
+            foreach (var userId in userIds)
+            {
+                await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+            }
+        }
+
     }
 }
 

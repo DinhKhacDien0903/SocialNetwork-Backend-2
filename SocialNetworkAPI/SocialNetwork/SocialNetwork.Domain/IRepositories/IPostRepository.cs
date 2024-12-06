@@ -10,7 +10,7 @@ namespace SocialNetwork.Domain.IRepositories
 {
     public interface IPostRepository
     {
-        Task<IEnumerable<PostViewModel>> GetAllAsync();
+        Task<IEnumerable<PostViewModel>> GetAllAsync(string userid);
 
         Task<PostEntity> GetByIDAsync(string id);
 

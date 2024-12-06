@@ -24,13 +24,14 @@ namespace SocialNetwork.Web.Controllers
             _reactionPostService = reactionPostService;
             _postHubService = postHubService;
         }
+
+
+  
         [HttpGet("All")]
         public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts()
         {
-            var posts = await _postService.GetAllPostsAsync();
-
-
-
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var posts = await _postService.GetAllPostsAsync(userId);
             return Ok(posts);
         }
 
@@ -61,7 +62,7 @@ namespace SocialNetwork.Web.Controllers
             }
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var createdPost = await _postService.CreatePostAsync(postViewModel, userId);
-            await _postHubService.SendPostAsync(createdPost);
+            //await _postHubService.SendPostAsync(createdPost);
             return CreatedAtAction(nameof(CreatePost), new { postId = createdPost.PostID }, createdPost);
         }
 

@@ -93,5 +93,11 @@ namespace SocialNetwork.Services.Services
 
             return result;
         }
+
+        public async Task<IEnumerable<UserSearchViewModel>> SearchUserByNameAsync(string name)
+        {
+            var searchUser= await _userRepository.SearchUserAsync(name);
+            return  _mapper.Map<IEnumerable<UserSearchViewModel>>(searchUser);
+        }
     }
 }

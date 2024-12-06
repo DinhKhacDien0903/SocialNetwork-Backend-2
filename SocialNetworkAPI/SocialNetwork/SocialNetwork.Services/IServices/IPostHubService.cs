@@ -24,5 +24,7 @@ namespace SocialNetwork.Services.IServices
         Task SendReactionUpdateAsycn(ReactionRequest reactionRequest);
 
         Task SendDeleteReactionAsycn(string userId, string postId);
+
+        Task SendNotificationToMultipleUsers(List<string> userIds, NotificationViewModel notification);
     }
 }

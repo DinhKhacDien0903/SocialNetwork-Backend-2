@@ -48,11 +48,13 @@ namespace SocialNetwork.DataAccess.Repositories
         {
             var userSearch=await _context.Users.Where(x=>x.FirstName.ToLower().Contains(query)
                             ||x.LastName.ToLower().Contains(query)|| 
-                            (x.FirstName.ToLower()+x.LastName.ToLower()).Contains(query)).ToListAsync()  ;
-            //if(userSearch == null)
-            //{
-
-            //}
+                            (x.FirstName.ToLower()+ " " +x.LastName.ToLower()).Contains(query)
+                            ||(x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query)
+                            ).ToListAsync()  ;
+            if (userSearch == null)
+            {
+                throw new Exception($"haven't user with {query} you search");
+            }
 
             return userSearch;
         }

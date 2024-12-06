@@ -94,6 +94,10 @@ namespace SocialNetwork.Helpers.Hubs
             }
         }
 
+        public async Task SendNotification(string usedId, NotificationViewModel message)
+        {
+            await Clients.User(usedId).SendAsync("ReceiveNotification", message);
+        }
 
     }
 }

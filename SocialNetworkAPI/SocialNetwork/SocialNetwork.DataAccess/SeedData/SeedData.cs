@@ -287,7 +287,7 @@ namespace SocialNetwork.DataAccess.SeedData
                         new EmotionTypeEntity
                         {
                             EmotionTypeID = "2",
-                            EmotionName = "HaHa"
+                            EmotionName = "Haha"
                         },
                         new EmotionTypeEntity
                         {

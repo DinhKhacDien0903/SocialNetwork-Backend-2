@@ -37,6 +37,13 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<ReactionEntity, ReactionRequest>().ReverseMap();
             CreateMap<ReactionPostViewModel, ReactionEntity>().ReverseMap();
             CreateMap<ReactionRepository,ReactionPostEntity>().ReverseMap();
+
+            //User
+            CreateMap<UserEntity, UserSearchViewModel>().ReverseMap();
+
+            //notification
+            CreateMap<NotificationEntity,NotificationViewModel>().ReverseMap();
+
             //xuoi
 
             CreateMap<UserEntity, UserViewModel>();
