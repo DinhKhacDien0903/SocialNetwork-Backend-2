@@ -35,6 +35,7 @@ namespace SocialNetwork.DataAccess.DataContext
         public DbSet<ReactionCommentEntity> ReactionComments { get; set; }
         public DbSet<ReactionMessageEntity> ReactionMessages { get; set; }
         public DbSet<ReactionGroupChatMessageEntity> ReactionGroupChatMessages { get; set; }
+        public DbSet<NotificationEntity> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -217,6 +218,26 @@ namespace SocialNetwork.DataAccess.DataContext
                       .OnDelete(DeleteBehavior.Cascade);  // Cascade delete on Comment deletion
             });
 
+            modelBuilder.Entity<NotificationEntity>(entity =>
+            {
+                entity.HasKey(n => n.Id);
+
+                entity.HasOne(n => n.GroupChat)
+                       .WithMany()
+                       .HasForeignKey(n => n.GroupId)
+                       .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(n => n.Sender)
+                       .WithMany()
+                       .HasForeignKey(n => n.SenderId)
+                       .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(n => n.Receiver)
+                       .WithMany()
+                       .HasForeignKey(n => n.ReceiverId)
+                       .OnDelete(DeleteBehavior.NoAction);
+            });
+                
 
             //modelBuilder.Entity<ImagesOfPostEntity>(entity =>
             //{

@@ -1,20 +1,25 @@
-﻿namespace SocialNetwork.Services.Services
+﻿using SocialNetwork.DTOs.ViewModels;
+
+namespace SocialNetwork.Services.Services
 {
     public class ChatHubService : IChatHubService
     {
         private readonly IUserRepository _userRepository;
         private readonly IMessageRepository _messageRepository;
         private readonly IMessageImagesRepository _messageImageRepository;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IMapper _mapper;
         public ChatHubService(
             IUserRepository userRepository,
             IMessageRepository messageRepository,
             IMessageImagesRepository messageImagesRepository,
+            INotificationRepository notificationRepository,
             IMapper mapper)
         {
             _userRepository = userRepository;
             _messageRepository = messageRepository;
             _messageImageRepository = messageImagesRepository;
+            _notificationRepository = notificationRepository;
             _mapper = mapper;
         }
 
@@ -42,6 +47,28 @@
             await _messageRepository.SaveChangeAsync();
 
             return messageViewModel;
+        }
+
+        public async Task<NotificationViewModel> AddNotificationToUserAsync(NotificationViewModel notificationViewModel)
+        {
+            var entity = _mapper.Map<NotificationEntity>(notificationViewModel);
+
+            entity.Id = Guid.NewGuid().ToString();
+
+            var notification = await _notificationRepository.AddAsync(entity);
+
+            await _notificationRepository.SaveChangeAsync();
+
+            notificationViewModel.Id = notification.Id;
+
+            return notificationViewModel;
+        }
+
+        public async Task<IEnumerable<NotificationViewModel>> GetAllNotificationMessageAsync(string userId)
+        {
+            var notification = await _notificationRepository.GetAllNotificationMessageAsync(userId);
+
+            return _mapper.Map<IEnumerable<NotificationViewModel>>(notification);
         }
 
         public async Task RemoveMessage(string messageId)

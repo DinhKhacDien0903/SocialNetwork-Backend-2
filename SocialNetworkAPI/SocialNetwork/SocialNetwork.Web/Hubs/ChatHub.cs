@@ -11,13 +11,19 @@ namespace SocialNetwork.Web.Hubs
 
         private readonly IChatHubService _chatHubService;
 
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
+
         private const int MAX_MESSAGE_LENGTH = 500;
+
+        private const string MESSAGE_NOTIFICATION = "You have a new message";
         public ChatHub(
             UserManager<UserEntity> userManager,
-            IChatHubService chatHubService)
+            IChatHubService chatHubService,
+            IHubContext<NotificationHub> notificationHubContext)
         {
             _userManager = userManager;
             _chatHubService = chatHubService;
+            _notificationHubContext = notificationHubContext;
         }
 
         public override async Task OnConnectedAsync()
@@ -77,6 +83,10 @@ namespace SocialNetwork.Web.Hubs
             }
 
             await NotifyReceiverAsync(param.ReciverId, CreateMessageResponse(message, param));
+
+            var notifiation = await SaveNotificationToUser(sender.Id, param.ReciverId, MESSAGE_NOTIFICATION);
+
+            await _notificationHubContext.Clients.User(param.ReciverId).SendAsync("ReceiveNotification", notifiation);
 
             return message;
         }
@@ -227,6 +237,23 @@ namespace SocialNetwork.Web.Hubs
         private async Task NotifyReceiverAsync(string receiverId, MessagePersonResponse response)
         {
             await Clients.User(receiverId).SendAsync("ReceiveSpecitificMessage", response);
+        }
+
+        private async Task<NotificationViewModel> SaveNotificationToUser(string senderId, string friendId, string message)
+        {
+            var sendDatetime = DateTime.UtcNow;
+
+            var notificationViewModel = new NotificationViewModel
+            {
+                SenderId = senderId,
+                ReceiverId = friendId,
+                Messeage = message,
+                CreatedAt = sendDatetime,
+                UpdatedAt = sendDatetime,
+                IsNotificationMessage = true
+            };
+
+            return await _chatHubService.AddNotificationToUserAsync(notificationViewModel);
         }
     }
 }

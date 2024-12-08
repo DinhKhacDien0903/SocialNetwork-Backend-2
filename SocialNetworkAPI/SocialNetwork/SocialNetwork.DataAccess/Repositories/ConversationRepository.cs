@@ -105,6 +105,7 @@ namespace SocialNetwork.DataAccess.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<BaseSearchFriendRespone> GetFriendsAsync(string userId, string searchText, int pageIndex, int pageSize, bool isTotalCount)
         {
             try
@@ -140,6 +141,103 @@ namespace SocialNetwork.DataAccess.Repositories
                 else
                 {
                     result.Friends = await friends
+                            .Skip(pageIndex * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<BaseSearchGroupChatsRespone> GetGroupChatsAsync(string userId, string searchText, int pageIndex, int pageSize, bool isTotalCount)
+        {
+            try
+            {
+                var result = new BaseSearchGroupChatsRespone();
+
+                //Get all group chat of current group util leaved
+                var groups = from gc in _context.GroupChats
+                             join gcm in _context.GroupChatMembers on gc.GroupChatID equals gcm.GroupChatID
+                             where gcm.UserID == userId &&
+                             !gcm.IsLeaved &&
+                             (string.IsNullOrEmpty(searchText) || gc.GroupName.ToLower().Contains(searchText.ToLower()))
+                             select new GroupResponse
+                             {
+                                 Id = gc.GroupChatID,
+                                 Name = gc.GroupName ?? "",
+                                 AvatarUrl = gc.Avatar ?? "",
+                             };
+
+                var total = groups.Count();
+
+                if (isTotalCount)
+                {
+                    result.TotalPage = total / pageSize;
+                    result.TotalCount = total;
+
+                    if (total % pageSize != 0)
+                    {
+                        result.TotalPage++;
+                    }
+                }
+                else
+                {
+                    result.Groups = await groups
+                            .Skip(pageIndex * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<BaseSearchGroupMemberResponse> GetGroupMembersAsync(string userId, string searchText, string GroupID, int pageIndex, int pageSize, bool isTotalCount)
+        {
+            try
+            {
+                var result = new BaseSearchGroupMemberResponse();
+
+                //Get all group chat member of current group util leaved
+                var groupMembers = from u in _context.Users
+                                   join gcm in _context.GroupChatMembers on u.Id equals gcm.UserID
+                                   where /*gcm.UserID == userId &&*/
+                                         gcm.GroupChatID == GroupID &&
+                                         !gcm.IsLeaved &&
+                                         //todo isUserDelete
+                                         (string.IsNullOrEmpty(searchText) || string.Concat(u.LastName.ToLower(), u.FirstName.ToLower()).Contains(searchText.ToLower()))
+                                   select new GroupMemberResponse
+                                   {
+                                       Id = u.Id,
+                                       FirstName = u.FirstName ?? "",
+                                       LastName = u.LastName ?? "",
+                                       AvatarUrl = u.AvatarUrl ?? "",
+                                   };
+
+                var total = groupMembers.Count();
+
+                if (isTotalCount)
+                {
+                    result.TotalPage = total / pageSize;
+                    result.TotalCount = total;
+
+                    if (total % pageSize != 0)
+                    {
+                        result.TotalPage++;
+                    }
+                }
+                else
+                {
+                    result.GroupMembers = await groupMembers
                             .Skip(pageIndex * pageSize)
                             .Take(pageSize)
                             .ToListAsync();
