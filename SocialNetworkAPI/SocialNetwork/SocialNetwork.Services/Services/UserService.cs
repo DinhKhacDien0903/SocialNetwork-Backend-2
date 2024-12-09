@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Domain;
 
 namespace SocialNetwork.Services.Services
 {
@@ -94,10 +95,19 @@ namespace SocialNetwork.Services.Services
             return result;
         }
 
-        public async Task<IEnumerable<UserSearchViewModel>> SearchUserByNameAsync(string name)
+        public async Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query)
         {
-            var searchUser= await _userRepository.SearchUserAsync(name);
-            return  _mapper.Map<IEnumerable<UserSearchViewModel>>(searchUser);
+            var result = new PageResult<UserSearchViewModel>() { CurrentPage = query.PageIndex };
+            var user = await _userRepository.SearchUserAsync(query);
+            var userSearch = user.Select(x=>new UserSearchViewModel
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                AvatarUrl = x.AvatarUrl
+            }).ToList();
+            result.TotalCount = userSearch.Count();
+            result.Data = userSearch;
+            return result;
         }
     }
 }

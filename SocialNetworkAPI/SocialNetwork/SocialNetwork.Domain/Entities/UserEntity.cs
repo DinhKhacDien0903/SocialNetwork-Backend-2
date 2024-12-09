@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿    using Microsoft.AspNetCore.Identity;
 
 namespace SocialNetwork.Domain.Entities
 {
@@ -27,5 +27,7 @@ namespace SocialNetwork.Domain.Entities
         public bool? Gender { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
+
+        public ICollection<RelationshipEntity> Relationship { get; set; }
     }
 }

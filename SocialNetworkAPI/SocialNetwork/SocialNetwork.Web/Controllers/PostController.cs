@@ -35,8 +35,8 @@ namespace SocialNetwork.Web.Controllers
             return Ok(posts);
         }
 
-        [HttpGet("AllPostUserId")]
-        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync(string userId)
+        [HttpGet("Me")]
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId)
         {
             var posts = await _postService.GetPostsByUserIdAsync(userId);
             return Ok(posts);

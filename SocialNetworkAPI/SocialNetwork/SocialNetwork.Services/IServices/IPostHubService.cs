@@ -17,7 +17,7 @@ namespace SocialNetwork.Services.IServices
 
         Task SendDeleteAsycn(Guid Id);
 
-        Task SendCommentAsycn(CommentViewModel commentRespone);
+        Task SendCommentAsycn(CommentViewModel commentRespone,int number);
 
         Task SendReactionAddAsycn(ReactionRequest reactionRequest);
 

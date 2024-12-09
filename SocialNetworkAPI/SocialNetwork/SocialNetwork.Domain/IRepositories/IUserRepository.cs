@@ -12,6 +12,6 @@ namespace SocialNetwork.Domain.IRepositories
 
         Task<UserEntity> GetUserInfor(string userId);
 
-        Task<IEnumerable<UserEntity>> SearchUserAsync(string query);
+        Task<IEnumerable<UserEntity>> SearchUserAsync(SearchQuery query);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Domain.IRepositories;
+using SocialNetwork.Domain;
 using SocialNetwork.DTOs.Request;
+using SocialNetwork.DTOs.ViewModels;
 
 namespace SocialNetwork.DataAccess.Repositories
 {
-    public class UserRepository :BaseRepository<UserEntity>, IUserRepository
+    public class UserRepository : BaseRepository<UserEntity>, IUserRepository
     {
         public readonly SocialNetworkdDataContext _context;
 
@@ -23,8 +26,8 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<UserEntity?> GetLoginAsync(LoginRequest loginRequest)
         {
-            var user =  await _userManager.FindByEmailAsync(loginRequest.Email);
-            if(user != null && await _userManager.CheckPasswordAsync(user, loginRequest.Password))
+            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            if (user != null && await _userManager.CheckPasswordAsync(user, loginRequest.Password))
             {
                 return user;
             }
@@ -36,7 +39,7 @@ namespace SocialNetwork.DataAccess.Repositories
         {
             var userIfor = await _userManager.FindByIdAsync(userId);
 
-            if(userIfor == null)
+            if (userIfor == null)
             {
                 throw new ArgumentNullException(nameof(userId), "User not found");
             }
@@ -44,26 +47,41 @@ namespace SocialNetwork.DataAccess.Repositories
             return userIfor;
         }
 
-        public async Task<IEnumerable<UserEntity>> SearchUserAsync(string query)
+        public async Task<IEnumerable<UserEntity>> SearchUserAsync(SearchQuery query)
         {
-            var userSearch=await _context.Users.Where(x=>x.FirstName.ToLower().Contains(query)
-                            ||x.LastName.ToLower().Contains(query)|| 
-                            (x.FirstName.ToLower()+ " " +x.LastName.ToLower()).Contains(query)
-                            ||(x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query)
-                            ).ToListAsync()  ;
-            if (userSearch == null)
-            {
-                throw new Exception($"haven't user with {query} you search");
-            }
+            var user = await _context.Users
+             .Where(x => x.FirstName.ToLower().Contains(query.keyWord.ToLower())
+                      || x.LastName.ToLower().Contains(query.keyWord.ToLower())
+                      || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
+                      || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower()))
+             .Skip(query.SkipNo)
+             .Take(query.TakeNo)
+             .Select(u => new UserSearchViewModel
+             {
+                 FirstName = u.FirstName,
+                 LastName = u.LastName,
+                 AvatarUrl = u.AvatarUrl
+             })
+             .ToListAsync();
 
+            if (user == null || !user.Any())
+            {
+                throw new Exception($"No users found matching your search criteria for '{query.keyWord}'");
+            }
+            var userSearch= user.Select(x=> new UserEntity
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                AvatarUrl = x.AvatarUrl
+            });
             return userSearch;
         }
 
-        public async Task UpdateStatusActiveUser(string userId, bool isActive)
+    public async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            
-            if(user == null)
+
+            if (user == null)
             {
                 throw new ArgumentNullException(nameof(userId), "User not found");
             }

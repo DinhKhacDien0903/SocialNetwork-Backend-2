@@ -62,8 +62,8 @@ namespace SocialNetwork.Web.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var addComment = await _commentService.AddCommentAsync(commentRequest,userId);
-            await _postHubContext.Clients.Group(addComment.PostID.ToString())
-            .SendAsync("ReceiveComment", addComment);
+            //await _postHubContext.Clients.Group(addComment.PostID.ToString())
+            //.SendAsync("ReceiveComment", addComment);
             return CreatedAtAction(nameof(AddComment), new { commentId = addComment.CommentID }, addComment);
             //return Ok(addComment);
         }

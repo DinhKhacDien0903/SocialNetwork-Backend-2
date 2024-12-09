@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using SocialNetwork.Domain;
 using SocialNetwork.DTOs.Authorize;
 using System.Security.Claims;
 
@@ -10,12 +11,17 @@ namespace SocialNetwork.Web.Controllers
     {
         private readonly IUserService _userServices;
         private readonly INotificationService _notificationService;
+        private readonly IRelationshipService _relationshipService;
 
-        public UserController(IUserService userServices, INotificationService notificationService = null)
+
+        public UserController(IUserService userServices, INotificationService notificationService = null, IRelationshipService relationshipService = null)
         {
             _userServices = userServices;
             _notificationService = notificationService;
+            _relationshipService = relationshipService;
         }
+
+        #region
 
         [Authorize(Roles = ApplicationRoleModel.User)]
         [HttpGet("getUsers")]
@@ -82,10 +88,14 @@ namespace SocialNetwork.Web.Controllers
                 return BadRequest(e.Message);
             }
         }
+        #endregion
 
+
+
+        #region
         [Authorize]
         [HttpGet("SearchUser")]
-        public async Task<IActionResult> GetSearchUserAsync(string userSearch)
+        public async Task<IActionResult> GetSearchUserAsync([FromQuery] SearchQuery userSearch)
         {
             try
             {
@@ -93,7 +103,7 @@ namespace SocialNetwork.Web.Controllers
                 return Ok(new BaseResponse
                 {
                     Status = 200,
-                    Message = "Get search user success",
+                    Message = "Lấy thông tin người dùng tìm kiếm thành công",
                     Data = user
                 });
             }
@@ -102,6 +112,7 @@ namespace SocialNetwork.Web.Controllers
                 return BadRequest(e.Message);
             }
         }
+
 
         [Authorize]
         [HttpGet("notifications")]
@@ -133,6 +144,76 @@ namespace SocialNetwork.Web.Controllers
             await _notificationService.MarkNotificationAsync(id);
             return Ok(new { Success = true });
         }
+        #endregion
+
+
+
+        #region
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> SendFriendRequest( string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.SendFriendRequest(userId, friendId); 
+            return Ok(new { Message = "send friend request is success" });
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AccepFriendRequest(string friendId)
+        {
+            await _relationshipService.AccepFriendRequestAsync( friendId);
+            return Ok(new { Message = "accep friend request is success" });
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CancelFriendRequest(string friendId)
+        {
+            await _relationshipService.CancelFriendRequestAsync( friendId);
+            return Ok(new { Message = "cancel friend request is success" });
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> DeclineFriendRequest(string friendId)
+        {
+            await _relationshipService.DeclineFriendRequestAsync( friendId);
+            return Ok(new { Message = "decline friend request is success" });
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllFriend()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var friend=await _relationshipService.GetAllFriendAsync(userId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message="get all friend is success",
+                Data = friend
+            });  
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllPedingFriend()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var friend = await _relationshipService.GetPendingFriendRequestAsync(userId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "get all peding friend is success",
+                Data = friend
+            });
+        }
+        #endregion
+
 
     }
 }

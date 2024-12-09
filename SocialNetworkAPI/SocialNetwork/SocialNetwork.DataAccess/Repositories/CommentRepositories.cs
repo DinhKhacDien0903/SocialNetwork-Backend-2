@@ -42,6 +42,12 @@ public class CommentRepositories : ICommentRepositories
         return await _context.Comments.FindAsync(commentId);
     }
 
+    public async Task<int> GetCountComment(string postId)
+    {
+        var commnet=await _context.Comments.Where(x=>x.PostID==postId).ToListAsync();
+        var number = commnet.Count;
+        return number;
+    }
     
 
     public async Task<CommentResultViewModel> GetCommentsByPostIdAsync(string postId)
@@ -73,17 +79,6 @@ public class CommentRepositories : ICommentRepositories
     }
 
 
- 
-
-    //public async Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(string parentCommentId)
-    //{
-    //    return await _context.Comments
-    //        .Where(x => x.ParentCommentID == parentCommentId && !x.IsDelete)
-    //        .Include(x => x.User)
-    //        .Include(x=>x.C)
-    //        .OrderByDescending(x => x.CreatedAt)
-    //        .ToListAsync();
-    //}
 
     public async Task UpdateCommentAsync(CommentEntity comment)
     {

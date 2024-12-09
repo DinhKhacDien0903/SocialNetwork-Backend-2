@@ -18,6 +18,6 @@ namespace SocialNetwork.Domain.IRepositories
         Task DeleteCommentAsync(string commentId);
         Task UpdateCommentAsync(CommentEntity comment);
         Task<int> GetCommentCountByPostIdAsync(string postId);
-
+        Task<int> GetCountComment(string postId);
     }
 }

@@ -71,22 +71,22 @@ namespace SocialNetwork.Helpers.Hubs
 
 
 
-        public async Task StartPostRoom(string postId)
-        {
-            await Groups.AddToGroupAsync(Context.ConnectionId, postId);
-        }
+        //public async Task StartPostRoom(string postId)
+        //{
+        //    await Groups.AddToGroupAsync(Context.ConnectionId, postId);
+        //}
 
-        public async Task LeavePostRoom(string postId)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, postId);
-        }
+        //public async Task LeavePostRoom(string postId)
+        //{
+        //    await Groups.RemoveFromGroupAsync(Context.ConnectionId, postId);
+        //}
 
-        public async Task SendCommentAsync(CommentViewModel comment)
+        public async Task SendCommentAsync(object comment)
         {
             try
             {
-                // Gửi bình luận đến tất cả các client trong phòng của bài đăng
-                await Clients.Group(comment.PostID.ToString()).SendAsync("ReceiveComment", comment);
+                //await Clients.Group(comment.PostID.ToString()).SendAsync("ReceiveComment", comment);
+                await Clients.All.SendAsync("ReceiveComment", comment);
             }
             catch (Exception ex)
             {

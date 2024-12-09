@@ -9,16 +9,17 @@ public class CommentService : ICommentService
     private readonly ICommentRepositories _commentRepositories;
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepository;
-    private readonly IHubContext<PostHub> _hubContext;
+    //private readonly IHubContext<PostHub> _hubContext;
+    private readonly IPostHubService _postHubService;
 
 
-
-    public CommentService(ICommentRepositories commentRepositories, IMapper mapper, IUserRepository userRepository, IHubContext<PostHub> hubContext)
+    public CommentService(ICommentRepositories commentRepositories, IMapper mapper, IUserRepository userRepository,  IPostHubService postHubService)
     {
         _commentRepositories = commentRepositories;
         _mapper = mapper;
         _userRepository = userRepository;
-        _hubContext = hubContext;
+        //_hubContext = hubContext;
+        _postHubService = postHubService;
     }
 
     public async Task<CommentViewModel> AddCommentAsync(CommentRequest commentRequest, string userId)
@@ -46,12 +47,15 @@ public class CommentService : ICommentService
 
         comment.LastName = user?.LastName;
         comment.FirstName=user?.FirstName;
+        int count = await _commentRepositories.GetCountComment(commentEntity.PostID);
+        int number = count + 1;
 
-        //await _hubContext.Clients.Group(commentRequest.PostID).SendAsync("ReceiveComment", comment);
 
+        await _postHubService.SendCommentAsycn(comment, number);
         return comment;
 
-    
+       
+
     }
 
 

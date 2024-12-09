@@ -49,7 +49,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
                     //EmotionTypeID = x.Reactions.Any(x => !x.Reaction.IsDeleted ) ? x.Reactions.First().Reaction.EmotionType.EmotionTypeID : null,
                     //EmotionName = x.Reactions.Any(x => !x.Reaction.IsDeleted) ? x.Reactions.First().Reaction.EmotionType.EmotionName : null,
-                    UserReaction= x.Reactions/*.Where(x=>!x.Reaction.IsDeleted&& x.Post.UserID==userId)*/
+                    UserReaction= x.Reactions.Where(x=>!x.Reaction.IsDeleted&& x.Reaction.UserID==userId)
                     .Select(x=> new EmotionViewModel
                     {
                         EmotionName=x.Reaction.EmotionType.EmotionName,
