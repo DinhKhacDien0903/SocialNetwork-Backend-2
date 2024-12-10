@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SocialNetwork.DataAccess.SeedData;
@@ -22,6 +20,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//TODO: handle scoped and singleton use factory design pattern
 builder.Services.AddIdentity<UserEntity, IdentityRole>(options =>
 {
     options.Stores.MaxLengthForKeys = 128;
@@ -60,9 +59,10 @@ builder.Services.AddScoped(typeof(IReactionMessageRepository), typeof(ReactionMe
 builder.Services.AddScoped(typeof(IConversationRepository), typeof(ConversationRepository));
 builder.Services.AddScoped(typeof(IGroupChatRepository), typeof(GroupChatRepository));
 builder.Services.AddScoped(typeof(INotificationPostRepository), typeof(NotificationPostRepository));
-//builder.Services.AddScoped(typeof(), typeof(NotificationRepository));
 
 
+
+builder.Services.AddScoped(typeof(INotificationRepository), typeof(NotificationRepository));
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
@@ -222,10 +222,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapHub<NotificationHub>("/notification");
+
 app.MapHub<ChatHub>("/chatPerson");
 
 app.MapHub<PostHub>("/postHub");
-
 
 app.MapHub<ReactionHub>("/reactionMessage");
 
