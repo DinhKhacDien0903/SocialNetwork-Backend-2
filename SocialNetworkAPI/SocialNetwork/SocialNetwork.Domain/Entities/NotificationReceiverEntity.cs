@@ -16,7 +16,7 @@ namespace SocialNetwork.Domain.Entities
         public string ReceiverId { get; set; }
         public bool IsRead { get; set; } = false;
         [ForeignKey("NotificationId")]
-        public NotificationEntity Notification { get; set; }
+        public NotificationPostEntity Notification { get; set; }
         [ForeignKey("ReceiverId")]
         public UserEntity Receiver { get; set; }
     }

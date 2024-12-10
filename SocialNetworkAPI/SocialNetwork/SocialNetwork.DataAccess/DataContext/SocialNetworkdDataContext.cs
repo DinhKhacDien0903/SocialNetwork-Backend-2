@@ -35,7 +35,7 @@ namespace SocialNetwork.DataAccess.DataContext
         public DbSet<ReactionCommentEntity> ReactionComments { get; set; }
         public DbSet<ReactionMessageEntity> ReactionMessages { get; set; }
         public DbSet<ReactionGroupChatMessageEntity> ReactionGroupChatMessages { get; set; }
-        public DbSet<NotificationEntity> Notification { get; set; }
+        public DbSet<NotificationPostEntity> Notification { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -144,13 +144,13 @@ namespace SocialNetwork.DataAccess.DataContext
             //     .Property(r => r.ReactionID)
             //     .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<NotificationEntity>()
+            modelBuilder.Entity<NotificationPostEntity>()
       .HasOne(n => n.User)
       .WithMany()
       .HasForeignKey(n => n.UserId)
       .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<NotificationEntity>()
+            modelBuilder.Entity<NotificationPostEntity>()
                 .HasOne(n => n.Receiver)
                 .WithMany()
                 .HasForeignKey(n => n.ReceiverId)

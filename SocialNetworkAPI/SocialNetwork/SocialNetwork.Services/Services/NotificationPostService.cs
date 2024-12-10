@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.Services.Services
 {
-    public class NotificationService : INotificationService
+    public class NotificationPostService : INotificationPostService
     {
-        public readonly INotificationRepository _notification;
+        public readonly INotificationPostRepository _notification;
         public readonly IMapper _mapper;
 
-        public NotificationService(IMapper mapper, INotificationRepository notification)
+        public NotificationPostService(IMapper mapper, INotificationPostRepository notification)
         {
             _mapper = mapper;
             _notification = notification;
         }
 
-        public async Task CreateNotificationAsync(NotificationViewModel model, List<string> friendId)
+        public async Task CreateNotificationAsync(NotificationPostViewModel model, List<string> friendId)
         {
-            var notifications = friendId.Select(friendId => new NotificationEntity
+            var notifications = friendId.Select(friendId => new NotificationPostEntity
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = model.UserId,
@@ -31,11 +31,11 @@ namespace SocialNetwork.Services.Services
             await _notification.CreateNotificationAsync(notifications);
         }
 
-        public async Task<IEnumerable<NotificationViewModel>> GetUserNotificationAsync(string userId)
+        public async Task<IEnumerable<NotificationPostViewModel>> GetUserNotificationAsync(string userId)
         {
             
             var notification= await _notification.GetNotificationByUserAsync(userId);
-            return _mapper.Map<IEnumerable<NotificationViewModel>>(notification);
+            return _mapper.Map<IEnumerable<NotificationPostViewModel>>(notification);
         }
 
         public async Task MarkNotificationAsync(string id)

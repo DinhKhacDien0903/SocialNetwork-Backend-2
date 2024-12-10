@@ -16,7 +16,7 @@ namespace SocialNetwork.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task CreateNotificationAsync(IEnumerable<NotificationEntity> notification)
+        public async Task CreateNotificationAsync(IEnumerable<NotificationPostEntity> notification)
         {
             //var user = await _context.Users.FindAsync(notification.UserId);
             try
@@ -42,7 +42,7 @@ namespace SocialNetwork.DataAccess.Repositories
             }
         }
 
-        public async Task<IEnumerable<NotificationEntity>> GetNotificationByUserAsync(string userId)
+        public async Task<IEnumerable<NotificationPostEntity>> GetNotificationByUserAsync(string userId)
         {
            
             return await _context.Notification

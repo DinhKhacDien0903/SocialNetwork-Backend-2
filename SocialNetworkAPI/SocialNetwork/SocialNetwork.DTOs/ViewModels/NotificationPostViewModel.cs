@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.DTOs.ViewModels
 {
-    public class NotificationViewModel
+    public class NotificationPostViewModel
     {
         //public string PostId { set; get; }
         public string UserId {  get; set; }

@@ -72,7 +72,7 @@ namespace SocialNetwork.Services.Services
             });
 
         }
-        public async Task SendNotificationToMultipleUsers(List<string> userIds, NotificationViewModel notification)
+        public async Task SendNotificationToMultipleUsers(List<string> userIds, NotificationPostViewModel notification)
         {
             foreach (var userId in userIds)
             {

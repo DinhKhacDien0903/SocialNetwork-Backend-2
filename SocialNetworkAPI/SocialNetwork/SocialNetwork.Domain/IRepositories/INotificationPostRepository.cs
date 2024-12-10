@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.Domain.IRepositories
 {
-    public  interface INotificationRepository
+    public  interface INotificationPostRepository
     {
-        public Task CreateNotificationAsync(IEnumerable<NotificationEntity> notification);
-        public Task<IEnumerable<NotificationEntity>> GetNotificationByUserAsync(string userId);
+        public Task CreateNotificationAsync(IEnumerable<NotificationPostEntity> notification);
+        public Task<IEnumerable<NotificationPostEntity>> GetNotificationByUserAsync(string userId);
         public Task MakeAsReadAsync(string id);
         public Task DeleteNotificationAsync(int id);
     }

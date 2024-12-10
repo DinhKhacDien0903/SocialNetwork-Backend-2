@@ -13,12 +13,12 @@ namespace SocialNetwork.Services.Services
         private readonly UserManager<UserEntity> _userManager;
         private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
-        private readonly INotificationService _notificationservice;
+        private readonly INotificationPostService _notificationservice;
         private readonly IRelationshipRepository _relationshipRepository;
         private readonly IPostHubService _postHubService;
         public PostService(IPostRepository postRepository,
             UserManager<UserEntity> userManager, IUserRepository userRepository
-            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper, INotificationService notificationservice, IRelationshipRepository relationshipRepository, IPostHubService postHubService)
+            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper, INotificationPostService notificationservice, IRelationshipRepository relationshipRepository, IPostHubService postHubService)
         {
             _userManager = userManager;
             _userRepository = userRepository;
@@ -91,7 +91,7 @@ namespace SocialNetwork.Services.Services
                     var content = $"{postEntity.User.FirstName} {postEntity.User.LastName} vừa đăng một bài viết mới.";
 
 
-                    var notification = new NotificationViewModel
+                    var notification = new NotificationPostViewModel
                     {
                         Content = content,
                         Type = "New_Post",

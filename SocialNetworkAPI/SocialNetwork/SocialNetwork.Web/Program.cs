@@ -59,7 +59,7 @@ builder.Services.AddScoped(typeof(IEmotionTypeRepository), typeof(EmotionTypeRep
 builder.Services.AddScoped(typeof(IReactionMessageRepository), typeof(ReactionMessageRepository));
 builder.Services.AddScoped(typeof(IConversationRepository), typeof(ConversationRepository));
 builder.Services.AddScoped(typeof(IGroupChatRepository), typeof(GroupChatRepository));
-builder.Services.AddScoped(typeof(INotificationRepository), typeof(NotificationRepository));
+builder.Services.AddScoped(typeof(INotificationPostRepository), typeof(NotificationPostRepository));
 //builder.Services.AddScoped(typeof(), typeof(NotificationRepository));
 
 
@@ -76,7 +76,7 @@ builder.Services.AddScoped(typeof(IReactionPostService), typeof(ReactionPostServ
 builder.Services.AddScoped(typeof(IConversationService), typeof(ConversationService));
 builder.Services.AddScoped(typeof(IGroupChatService), typeof(GroupChatService));
 //builder.Services.AddScoped(typeof(IReactionCommentService), typeof(ReactionCommentService));
-builder.Services.AddScoped(typeof(INotificationService), typeof(NotificationService));
+builder.Services.AddScoped(typeof(INotificationPostService), typeof(NotificationPostService));
 
 
 
