@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.DataAccess.Repositories
 {
-    public class NotificationRepository : INotificationRepository
+    public class NotificationPostRepository : INotificationPostRepository
     {
         public readonly SocialNetworkdDataContext _context;
 
-        public NotificationRepository(SocialNetworkdDataContext context)
+        public NotificationPostRepository(SocialNetworkdDataContext context)
         {
             _context = context;
         }
