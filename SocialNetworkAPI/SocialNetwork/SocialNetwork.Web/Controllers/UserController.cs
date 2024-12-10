@@ -10,11 +10,11 @@ namespace SocialNetwork.Web.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userServices;
-        private readonly INotificationService _notificationService;
+        private readonly INotificationPostService _notificationService;
         private readonly IRelationshipService _relationshipService;
 
 
-        public UserController(IUserService userServices, INotificationService notificationService = null, IRelationshipService relationshipService = null)
+        public UserController(IUserService userServices, INotificationPostService notificationService = null, IRelationshipService relationshipService = null)
         {
             _userServices = userServices;
             _notificationService = notificationService;

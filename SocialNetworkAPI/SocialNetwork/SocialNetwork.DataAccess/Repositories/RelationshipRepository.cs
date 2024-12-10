@@ -61,10 +61,10 @@ namespace SocialNetwork.DataAccess.Repositories
             return listSendFriend;  
         }
 
-        public Task<IEnumerable<UserEntity>> GetSendFriendRequestAsync(string userId)
-        {
-            var 
-        }
+        //public Task<IEnumerable<UserEntity>> GetSendFriendRequestAsync(string userId)
+        //{
+        //    var 
+        //}
 
         public async Task SendFriendRequestAsync(string userId, string friendId)
         {

@@ -42,7 +42,7 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<UserEntity, UserSearchViewModel>().ReverseMap();
 
             //notification
-            CreateMap<NotificationEntity,NotificationViewModel>().ReverseMap();
+            CreateMap<NotificationPostEntity,NotificationPostViewModel>().ReverseMap();
 
             //relationship
             CreateMap<UserSearchViewModel,UserEntity>().ReverseMap();
@@ -57,7 +57,6 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<MessagesEntity, MessagePersonResponse>();
             CreateMap<MessageImageEntity, MessageImageViewModel>();
             CreateMap<GroupChatEntity, GroupChatViewModel>();
-            CreateMap<NotificationEntity, NotificationViewModel>();
 
             //nguoc lai
             CreateMap<UserViewModel, UserEntity>();
@@ -66,7 +65,6 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<MessagePersonResponse, MessagesEntity>();
             CreateMap<MessageImageViewModel, MessageImageEntity>();
             CreateMap<GroupChatViewModel, GroupChatEntity>();
-            CreateMap<NotificationViewModel, NotificationEntity>();
         }
     }
 }

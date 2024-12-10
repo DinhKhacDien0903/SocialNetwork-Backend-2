@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.Domain.Entities
 {
-    public class NotificationEntity:BaseEntity
+    public class NotificationPostEntity : BaseEntity
     {
         [Key]
         public string Id { set; get; }=Guid.NewGuid().ToString();

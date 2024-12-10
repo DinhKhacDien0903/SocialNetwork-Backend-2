@@ -2,10 +2,9 @@
 {
     public class NotificationRepository : BaseRepository<NotificationEntity> , INotificationRepository
     {
-        public readonly SocialNetworkdDataContext _context;
+        //public readonly SocialNetworkdDataContext _context;
 
-        public NotificationRepository(
-            SocialNetworkdDataContext context) : base(context)
+        public NotificationRepository(SocialNetworkdDataContext context) : base(context)
         {
             _context = context;
         }
