@@ -44,6 +44,11 @@ namespace SocialNetwork.Services.AuttoMapper
             //notification
             CreateMap<NotificationEntity,NotificationViewModel>().ReverseMap();
 
+            //relationship
+            CreateMap<UserSearchViewModel,UserEntity>().ReverseMap();
+            CreateMap<UserSearchViewModel,RelationshipEntity>().ReverseMap();
+
+
             //xuoi
 
             CreateMap<UserEntity, UserViewModel>();

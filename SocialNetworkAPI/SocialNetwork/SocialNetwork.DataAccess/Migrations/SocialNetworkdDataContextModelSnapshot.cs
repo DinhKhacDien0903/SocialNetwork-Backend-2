@@ -161,25 +161,28 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.CommentEntity", b =>
                 {
-                    b.Property<Guid>("CommentID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CommentID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ParentCommentID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ParentCommentID")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("PostID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("PostEntityPostID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PostID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -192,6 +195,8 @@ namespace SocialNetwork.DataAccess.Migrations
 
                     b.HasIndex("ParentCommentID");
 
+                    b.HasIndex("PostEntityPostID");
+
                     b.HasIndex("PostID");
 
                     b.HasIndex("UserID");
@@ -201,9 +206,8 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.EmotionTypeEntity", b =>
                 {
-                    b.Property<Guid>("EmotionTypeID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("EmotionTypeID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("EmotionName")
                         .IsRequired()
@@ -217,11 +221,14 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.GroupChatEntity", b =>
                 {
-                    b.Property<Guid>("GroupChatID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("GroupChatID")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<string>("Avatar")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -244,8 +251,8 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.GroupChatMemberEntity", b =>
                 {
-                    b.Property<Guid>("GroupChatID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("GroupChatID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
                     b.Property<string>("UserID")
@@ -271,19 +278,19 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.GroupChatMessageEntity", b =>
                 {
-                    b.Property<Guid>("GroupChatMessageID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("GroupChatMessageID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("GroupChatID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("GroupChatID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -306,12 +313,12 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.GroupChatMessageImageEntity", b =>
                 {
-                    b.Property<Guid>("GroupChatMessageImageID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("GroupChatMessageImageID")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("GroupChatMessageID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("GroupChatMessageID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -336,8 +343,8 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.GroupChatMessageStatusEntity", b =>
                 {
-                    b.Property<Guid>("GroupChatMessageID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("GroupChatMessageID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
                     b.Property<string>("UserID")
@@ -362,11 +369,10 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ImagesOfPostEntity", b =>
                 {
-                    b.Property<Guid>("ImagesOfPostID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ImagesOfPostID")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ImgUrl")
@@ -377,8 +383,9 @@ namespace SocialNetwork.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("PostID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("PostID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -392,9 +399,8 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.MessageImageEntity", b =>
                 {
-                    b.Property<Guid>("MessageImageID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("MessageImageID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -404,8 +410,9 @@ namespace SocialNetwork.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("MessageID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("MessageID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("MessageImageID");
 
@@ -416,8 +423,8 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.MessageStatusEntity", b =>
                 {
-                    b.Property<Guid>("MessageID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("MessageID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
@@ -435,15 +442,14 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.MessagesEntity", b =>
                 {
-                    b.Property<Guid>("MessageID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("MessageID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -457,6 +463,9 @@ namespace SocialNetwork.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("Symbol")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -469,17 +478,57 @@ namespace SocialNetwork.DataAccess.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Domain.Entities.PostEntity", b =>
+            modelBuilder.Entity("SocialNetwork.Domain.Entities.NotificationEntity", b =>
                 {
-                    b.Property<Guid>("PostID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notification");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entities.PostEntity", b =>
+                {
+                    b.Property<string>("PostID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDelete")
@@ -501,12 +550,12 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ReactionCommentEntity", b =>
                 {
-                    b.Property<Guid>("ReactionID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("ReactionID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
-                    b.Property<Guid>("CommentID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("CommentID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
 
                     b.HasKey("ReactionID", "CommentID");
@@ -518,15 +567,15 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ReactionEntity", b =>
                 {
-                    b.Property<Guid>("ReactionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("ReactionID")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("EmotionTypeID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("EmotionTypeID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -549,12 +598,12 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ReactionGroupChatMessageEntity", b =>
                 {
-                    b.Property<Guid>("ReactionID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("ReactionID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
-                    b.Property<Guid>("GroupChatMessageID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("GroupChatMessageID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
 
                     b.HasKey("ReactionID", "GroupChatMessageID");
@@ -566,12 +615,12 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ReactionMessageEntity", b =>
                 {
-                    b.Property<Guid>("ReactionID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("ReactionID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
-                    b.Property<Guid>("MessageID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("MessageID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
 
                     b.HasKey("ReactionID", "MessageID");
@@ -583,12 +632,12 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ReactionPostEntity", b =>
                 {
-                    b.Property<Guid>("ReactionID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("ReactionID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(0);
 
-                    b.Property<Guid>("PostID")
-                        .HasColumnType("uniqueidentifier")
+                    b.Property<string>("PostID")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnOrder(1);
 
                     b.HasKey("ReactionID", "PostID");
@@ -604,7 +653,7 @@ namespace SocialNetwork.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ExpiredAt")
@@ -656,9 +705,17 @@ namespace SocialNetwork.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserEntityId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("UserID", "FriendID");
 
                     b.HasIndex("FriendID");
+
+                    b.HasIndex("UserEntityId");
 
                     b.ToTable("Relationships");
                 });
@@ -669,7 +726,7 @@ namespace SocialNetwork.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsAccepted")
@@ -886,9 +943,13 @@ namespace SocialNetwork.DataAccess.Migrations
             modelBuilder.Entity("SocialNetwork.Domain.Entities.CommentEntity", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entities.CommentEntity", "ParentComment")
-                        .WithMany("Replies")
+                        .WithMany("Children")
                         .HasForeignKey("ParentCommentID")
                         .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SocialNetwork.Domain.Entities.PostEntity", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("PostEntityPostID");
 
                     b.HasOne("SocialNetwork.Domain.Entities.PostEntity", "Post")
                         .WithMany()
@@ -1037,6 +1098,25 @@ namespace SocialNetwork.DataAccess.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entities.NotificationEntity", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entities.UserEntity", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Domain.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entities.PostEntity", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entities.UserEntity", "User")
@@ -1110,13 +1190,13 @@ namespace SocialNetwork.DataAccess.Migrations
                     b.HasOne("SocialNetwork.Domain.Entities.MessagesEntity", "Message")
                         .WithMany()
                         .HasForeignKey("MessageID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SocialNetwork.Domain.Entities.ReactionEntity", "Reaction")
                         .WithMany()
                         .HasForeignKey("ReactionID")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Message");
@@ -1127,7 +1207,7 @@ namespace SocialNetwork.DataAccess.Migrations
             modelBuilder.Entity("SocialNetwork.Domain.Entities.ReactionPostEntity", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entities.PostEntity", "Post")
-                        .WithMany()
+                        .WithMany("Reactions")
                         .HasForeignKey("PostID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1161,6 +1241,10 @@ namespace SocialNetwork.DataAccess.Migrations
                         .HasForeignKey("FriendID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SocialNetwork.Domain.Entities.UserEntity", null)
+                        .WithMany("Relationship")
+                        .HasForeignKey("UserEntityId");
 
                     b.HasOne("SocialNetwork.Domain.Entities.UserEntity", "User")
                         .WithMany()
@@ -1213,12 +1297,21 @@ namespace SocialNetwork.DataAccess.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.CommentEntity", b =>
                 {
-                    b.Navigation("Replies");
+                    b.Navigation("Children");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entities.PostEntity", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Images");
+
+                    b.Navigation("Reactions");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entities.UserEntity", b =>
+                {
+                    b.Navigation("Relationship");
                 });
 #pragma warning restore 612, 618
         }

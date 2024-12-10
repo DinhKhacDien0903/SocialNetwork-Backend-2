@@ -12,9 +12,9 @@ namespace SocialNetwork.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task AccepFriendRequestAsync(string friendId)
+        public async Task AccepFriendRequestAsync(string userId, string friendId)
         {
-            var friend= await _context.Relationships.FindAsync(friendId);
+            var friend= await _context.Relationships.FindAsync(userId,friendId);
             if (friend != null)
             {
                 friend.Status= FriendshipStatus.Accepted;
@@ -22,9 +22,9 @@ namespace SocialNetwork.DataAccess.Repositories
             }
         }
 
-        public async Task CancelFriendRequestAsync(string friendId)
+        public async Task CancelFriendRequestAsync(string userId, string friendId)
         {
-            var friend=await _context.Relationships.FindAsync((friendId));
+            var friend=await _context.Relationships.FindAsync(userId, friendId);
             if (friend != null)
             {
                 friend.Status = FriendshipStatus.Canceled;
@@ -32,9 +32,9 @@ namespace SocialNetwork.DataAccess.Repositories
             }
         }
 
-        public async Task DeclineFriendRequestAsync(string friendId)
+        public async Task DeclineFriendRequestAsync(string userId, string friendId)
         {
-            var friend=await _context.Relationships.FindAsync(friendId);
+            var friend=await _context.Relationships.FindAsync(userId, friendId);
             if (friend != null)
             {
                 friend.Status = FriendshipStatus.Declined;
@@ -55,10 +55,15 @@ namespace SocialNetwork.DataAccess.Repositories
             return await _context.Relationships.Where(x => x.UserID == userId&& !x.IsDeleted).Select(x => x.FriendID).ToListAsync();/*|| x.FriendID == userId*/
         }
 
-        public async Task<IEnumerable<RelationshipEntity>> GetPendingFriendRequestAsync(string userId)
+        public async Task<IEnumerable<UserEntity>> GetPendingFriendRequestAsync(string userId)
         {
-            var listSendFriend= await _context.Relationships.Where(x=>x.UserID==userId && x.Status==FriendshipStatus.Pending).ToListAsync();
+            var listSendFriend= await _context.Relationships.Where(x=>x.UserID==userId && x.Status==FriendshipStatus.Pending).Select(x => x.Friend).ToListAsync();
             return listSendFriend;  
+        }
+
+        public Task<IEnumerable<UserEntity>> GetSendFriendRequestAsync(string userId)
+        {
+            var 
         }
 
         public async Task SendFriendRequestAsync(string userId, string friendId)

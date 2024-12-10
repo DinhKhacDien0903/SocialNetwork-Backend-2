@@ -60,6 +60,8 @@ builder.Services.AddScoped(typeof(IReactionMessageRepository), typeof(ReactionMe
 builder.Services.AddScoped(typeof(IConversationRepository), typeof(ConversationRepository));
 builder.Services.AddScoped(typeof(IGroupChatRepository), typeof(GroupChatRepository));
 builder.Services.AddScoped(typeof(INotificationRepository), typeof(NotificationRepository));
+//builder.Services.AddScoped(typeof(), typeof(NotificationRepository));
+
 
 
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
@@ -79,8 +81,6 @@ builder.Services.AddScoped(typeof(INotificationService), typeof(NotificationServ
 
 
 builder.Services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
-
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(typeof(IPostService), typeof(PostService));
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));

@@ -8,9 +8,9 @@ namespace SocialNetwork.Domain
 {
     public enum FriendshipStatus
     {
-        Pending,
-        Accepted,
-        Declined,
-        Canceled
+        Pending=1,
+        Accepted=2,
+        Declined=3,
+        Canceled=4
     }
 }

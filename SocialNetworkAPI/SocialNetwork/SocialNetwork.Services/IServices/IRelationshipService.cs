@@ -4,10 +4,10 @@
     {
         Task<IEnumerable<string>> GetFriendIdByUserId(string userId);
         Task SendFriendRequest(string friendId,string userId);
-        Task AccepFriendRequestAsync(string friendId);
-        Task DeclineFriendRequestAsync(string friendId);
-        Task CancelFriendRequestAsync(string friendId);
-        Task<IEnumerable<UserEntity>> GetAllFriendAsync(string userId);
-        Task<IEnumerable<RelationshipEntity>> GetPendingFriendRequestAsync(string userId);
+        Task AccepFriendRequestAsync(string userId, string friendId);
+        Task DeclineFriendRequestAsync(string userId, string friendId);
+        Task CancelFriendRequestAsync(string userId, string friendId);
+        Task<IEnumerable<UserSearchViewModel>> GetAllFriendAsync(string userId);
+        Task<IEnumerable<UserSearchViewModel>> GetPendingFriendRequestAsync(string userId);
     }
 }

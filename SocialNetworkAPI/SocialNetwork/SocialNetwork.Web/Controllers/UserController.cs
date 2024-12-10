@@ -150,7 +150,7 @@ namespace SocialNetwork.Web.Controllers
 
         #region
         [Authorize]
-        [HttpPost]
+        [HttpPost("Send")]
         public async Task<IActionResult> SendFriendRequest( string friendId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -159,33 +159,36 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> AccepFriendRequest(string friendId)
+        [HttpPost("accept/{friendId}")]
+        public async Task<IActionResult> AcceptFriendRequest(string friendId)
         {
-            await _relationshipService.AccepFriendRequestAsync( friendId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.AccepFriendRequestAsync(userId, friendId);
             return Ok(new { Message = "accep friend request is success" });
         }
 
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("cancel/{friendId}")]
         public async Task<IActionResult> CancelFriendRequest(string friendId)
         {
-            await _relationshipService.CancelFriendRequestAsync( friendId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.CancelFriendRequestAsync(userId, friendId);
             return Ok(new { Message = "cancel friend request is success" });
         }
 
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("decline/{friendId}")]
         public async Task<IActionResult> DeclineFriendRequest(string friendId)
         {
-            await _relationshipService.DeclineFriendRequestAsync( friendId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.DeclineFriendRequestAsync(userId, friendId);
             return Ok(new { Message = "decline friend request is success" });
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("friends")]
         public async Task<IActionResult> GetAllFriend()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -200,7 +203,7 @@ namespace SocialNetwork.Web.Controllers
 
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("request")]
         public async Task<IActionResult> GetAllPedingFriend()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
