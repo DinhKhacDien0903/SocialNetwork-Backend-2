@@ -14,7 +14,7 @@
 
         public bool IsRead { get; set; } = false;
 
-        public bool IsNotificationMessage { get; set; } = true;
+        public int Type { get; set; } = 0;
 
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 

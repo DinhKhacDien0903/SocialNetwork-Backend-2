@@ -84,10 +84,17 @@ namespace SocialNetwork.Web.Hubs
 
             await NotifyReceiverAsync(param.ReciverId, CreateMessageResponse(message, param));
 
-            var notifiation = await SaveNotificationToUser(sender.Id, param.ReciverId, MESSAGE_NOTIFICATION);
+            try
+            {
+                var notifiation = await SaveNotificationToUser(sender.Id, param.ReciverId, MESSAGE_NOTIFICATION);
 
-            await _notificationHubContext.Clients.User(param.ReciverId).SendAsync("ReceiveNotification", notifiation);
+                await _notificationHubContext.Clients.User(param.ReciverId).SendAsync("ReceiveNotification", notifiation);
+            }
+            catch(Exception c)
+            {
 
+                var x = c.Message;
+            }
             return message;
         }
 
@@ -226,6 +233,7 @@ namespace SocialNetwork.Web.Hubs
         {
             return new MessagePersonResponse
             {
+                SenderID = message.SenderID,
                 MessageID = message.MessageID,
                 Content = request.Content,
                 Images = request.Images,
@@ -250,7 +258,7 @@ namespace SocialNetwork.Web.Hubs
                 Messeage = message,
                 CreatedAt = sendDatetime,
                 UpdatedAt = sendDatetime,
-                IsNotificationMessage = true
+                Type = 0
             };
 
             return await _chatHubService.AddNotificationToUserAsync(notificationViewModel);

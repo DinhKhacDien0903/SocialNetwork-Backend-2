@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using SocialNetwork.Domain.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
 
 namespace SocialNetwork.DataAccess.DataContext
 {
@@ -35,7 +32,6 @@ namespace SocialNetwork.DataAccess.DataContext
         public DbSet<ReactionCommentEntity> ReactionComments { get; set; }
         public DbSet<ReactionMessageEntity> ReactionMessages { get; set; }
         public DbSet<ReactionGroupChatMessageEntity> ReactionGroupChatMessages { get; set; }
-        public DbSet<NotificationPostEntity> Notification { get; set; }
         public DbSet<NotificationEntity> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -145,17 +141,6 @@ namespace SocialNetwork.DataAccess.DataContext
             //     .Property(r => r.ReactionID)
             //     .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<NotificationPostEntity>()
-      .HasOne(n => n.User)
-      .WithMany()
-      .HasForeignKey(n => n.UserId)
-      .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<NotificationPostEntity>()
-                .HasOne(n => n.Receiver)
-                .WithMany()
-                .HasForeignKey(n => n.ReceiverId)
-                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<ReactionGroupChatMessageEntity>(entity =>
             {
                 // Composite primary key

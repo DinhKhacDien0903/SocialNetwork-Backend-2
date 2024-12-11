@@ -224,7 +224,7 @@ app.MapControllers();
 
 app.MapHub<NotificationHub>("/notification");
 
-app.MapHub<ChatHub>("/chatPerson");
+app.MapHub<ChatHub>("/chat");
 
 app.MapHub<PostHub>("/postHub");
 

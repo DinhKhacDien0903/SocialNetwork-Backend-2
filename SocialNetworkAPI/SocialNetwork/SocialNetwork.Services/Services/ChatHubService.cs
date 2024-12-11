@@ -51,17 +51,24 @@ namespace SocialNetwork.Services.Services
 
         public async Task<NotificationViewModel> AddNotificationToUserAsync(NotificationViewModel notificationViewModel)
         {
-            var entity = _mapper.Map<NotificationEntity>(notificationViewModel);
+            try
+            {
+                var entity = _mapper.Map<NotificationEntity>(notificationViewModel);
 
-            entity.Id = Guid.NewGuid().ToString();
+                entity.Id = Guid.NewGuid().ToString();
 
-            var notification = await _notificationRepository.AddAsync(entity);
+                var notification = await _notificationRepository.AddAsync(entity);
 
-            await _notificationRepository.SaveChangeAsync();
+                await _notificationRepository.SaveChangeAsync();
 
-            notificationViewModel.Id = notification.Id;
+                notificationViewModel.Id = notification.Id;
 
-            return notificationViewModel;
+                return notificationViewModel;
+            }catch(Exception e)
+            {
+                var x = e.Message;
+                return new NotificationViewModel();
+            }
         }
 
         public async Task<IEnumerable<NotificationViewModel>> GetAllNotificationMessageAsync(string userId)
