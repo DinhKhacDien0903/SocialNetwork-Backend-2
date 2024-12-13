@@ -19,13 +19,13 @@ namespace SocialNetwork.Services.Services
 
         public async Task CreateNotificationAsync(NotificationPostViewModel model, List<string> friendId)
         {
-            var notifications = friendId.Select(friendId => new NotificationPostEntity
+            var notifications = friendId.Select(friendId => new NotificationEntity
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = model.UserId,
+                SenderId = model.UserId,
                 ReceiverId = friendId,
-                Content = model.Content,
-                Type = "New_Post",
+                Messeage = model.Content,
+                Type = 1,
                 CreatedAt = DateTime.UtcNow
             }).ToList();
             await _notification.CreateNotificationAsync(notifications);

@@ -15,7 +15,11 @@
 
         public bool IsRead { get; set; } = false;
 
-        public bool IsNotificationMessage { get; set; } = true;
+        /// <summary>
+        /// type = 0 => notification message
+        /// type = 1 => notification post
+        /// </summary>
+        public int Type { get; set; } = 0;
 
         public bool IsDelete { get; set; } = false;
 

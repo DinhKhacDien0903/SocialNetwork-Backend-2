@@ -16,13 +16,13 @@ namespace SocialNetwork.DataAccess.Repositories
             _context = context;
         }
 
-        public async Task CreateNotificationAsync(IEnumerable<NotificationPostEntity> notification)
+        public async Task CreateNotificationAsync(IEnumerable<NotificationEntity> notification)
         {
             //var user = await _context.Users.FindAsync(notification.UserId);
             try
             {
                 //notification.User = user;
-                await _context.Notification.AddRangeAsync(notification);
+                await _context.Notifications.AddRangeAsync(notification);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -34,7 +34,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task DeleteNotificationAsync(int id)
         {
-            var notification = await _context.Notification.FindAsync(id);
+            var notification = await _context.Notifications.FindAsync(id);
             if (notification != null)
             {
                 notification.IsDelete = true;
@@ -42,10 +42,10 @@ namespace SocialNetwork.DataAccess.Repositories
             }
         }
 
-        public async Task<IEnumerable<NotificationPostEntity>> GetNotificationByUserAsync(string userId)
+        public async Task<IEnumerable<NotificationEntity>> GetNotificationByUserAsync(string userId)
         {
            
-            return await _context.Notification
+            return await _context.Notifications
                 .Where(n => n.ReceiverId==userId && !n.IsDelete)
                 .OrderByDescending(n => n.CreatedAt)
                 .ToListAsync();
@@ -54,7 +54,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task MakeAsReadAsync(string id)
         {
-            var notification=await _context.Notification.FindAsync(id);
+            var notification=await _context.Notifications.FindAsync(id);
             if (notification != null)
             {
                 //notification.IsRead = true;

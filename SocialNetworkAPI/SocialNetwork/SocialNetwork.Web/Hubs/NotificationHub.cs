@@ -85,7 +85,7 @@ namespace SocialNetwork.Web.Hubs
                 Messeage = message,
                 CreatedAt = sendDatetime,
                 UpdatedAt = sendDatetime,
-                IsNotificationMessage = true
+                Type = 0
             };
 
             return await _chatHubService.AddNotificationToUserAsync(notificationViewModel);

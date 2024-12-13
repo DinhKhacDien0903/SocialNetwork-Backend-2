@@ -15,14 +15,14 @@
                      .Where(n => n.ReceiverId == userId &&
                                  !n.IsRead &&
                                  !n.IsDelete &&
-                                 n.IsNotificationMessage)
+                                 n.Type == 0)
                      .GroupBy(n => new { n.SenderId, n.GroupId })
                      .Select(grouped => new NotificationEntity
                      {
                          SenderId = grouped.Key.SenderId,
                          GroupId = grouped.Key.GroupId,
                          ReceiverId = userId,
-                         IsNotificationMessage = true,
+                         Type = 0,
                          Id = grouped.OrderByDescending(x => x.CreatedAt).First().Id,
                          Messeage = grouped.OrderByDescending(x => x.CreatedAt).First().Messeage,
                          CreatedAt = grouped.Max(x => x.CreatedAt),
