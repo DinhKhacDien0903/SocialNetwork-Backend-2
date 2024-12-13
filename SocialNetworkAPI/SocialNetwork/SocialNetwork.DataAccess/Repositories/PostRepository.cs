@@ -25,7 +25,28 @@ namespace SocialNetwork.DataAccess.Repositories
             await _context.Posts.AddAsync(entity);
         }
 
+        public async Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync()
+        {
+            var postWait = await _context.Posts.Include(x => x.User)
+                .Include(x => x.Images).OrderByDescending(x => x.CreatedAt)
+                .Where(x=>!x.IsDelete)
+                .Select(x => new AdminBrowsePostViewModel
+                {
+                    PostID = x.PostID,
+                    UserID=x.UserID,
+                    Content = x.Content,
+                    LastName=x.User.LastName,
+                    FirstName=x.User.FirstName,
+                    AvatarUrl=x.User.AvatarUrl,
+                    //CreatedAt=x.CreatedAt,
+                    Images = x.Images.Where(x => !x.IsDeleted).Select(x=>new ImagesOfPostViewModel
+                    {
+                        ImgUrl = x.ImgUrl,  
+                    }).ToList()
+                }).ToListAsync();
 
+            return postWait;
+        }
 
 
 
@@ -38,6 +59,7 @@ namespace SocialNetwork.DataAccess.Repositories
                 .ThenInclude(rp => rp.Reaction)
                 .ThenInclude(r => r.EmotionType)
                 .OrderByDescending(x => x.CreatedAt)
+                .Where(x => !x.IsDelete)
                 .Select(x => new PostViewModel
                 {
                     PostID = x.PostID,
@@ -46,6 +68,7 @@ namespace SocialNetwork.DataAccess.Repositories
                     LastName = x.User.LastName,
                     FirstName = x.User.FirstName,
                     AvatarUrl = x.User.AvatarUrl,
+                    
 
                     //EmotionTypeID = x.Reactions.Any(x => !x.Reaction.IsDeleted ) ? x.Reactions.First().Reaction.EmotionType.EmotionTypeID : null,
                     //EmotionName = x.Reactions.Any(x => !x.Reaction.IsDeleted) ? x.Reactions.First().Reaction.EmotionType.EmotionName : null,
@@ -76,10 +99,10 @@ namespace SocialNetwork.DataAccess.Repositories
                 .ToListAsync();
 
 
-            foreach (var post in posts)
-            {
-                Console.WriteLine($"PostID: {post.PostID}, UserLastName: {post.LastName}, UserFirstName: {post.FirstName}");
-            }
+            //foreach (var post in posts)
+            //{
+            //    Console.WriteLine($"PostID: {post.PostID}, UserLastName: {post.LastName}, UserFirstName: {post.FirstName}");
+            //}
 
             return posts;
         }
@@ -104,12 +127,13 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<PostEntity> GetByIDAsync(string id)
         {
-            return await _context.Posts.FindAsync(id);
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.PostID.ToString() == id);
+            return post;
         }
 
-        public async void Delete(PostEntity Entity)
+        public async void Delete(string  postId)
         {
-            var post = await GetByIDAsync(Entity.PostID);
+            var post = await GetByIDAsync(postId);
             if (post != null)
             {
                 post.IsDelete = true;
@@ -118,5 +142,7 @@ namespace SocialNetwork.DataAccess.Repositories
             }
 
         }
+
+       
     }
 }

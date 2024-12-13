@@ -11,6 +11,7 @@ namespace SocialNetwork.Domain.IRepositories
     public interface IPostRepository
     {
         Task<IEnumerable<PostViewModel>> GetAllAsync(string userid);
+        Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync();
 
         Task<PostEntity> GetByIDAsync(string id);
 
@@ -18,7 +19,7 @@ namespace SocialNetwork.Domain.IRepositories
 
         void Update(PostEntity entity);
 
-        void Delete(PostEntity Entity);
+        void Delete(string postId);
 
         Task SaveChangeAsync();
 

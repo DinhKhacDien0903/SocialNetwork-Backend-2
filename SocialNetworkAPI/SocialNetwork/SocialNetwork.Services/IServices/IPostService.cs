@@ -11,7 +11,8 @@ namespace SocialNetwork.Services.IServices
     public interface IPostService
     {
         Task<IEnumerable<PostViewModel>> GetAllPostsAsync(string userId);
-        //Task<IEnumerable<EmotionRequest>> GetAllEmotionAsync();
+
+        Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync();
 
         Task<PostViewModel> GetPostByIdAsync(string postId);
 

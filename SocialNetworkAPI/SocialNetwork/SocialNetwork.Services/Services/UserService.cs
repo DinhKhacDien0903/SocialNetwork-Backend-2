@@ -95,10 +95,10 @@ namespace SocialNetwork.Services.Services
             return result;
         }
 
-        public async Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query)
+        public async Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query,string userId)
         {
             var result = new PageResult<UserSearchViewModel>() { CurrentPage = query.PageIndex };
-            var user = await _userRepository.SearchUserAsync(query);
+            var user = await _userRepository.SearchUserAsync(query,userId);
             var userSearch = user.Select(x=>new UserSearchViewModel
             {
                 FirstName = x.FirstName,
@@ -107,6 +107,7 @@ namespace SocialNetwork.Services.Services
             }).ToList();
             result.TotalCount = userSearch.Count();
             result.Data = userSearch;
+
             return result;
         }
     }

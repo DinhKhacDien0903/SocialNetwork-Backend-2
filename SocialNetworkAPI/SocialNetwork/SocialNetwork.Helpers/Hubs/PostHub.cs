@@ -99,5 +99,10 @@ namespace SocialNetwork.Helpers.Hubs
             await Clients.User(usedId).SendAsync("ReceiveNotification", message);
         }
 
+
+        public async Task SendSearchAsync()
+        {
+            await Clients.All.SendAsync("SearchUser");
+        }
     }
 }

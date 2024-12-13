@@ -20,6 +20,6 @@ namespace SocialNetwork.Services.IServices
         Task<IEnumerable<FriendViewModel>> GetFriendOnlinesAsync(string userId);
 
 
-        Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query);
+        Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query,string userId);
     }
 }

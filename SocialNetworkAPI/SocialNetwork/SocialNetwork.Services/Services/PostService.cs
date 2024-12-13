@@ -35,10 +35,6 @@ namespace SocialNetwork.Services.Services
 
         public async Task<PostResponse> CreatePostAsync(PostRequest postRequest, string userID)
         {
-            if (string.IsNullOrWhiteSpace(postRequest.Content))
-            {
-                throw new ArgumentException("Content cannot be null or empty.", nameof(postRequest.Content));
-            }
 
             try
             {
@@ -67,7 +63,6 @@ namespace SocialNetwork.Services.Services
                         var imageEntity = _mapper.Map<ImagesOfPostEntity>(image);
                         
                         imageEntity.PostID = postEntity.PostID;
-                        //await _imageRepository.AddAsync(imageEntity);
 
                         }
                     }
@@ -132,14 +127,7 @@ namespace SocialNetwork.Services.Services
 
         public async Task<bool> DeletePostAsync(string postId)
         {
-            var postEntity = await _postRepository.GetByIDAsync(postId);
-            if (postEntity == null)
-            {
-                throw new Exception("Không có bài viết tương ứng với postId");
-            }
-            postEntity.IsDelete = true;
-            _postRepository.Update(postEntity);
-            await _postRepository.SaveChangeAsync();
+             _postRepository.Delete(postId);
             return true;
         }
 
@@ -185,6 +173,12 @@ namespace SocialNetwork.Services.Services
             var posts = await _postRepository.GetAllAsync(userId); 
             var userPosts = posts.Where(p => p.UserID == userId); 
             return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
+        }
+
+        public Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync()
+        {
+            var postWait=_postRepository.GetAdminBrowseAsync();
+            return postWait;
         }
     }
 }

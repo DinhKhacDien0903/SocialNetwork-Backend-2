@@ -18,10 +18,16 @@ namespace SocialNetwork.Services.Services
             return friend;
         }
 
-        public  Task CancelFriendRequestAsync(string userId, string friendId)
+        public  Task CancelFriendAsync(string userId, string friendId)
         {
-            var friend =  _relationshipRepository.CancelFriendRequestAsync(userId, friendId);
+            var friend =  _relationshipRepository.CancelFriendAsync(userId, friendId);
             return friend;
+        }
+
+        public Task DeclineFriendAsync(string userId, string friendId)
+        {
+            var model=_relationshipRepository.DeclineFriendAsync(userId, friendId);
+            return model;
         }
 
         public  Task DeclineFriendRequestAsync(string userId, string friendId)
@@ -47,6 +53,13 @@ namespace SocialNetwork.Services.Services
         {
             var getFriendPeding = await _relationshipRepository.GetPendingFriendRequestAsync(userId);
             var friend = _mapper.Map<IEnumerable<UserSearchViewModel>>(getFriendPeding);
+            return friend;
+        }
+
+        public async Task<IEnumerable<UserSearchViewModel>> GetSendFriendRequestAsync(string userId)
+        {
+            var model = await _relationshipRepository.GetSendFriendRequestAsync(userId);
+            var friend= _mapper.Map<IEnumerable<UserSearchViewModel>>(model);
             return friend;
         }
 

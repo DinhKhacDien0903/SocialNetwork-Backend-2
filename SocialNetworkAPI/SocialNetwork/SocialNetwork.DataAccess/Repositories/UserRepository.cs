@@ -47,27 +47,32 @@ namespace SocialNetwork.DataAccess.Repositories
             return userIfor;
         }
 
-        public async Task<IEnumerable<UserEntity>> SearchUserAsync(SearchQuery query)
+        public async Task<IEnumerable<UserEntity>> SearchUserAsync(SearchQuery query, string userId)
         {
+            var me = await _userManager.FindByIdAsync(userId);
             var user = await _context.Users
-             .Where(x => x.FirstName.ToLower().Contains(query.keyWord.ToLower())
+             .Where(x => 
+             x.Id!= me.Id.ToString()&&
+             (x.FirstName.ToLower().Contains(query.keyWord.ToLower())
                       || x.LastName.ToLower().Contains(query.keyWord.ToLower())
                       || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
-                      || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower()))
+                      || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
+                      )
+                      )
              .Skip(query.SkipNo)
              .Take(query.TakeNo)
-             .Select(u => new UserSearchViewModel
-             {
-                 FirstName = u.FirstName,
-                 LastName = u.LastName,
-                 AvatarUrl = u.AvatarUrl
-             })
+             //.Select(u => new UserSearchViewModel
+             //{
+             //    FirstName = u.FirstName,
+             //    LastName = u.LastName,
+             //    AvatarUrl = u.AvatarUrl
+             //})
              .ToListAsync();
 
-            if (user == null || !user.Any())
-            {
-                throw new Exception($"No users found matching your search criteria for '{query.keyWord}'");
-            }
+            //if (user == null || !user.Any())
+            //{
+            //    return 
+            //}
             var userSearch= user.Select(x=> new UserEntity
             {
                 FirstName = x.FirstName,

@@ -96,10 +96,11 @@ namespace SocialNetwork.Web.Controllers
         [Authorize]
         [HttpGet("SearchUser")]
         public async Task<IActionResult> GetSearchUserAsync([FromQuery] SearchQuery userSearch)
-        {
+       {
             try
             {
-                var user = await _userServices.SearchUserByNameAsync(userSearch);
+                var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _userServices.SearchUserByNameAsync(userSearch,userId);
                 return Ok(new BaseResponse
                 {
                     Status = 200,
@@ -159,8 +160,8 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [Authorize]
-        [HttpPost("accept/{friendId}")]
-        public async Task<IActionResult> AcceptFriendRequest(string friendId)
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptFriendRequest([FromBody] string friendId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             await _relationshipService.AccepFriendRequestAsync(userId, friendId);
@@ -170,20 +171,29 @@ namespace SocialNetwork.Web.Controllers
 
         [Authorize]
         [HttpPost("cancel/{friendId}")]
-        public async Task<IActionResult> CancelFriendRequest(string friendId)
+        public async Task<IActionResult> CancelFriend(string friendId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            await _relationshipService.CancelFriendRequestAsync(userId, friendId);
+            await _relationshipService.CancelFriendAsync(userId, friendId);
             return Ok(new { Message = "cancel friend request is success" });
         }
 
 
         [Authorize]
-        [HttpPost("decline/{friendId}")]
+        [HttpPost("cancelRequest/{friendId}")]
         public async Task<IActionResult> DeclineFriendRequest(string friendId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             await _relationshipService.DeclineFriendRequestAsync(userId, friendId);
+            return Ok(new { Message = "decline friend request is success" });
+        }
+
+        [Authorize]
+        [HttpPost("decline/{friendId}")]
+        public async Task<IActionResult> DeclineFriend(string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.DeclineFriendAsync(userId, friendId);
             return Ok(new { Message = "decline friend request is success" });
         }
 
@@ -213,6 +223,20 @@ namespace SocialNetwork.Web.Controllers
                 Status = 200,
                 Message = "get all peding friend is success",
                 Data = friend
+            });
+        }
+
+        [Authorize]
+        [HttpGet("sendRequest")]
+        public async Task<IActionResult> GetAllSendRequestFriend()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var sendRequest= await _relationshipService.GetSendFriendRequestAsync(userId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "get all send request is success",
+                Data = sendRequest
             });
         }
         #endregion

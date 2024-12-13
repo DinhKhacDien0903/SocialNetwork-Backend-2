@@ -35,7 +35,26 @@ namespace SocialNetwork.Web.Controllers
             return Ok(posts);
         }
 
-        [HttpGet("Me")]
+        [HttpGet("not-approved")]
+        public async Task<ActionResult<IEnumerable<AdminBrowsePostViewModel>>> GetAllPostsAdmin()
+        {   
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var posts = await _postService.GetAdminBrowseAsync();
+            return Ok(posts);
+        }
+
+        [HttpPost("deletePost/{postId}")]
+        public async Task<ActionResult> DeletePost(string postId)
+        {
+            var result=await _postService.DeletePostAsync(postId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "delete post is success"
+            });
+        }
+
+        [HttpGet("User")]
         public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId)
         {
             var posts = await _postService.GetPostsByUserIdAsync(userId);
@@ -86,16 +105,7 @@ namespace SocialNetwork.Web.Controllers
             return Ok(updatedPost);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePost(string id)
-        {
-            var result = await _postService.DeletePostAsync(id);
-            if (!result)
-            {
-                return NotFound("Bài viết không tồn tại.");
-            }
-            return NoContent();
-        }
+       
 
         /// <summary>
         /// Emotion
