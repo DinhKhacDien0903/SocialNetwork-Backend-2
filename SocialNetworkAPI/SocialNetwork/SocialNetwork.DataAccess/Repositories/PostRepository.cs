@@ -128,9 +128,6 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<PostEntity> GetByIDAsync(string id)
         {
-            //var post = await _context.Posts.FindAsync(id);
-            ////var post = await _context.Posts.FirstOrDefaultAsync(p => p.PostID.ToString() == id);
-            //return post;
             return await _context.Posts
                             .AsNoTracking()
                             .FirstOrDefaultAsync(p => p.PostID == id);
