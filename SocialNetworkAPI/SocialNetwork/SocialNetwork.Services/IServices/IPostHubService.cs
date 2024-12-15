@@ -26,5 +26,7 @@ namespace SocialNetwork.Services.IServices
         Task SendDeleteReactionAsycn(string userId, string postId);
 
         Task SendNotificationToMultipleUsers(List<string> userIds, NotificationPostViewModel notification);
+
+        Task SendRefusePostAsync(string postId);
     }
 }

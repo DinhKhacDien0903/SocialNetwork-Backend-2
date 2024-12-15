@@ -80,6 +80,10 @@ namespace SocialNetwork.Services.Services
             }
         }
 
+        public async Task SendRefusePostAsync(string postId)
+        {
+            await _hubContext.Clients.All.SendAsync("ReceiveRefusePost", postId);
+        }
     }
 }
 

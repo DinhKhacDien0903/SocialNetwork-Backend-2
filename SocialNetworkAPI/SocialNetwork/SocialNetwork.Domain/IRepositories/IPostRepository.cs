@@ -17,9 +17,9 @@ namespace SocialNetwork.Domain.IRepositories
 
         Task AddAsync(PostEntity entity);
 
-        void Update(PostEntity entity);
+        //Task Update(PostEntity entity);
 
-        void Delete(string postId);
+        Task Delete(string postId);
 
         Task SaveChangeAsync();
 

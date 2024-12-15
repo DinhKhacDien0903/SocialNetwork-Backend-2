@@ -108,10 +108,11 @@ namespace SocialNetwork.DataAccess.Repositories
         }
 
 
-        public void Update(PostEntity entity)
-        {
-            _context.Posts.Update(entity);
-        }
+        //public async Task Update(PostEntity entity)
+        //{
+        //  var up=await _context.Posts.Update(entity);
+        //    await _context.SaveChangesAsync();
+        //}
 
         public async Task SaveChangeAsync()
         {
@@ -127,17 +128,21 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<PostEntity> GetByIDAsync(string id)
         {
-            var post = await _context.Posts.FirstOrDefaultAsync(p => p.PostID.ToString() == id);
-            return post;
+            //var post = await _context.Posts.FindAsync(id);
+            ////var post = await _context.Posts.FirstOrDefaultAsync(p => p.PostID.ToString() == id);
+            //return post;
+            return await _context.Posts
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(p => p.PostID == id);
         }
 
-        public async void Delete(string  postId)
+        public async Task Delete(string  postId)
         {
             var post = await GetByIDAsync(postId);
             if (post != null)
             {
                 post.IsDelete = true;
-                _context.Posts.Update(post);
+                _context.Entry(post).Property(p => p.IsDelete).IsModified = true;
                 await _context.SaveChangesAsync();
             }
 

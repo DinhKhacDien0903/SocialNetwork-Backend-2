@@ -34,24 +34,12 @@ namespace SocialNetwork.Helpers.Hubs
             }
         }
         
-        public async Task SendUpdatePostAsycn(PostViewModel post)
+
+        public async Task SendRefusePostAsync(string id)
         {
             try
             {
-                await Clients.All.SendAsync("ReceiveUpdatePost", post);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error in sendUpdatePost");
-
-            }
-        }
-
-        public async Task SendDelete(Guid id)
-        {
-            try
-            {
-                await Clients.All.SendAsync("ReceiveDeletePost", id);
+                await Clients.All.SendAsync("ReceiveRefusePost", id);
             }
             catch (Exception ex)
             {
@@ -59,10 +47,6 @@ namespace SocialNetwork.Helpers.Hubs
             }
         }
 
-        //public async Task SendReaction(ReactionRequest reactionRequest)
-        //{
-        //    await Clients.All.SendAsync("ReceiveReaction", reactionRequest);
-        //}
 
         public async Task RemoveReaction(string postId, string userId)
         {
@@ -71,15 +55,6 @@ namespace SocialNetwork.Helpers.Hubs
 
 
 
-        //public async Task StartPostRoom(string postId)
-        //{
-        //    await Groups.AddToGroupAsync(Context.ConnectionId, postId);
-        //}
-
-        //public async Task LeavePostRoom(string postId)
-        //{
-        //    await Groups.RemoveFromGroupAsync(Context.ConnectionId, postId);
-        //}
 
         public async Task SendCommentAsync(object comment)
         {

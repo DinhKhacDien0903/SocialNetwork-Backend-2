@@ -127,7 +127,8 @@ namespace SocialNetwork.Services.Services
 
         public async Task<bool> DeletePostAsync(string postId)
         {
-             _postRepository.Delete(postId);
+           await  _postRepository.Delete(postId);
+            await _postHubService.SendRefusePostAsync(postId);
             return true;
         }
 
@@ -155,18 +156,18 @@ namespace SocialNetwork.Services.Services
         }
 
 
-        public async Task<PostViewModel> UpdatePostAsync(PostViewModel post)
-        {
-            var postEntity = await _postRepository.GetByIDAsync(post.PostID);
-            if (postEntity == null)
-            {
-                throw new Exception("Không tồn tại bài viết");
-            }
-            _mapper.Map(post, postEntity);
-            _postRepository.Update(postEntity);
-            await _postRepository.SaveChangeAsync();
-            return _mapper.Map<PostViewModel>(postEntity);
-        }
+        //public async Task<PostViewModel> UpdatePostAsync(PostViewModel post)
+        //{
+        //    var postEntity = await _postRepository.GetByIDAsync(post.PostID);
+        //    if (postEntity == null)
+        //    {
+        //        throw new Exception("Không tồn tại bài viết");
+        //    }
+        //    _mapper.Map(post, postEntity);
+        //    _postRepository.Update(postEntity);
+        //    await _postRepository.SaveChangeAsync();
+        //    return _mapper.Map<PostViewModel>(postEntity);
+        //}
 
         public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
         {

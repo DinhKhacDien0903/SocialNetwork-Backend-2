@@ -18,7 +18,7 @@ namespace SocialNetwork.Services.IServices
 
         Task<PostResponse> CreatePostAsync(PostRequest post,string userID);
 
-        Task<PostViewModel> UpdatePostAsync(PostViewModel post);
+        //Task<PostViewModel> UpdatePostAsync(PostViewModel post);
 
         Task<bool> DeletePostAsync(string postId);
 
