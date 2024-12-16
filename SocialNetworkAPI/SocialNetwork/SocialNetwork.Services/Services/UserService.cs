@@ -116,7 +116,8 @@ namespace SocialNetwork.Services.Services
             {
                 FirstName = x.FirstName,
                 LastName = x.LastName,
-                AvatarUrl = x.AvatarUrl
+                AvatarUrl = x.AvatarUrl,
+                Id=x.Id
             }).ToList();
             result.TotalCount = userSearch.Count();
             result.Data = userSearch;
