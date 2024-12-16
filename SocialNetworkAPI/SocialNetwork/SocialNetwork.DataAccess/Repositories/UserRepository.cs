@@ -34,6 +34,10 @@ namespace SocialNetwork.DataAccess.Repositories
             return null;
         }
 
+        public async Task<int> GetTotalFriendAsync(string userId)
+        {
+            return await _context.Relationships.Where(x => x.UserID == userId && !x.IsDeleted && x.Status == FriendshipStatus.Accepted).Select(x => x.FriendID).CountAsync();
+        }
 
         public async Task<UserEntity> GetUserInfor(string userId)
         {
@@ -97,5 +101,40 @@ namespace SocialNetwork.DataAccess.Repositories
 
             await _userManager.UpdateAsync(user);
         }
+
+        public async Task<UserEntity> UpdateUserInforAsync(UserEntity userEntity)
+        {
+            var query = from u in _context.Users
+                        where u.Id == userEntity.Id
+                        select u;
+
+            var user = await query.FirstOrDefaultAsync();
+
+            if(user == null)
+            {
+                throw new ArgumentNullException(nameof(userEntity.Id), "User not found");
+            }
+
+            void UpdateField<T>(Action<T> setField, T value, T currentValue)
+            {
+                if (value != null && !EqualityComparer<T>.Default.Equals(currentValue, value))
+                {
+                    setField(value);
+                }
+            }
+
+            UpdateField(value => user.FirstName = value, userEntity.FirstName, user.FirstName);
+            UpdateField(value => user.LastName = value, userEntity.LastName, user.LastName);
+            UpdateField(value => user.Gender = value, userEntity.Gender, user.Gender);
+            UpdateField(value => user.DateOfBirth = value, userEntity.DateOfBirth, user.DateOfBirth);
+            UpdateField(value => user.Address = value, userEntity.Address, user.Address);
+            UpdateField(value => user.isPrivate = value, userEntity.isPrivate, user.isPrivate);
+            UpdateField(value => user.AvatarUrl = value, userEntity.AvatarUrl, user.AvatarUrl);
+
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
     }
+
 }

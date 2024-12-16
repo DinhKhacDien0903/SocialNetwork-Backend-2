@@ -9,6 +9,19 @@ namespace SocialNetwork.DataAccess.SeedData
         {
             var context = serviceProvider.GetRequiredService<SocialNetworkdDataContext>();
 
+            var role = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            if (!context.Roles.Any())
+            {
+                var roles = new[] { "Admin", "User" };
+
+                foreach (var item in roles)
+                {
+                    if (!await role.RoleExistsAsync(item))
+                        await role.CreateAsync(new IdentityRole(item));
+                }
+            }
+
             if (!userManager.Users.Any())
             {
                 var users = new List<UserEntity>();
@@ -24,15 +37,17 @@ namespace SocialNetwork.DataAccess.SeedData
                         IsActive = i <= 4,
                         CreatedAt = DateTime.UtcNow.AddDays(-i),
                         LastLogin = i <= 4 ? DateTime.UtcNow : (DateTime?)null,
+                        Gender = false,
                         EmailConfirmed = true,
                         AvatarUrl = "https://res.cloudinary.com/dlran3qvj/image/upload/v1732701622/file_1732701619587.jpg"
                     };
 
-                    var result = await userManager.CreateAsync(user, "P@ssw0rd!");
+                    var result = await userManager.CreateAsync(user, "ABCd123!@#");
 
                     if (result.Succeeded)
                     {
                         users.Add(user);
+                        await userManager.AddToRoleAsync(user, "User");
                     }
                 }
 

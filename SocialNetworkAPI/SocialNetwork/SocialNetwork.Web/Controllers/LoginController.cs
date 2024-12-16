@@ -64,7 +64,7 @@ namespace SocialNetwork.Web.Controllers
             }
         }
 
-        [HttpPost("singup")]
+        [HttpPost("signup")]
         public async Task<ActionResult> SingUp(SingUpRequest singUpRequest)
         {
             try

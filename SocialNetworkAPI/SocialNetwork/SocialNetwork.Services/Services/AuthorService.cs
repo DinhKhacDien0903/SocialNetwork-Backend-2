@@ -250,7 +250,8 @@ namespace SocialNetwork.Services.Services
             {
                 UserName = signUpRequest.UserName,
                 Email = signUpRequest.Email,
-                PhoneNumber = signUpRequest.PhoneNumber
+                FirstName = signUpRequest.FirstName,
+                LastName = signUpRequest.LastName,
             };
 
             var result =  await _userManager.CreateAsync(user, signUpRequest.Password);

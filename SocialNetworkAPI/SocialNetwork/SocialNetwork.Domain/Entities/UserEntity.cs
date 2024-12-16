@@ -29,5 +29,8 @@ namespace SocialNetwork.Domain.Entities
         public DateTime? DateOfBirth { get; set; }
 
         public ICollection<RelationshipEntity> Relationship { get; set; }
+
+        public bool isPrivate { get; set; } = false;
     }
 }
+

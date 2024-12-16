@@ -18,11 +18,5 @@ namespace SocialNetwork.DTOs.Request
 
         [Required]
         public string LastName { get; set; } = string.Empty;
-
-        [Required]
-        public string PhoneNumber { get; set; } = string.Empty;
-
-        [Required]
-        public bool Gender { get; set; }
     }
 }
