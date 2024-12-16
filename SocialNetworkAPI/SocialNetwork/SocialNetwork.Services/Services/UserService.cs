@@ -61,7 +61,11 @@ namespace SocialNetwork.Services.Services
             {
                 var userEntity = await _userRepository.GetUserInfor(userId);
 
-                return _mapper.Map<UserViewModel>(userEntity);
+                var userVM = _mapper.Map<UserViewModel>(userEntity);
+
+                userVM.totalOfFirend = await _userRepository.GetTotalFriendAsync(userId);
+
+                return userVM;
 
             }catch(Exception e)
             {

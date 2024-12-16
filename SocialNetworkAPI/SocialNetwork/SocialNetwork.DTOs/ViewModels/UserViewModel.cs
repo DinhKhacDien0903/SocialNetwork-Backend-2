@@ -24,5 +24,7 @@
         public bool? isPrivate { get; set; } = false;
 
         public string? DateOfBirthFormatted => DateOfBirth?.ToString("yyyy-MM-dd");
+
+        public int? totalOfFirend { get; set; } = 0;
     }
 }

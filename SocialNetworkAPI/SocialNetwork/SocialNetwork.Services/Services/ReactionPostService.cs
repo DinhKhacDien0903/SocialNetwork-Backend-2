@@ -66,32 +66,24 @@ namespace SocialNetwork.Services.Services
             {
                 ReactionID = Guid.NewGuid().ToString(),
                 UserID = userId,
-                User = await _userRepository.GetByIDAsync(userId),
                 EmotionTypeID = emotionTypeId,
                 IsDeleted = false
             };
 
+            await _reactionRepository.AddAsync(reactionNew);
+
             var newReactionPost = new ReactionPostEntity
             {
-                //ReactionID = Guid.NewGuid().ToString(),
-                Post = await _postRepository.GetByIDAsync(postId),
                 PostID = postId,
-                Reaction = reactionNew,
                 ReactionID = reactionNew.ReactionID
 
             };
 
             await _reactionPost.AddAsync(newReactionPost);
 
-
-
-
-
             await _postHubService.SendReactionAddAsycn(reactionRequest);
             return reactionRequest;
         }
-
-
 
         public async Task<IEnumerable<EmotionTypeEntity>> GetAllEmotionTypesAsync()
         {

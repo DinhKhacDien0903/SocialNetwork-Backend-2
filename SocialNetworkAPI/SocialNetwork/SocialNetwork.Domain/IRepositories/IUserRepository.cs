@@ -15,5 +15,7 @@ namespace SocialNetwork.Domain.IRepositories
         Task<IEnumerable<UserEntity>> SearchUserAsync(SearchQuery query,string userId);
 
         Task<UserEntity> UpdateUserInforAsync(UserEntity userEntity);
+
+        Task<int> GetTotalFriendAsync(string userId);
     }
 }

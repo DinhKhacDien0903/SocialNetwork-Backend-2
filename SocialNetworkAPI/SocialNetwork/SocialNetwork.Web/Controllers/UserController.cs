@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using SocialNetwork.Domain;
 using SocialNetwork.DTOs.Authorize;
 using SocialNetwork.DTOs.ViewModels;
@@ -49,13 +48,13 @@ namespace SocialNetwork.Web.Controllers
 
         [Authorize]
         [HttpGet("getInfor")]
-        public async Task<IActionResult> GetUserInfor()
+        public async Task<IActionResult> GetUserInfor(string? userId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if(userId == null)
+            if(string.IsNullOrEmpty(userId))
             {
-                return Unauthorized("You must login to get your informations");
+                userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             }   
 
             var user = await _userServices.GetUserInforAsync(userId);
