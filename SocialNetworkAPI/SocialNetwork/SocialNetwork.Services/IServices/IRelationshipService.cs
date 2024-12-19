@@ -3,7 +3,7 @@
     public interface IRelationshipService
     {
         Task<IEnumerable<string>> GetFriendIdByUserId(string userId);
-        Task SendFriendRequest(string friendId,string userId);
+        Task<FriendRequestViewmodel> SendFriendRequest(string friendId,string userId);
         Task AccepFriendRequestAsync(string userId, string friendId);
         Task DeclineFriendRequestAsync(string userId, string friendId);
         Task DeclineFriendAsync(string userId, string friendId);

@@ -72,17 +72,28 @@ namespace SocialNetwork.Services.Services
             });
 
         }
-        public async Task SendNotificationToMultipleUsers(List<string> userIds, NotificationPostViewModel notification)
+        //public async Task SendNotificationToMultipleUsers(List<string> userIds, NotificationPostViewModel notification)
+        //{
+        //    foreach (var userId in userIds)
+        //    {
+        //        await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
+        //    }
+        //}
+
+        public async Task SendFriendRequestNotification(FriendRequestViewmodel model,string friendid)
         {
-            foreach (var userId in userIds)
-            {
-                await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
-            }
+            await _hubContext.Clients.User(friendid).SendAsync("FriendRequestNotification",model);
         }
 
         public async Task SendRefusePostAsync(string postId)
         {
             await _hubContext.Clients.All.SendAsync("ReceiveRefusePost", postId);
+        }
+
+        public async Task AcceptFriendNotification(FriendRequestViewmodel model, string friendid)
+        {
+            await _hubContext.Clients.User(friendid).SendAsync("AcceptFriend", model);
+
         }
     }
 }

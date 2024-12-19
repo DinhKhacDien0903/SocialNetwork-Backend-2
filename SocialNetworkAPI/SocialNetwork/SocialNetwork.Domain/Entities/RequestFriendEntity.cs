@@ -6,19 +6,18 @@
         public Guid RequestFriendID { get; set; }
 
         [Required]
-        public string SenderID { get; set; }
+        public string UserID { get; set; }
 
         [Required]
-        public string ReceiverID { get; set; }
+        public string FriendID { get; set; }
 
-        public bool IsPending { get; set; } = true;
-        public bool IsAccepted { get; set; } = false;
-        public bool IsRejected { get; set; } = false;
 
-        [ForeignKey("SenderID")]
-        public UserEntity Sender { get; set; } = new UserEntity();
+        public FriendshipStatus Status { get; set; }
 
-        [ForeignKey("ReceiverID")]
-        public UserEntity Receiver { get; set; } = new UserEntity();
+        [ForeignKey("UserID")]
+        public UserEntity User { get; set; }
+
+        [ForeignKey("FriendID")]
+        public UserEntity Friend { get; set; }
     }
 }

@@ -11,11 +11,11 @@ namespace SocialNetwork.Web.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userServices;
-        private readonly INotificationPostService _notificationService;
+        private readonly INotificationService _notificationService;
         private readonly IRelationshipService _relationshipService;
 
 
-        public UserController(IUserService userServices, INotificationPostService notificationService = null, IRelationshipService relationshipService = null)
+        public UserController(IUserService userServices, INotificationService notificationService = null, IRelationshipService relationshipService = null)
         {
             _userServices = userServices;
             _notificationService = notificationService;
@@ -116,14 +116,37 @@ namespace SocialNetwork.Web.Controllers
         }
 
 
+        // [Authorize]
+        // [HttpGet("notifications")]
+        // public async Task<IActionResult> GetNotification()
+        //{
+        //     try
+        //     {
+        //         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //         var notification = await _notificationService.GetUserNotificationAsync(userId);
+        //         return Ok(new BaseResponse
+        //         {
+        //             Status = 200,
+        //             Message = "Get Notification is success",
+        //             Data = notification
+        //         });
+
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(ex.Message);
+        //     }
+
+        // }
+
         [Authorize]
-        [HttpGet("notifications")]
-        public async Task<IActionResult> GetNotification()
-       {
+        [HttpGet("notificationFriend")]
+        public async Task<IActionResult> GetNotificationFriend()
+        {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var notification = await _notificationService.GetUserNotificationAsync(userId);
+                var notification = await _notificationService.GetAllFriendRequest(userId);
                 return Ok(new BaseResponse
                 {
                     Status = 200,
@@ -139,6 +162,7 @@ namespace SocialNetwork.Web.Controllers
 
         }
 
+
         [Authorize]
         [HttpPut("{id}/mark-read")]
         public async Task<IActionResult> MarkAsRead(string id)
@@ -153,11 +177,16 @@ namespace SocialNetwork.Web.Controllers
         #region
         [Authorize]
         [HttpPost("Send")]
-        public async Task<IActionResult> SendFriendRequest( string friendId)
+        public async Task<IActionResult> SendFriendRequest([FromBody] string friendId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            await _relationshipService.SendFriendRequest(userId, friendId); 
-            return Ok(new { Message = "send friend request is success" });
+            var friendInf= await _relationshipService.SendFriendRequest(userId, friendId); 
+            return Ok(new BaseResponse
+            {
+                Status=200,
+                Message="send friend request success",
+                Data = friendInf
+            });
         }
 
         [Authorize]

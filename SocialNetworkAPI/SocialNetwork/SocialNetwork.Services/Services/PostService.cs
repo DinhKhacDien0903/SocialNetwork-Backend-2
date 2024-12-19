@@ -101,7 +101,7 @@ namespace SocialNetwork.Services.Services
                     await _notificationservice.CreateNotificationAsync(notification, friendToNotify);
 
                     // Gửi thông báo qua SignalR đến danh sách bạn bè
-                    await _postHubService.SendNotificationToMultipleUsers(friendToNotify, notification);
+                    //await _postHubService.SendNotificationToMultipleUsers(friendToNotify, notification);
                 }
 
                 await _postHubService.SendPostAsync(postResponse);
