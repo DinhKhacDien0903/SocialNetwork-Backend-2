@@ -69,15 +69,15 @@ namespace SocialNetwork.DataAccess.DataContext
         .HasKey(rf => rf.RequestFriendID);
 
             modelBuilder.Entity<RequestFriendEntity>()
-                .HasOne(rf => rf.Sender)
+                .HasOne(rf => rf.Friend)
                 .WithMany() // Nếu không có collection
-                .HasForeignKey(rf => rf.SenderID)
+                .HasForeignKey(rf => rf.FriendID)
                 .OnDelete(DeleteBehavior.Restrict); // Hoặc SetNull nếu cần
 
             modelBuilder.Entity<RequestFriendEntity>()
-                .HasOne(rf => rf.Receiver)
+                .HasOne(rf => rf.User)
                 .WithMany() // Nếu không có collection
-                .HasForeignKey(rf => rf.ReceiverID)
+                .HasForeignKey(rf => rf.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
 
 

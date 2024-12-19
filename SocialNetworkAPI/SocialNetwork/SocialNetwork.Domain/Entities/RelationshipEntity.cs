@@ -12,7 +12,7 @@
 
         public DateTime? DeletedAt { get; set; }
 
-        public FriendshipStatus Status { get; set; }
+        //public FriendshipStatus Status { get; set; }
 
         [ForeignKey("UserID")]
         public UserEntity User { get; set; }

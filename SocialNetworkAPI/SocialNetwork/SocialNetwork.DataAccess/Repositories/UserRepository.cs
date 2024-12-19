@@ -77,7 +77,9 @@ namespace SocialNetwork.DataAccess.Repositories
             {
                 FirstName = x.FirstName,
                 LastName = x.LastName,
-                AvatarUrl = x.AvatarUrl
+                AvatarUrl = x.AvatarUrl,
+                Id = x.Id,
+
             });
             return userSearch;
         }

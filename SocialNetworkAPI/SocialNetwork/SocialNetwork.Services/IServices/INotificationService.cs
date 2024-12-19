@@ -11,6 +11,8 @@ namespace SocialNetwork.Services.IServices
         public Task<IEnumerable<NotificationViewModel>> GetUserNotificationAsync(string userId);
         public Task CreateNotificationAsync(NotificationViewModel notificationViewModel, List<string> friendId);
         public Task MarkNotificationAsync(string id);
-
+        Task<IEnumerable<FriendRequestViewmodel>> GetAllFriendRequest(string userId);
+        public Task AddNotificationAsync(NotificationRequestFriendViewModel notification);
+        public Task AcceptNotificationAsync(NotificationRequestFriendViewModel notification);
     }
 }

@@ -8,8 +8,8 @@ namespace SocialNetwork.Services.AuttoMapper
     {
         public AutoMapperConfig()
         {
-            //CreateMap<UserEntity, UserViewModel>();
-            //CreateMap<UserViewModel, UserEntity>();
+            //notification
+            CreateMap<NotificationRequestFriendViewModel,NotificationEntity>().ReverseMap();
 
 
             //post

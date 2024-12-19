@@ -19,7 +19,7 @@
         /// type = 0 => notification message
         /// type = 1 => notification post
         /// </summary>
-        public int Type { get; set; } = 0;
+        public int Type { get; set; }
 
         public bool IsDelete { get; set; } = false;
 

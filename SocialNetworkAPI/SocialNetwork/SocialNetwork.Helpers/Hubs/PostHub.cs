@@ -69,12 +69,20 @@ namespace SocialNetwork.Helpers.Hubs
             }
         }
 
-        public async Task SendNotification(string usedId, NotificationPostViewModel message)
+        //public async Task SendNotification(string usedId, NotificationPostViewModel message)
+        //{
+        //    await Clients.User(usedId).SendAsync("ReceiveNotification", message);
+        //}
+
+        public async Task SendFriendRequest(FriendRequestViewmodel model, string friendId)
         {
-            await Clients.User(usedId).SendAsync("ReceiveNotification", message);
+            await Clients.User(friendId).SendAsync("FriendRequestNotification" ,model);
         }
 
-
+        public async Task SendAcceptRequest(FriendRequestViewmodel model, string friendId)
+        {
+            await Clients.User(friendId).SendAsync("AcceptFriend", model);
+        }
         public async Task SendSearchAsync()
         {
             await Clients.All.SendAsync("SearchUser");

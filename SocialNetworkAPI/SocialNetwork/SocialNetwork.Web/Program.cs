@@ -39,6 +39,7 @@ builder.Services.AddScoped<ICommentRepositories, CommentRepositories>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
