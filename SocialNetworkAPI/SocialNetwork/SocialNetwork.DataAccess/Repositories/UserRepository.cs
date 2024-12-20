@@ -36,7 +36,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<int> GetTotalFriendAsync(string userId)
         {
-            return await _context.Relationships.Where(x => x.UserID == userId && !x.IsDeleted && x.Status == FriendshipStatus.Accepted).Select(x => x.FriendID).CountAsync();
+            return await _context.Relationships.Where(x => x.UserID == userId).Select(x => x.FriendID).CountAsync();
         }
 
         public async Task<UserEntity> GetUserInfor(string userId)

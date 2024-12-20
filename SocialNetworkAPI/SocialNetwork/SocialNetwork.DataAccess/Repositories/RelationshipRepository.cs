@@ -129,7 +129,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<IEnumerable<string>> GetFriendIdByUserId(string userId)
         {
-            return await _context.RequestFriends.Where(x => x.UserID == userId && x.Status== FriendshipStatus.Accepted).Select(x => x.FriendID).ToListAsync();/*|| x.FriendID == userId*/
+            return await _context.Relationships.Where(x => x.UserID == userId).Select(x => x.FriendID).ToListAsync();/*|| x.FriendID == userId*/
         }
 
         public async Task<IEnumerable<UserEntity>> GetPendingFriendRequestAsync(string userId)
