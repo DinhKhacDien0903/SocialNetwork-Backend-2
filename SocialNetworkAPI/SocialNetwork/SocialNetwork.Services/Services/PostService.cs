@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Domain;
 using SocialNetwork.DTOs.Response;
 using SocialNetwork.Services.IServices;
 using System.Security.Claims;
@@ -134,15 +136,21 @@ namespace SocialNetwork.Services.Services
 
     
 
-        public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync(string userId)
+        public async Task<PageResult<PostViewModel>> GetAllPostsAsync(string userId, int pageIndex, int pageSize)
         {
 
             var posts = await _postRepository.GetAllAsync(userId);
 
-            //var user=_userRepository.get
+            var total= posts.Count();
+            var pagePost= posts.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var getPost = new PageResult<PostViewModel>
+            {
+                CurrentPage = pageIndex,
+                TotalCount = total,
+                Data = pagePost,
+            };
+            return getPost;
 
-
-            return _mapper.Map<IEnumerable<PostViewModel>>(posts);
         }
 
         public async Task<PostViewModel> GetPostByIdAsync(string postId)
@@ -169,11 +177,19 @@ namespace SocialNetwork.Services.Services
         //    return _mapper.Map<PostViewModel>(postEntity);
         //}
 
-        public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
+        public async  Task<PageResult<PostViewModel>> GetPostsByUserIdAsync(string userId,int pageSize,int pageIndex)
         {
             var posts = await _postRepository.GetAllAsync(userId); 
             var userPosts = posts.Where(p => p.UserID == userId); 
-            return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
+            var total=posts.Count();
+            var pagePost=posts.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var getPost = new PageResult<PostViewModel>
+            {
+                CurrentPage = pageIndex,
+                TotalCount = total,
+                Data = pagePost,
+            };
+            return getPost;
         }
 
         public Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync()

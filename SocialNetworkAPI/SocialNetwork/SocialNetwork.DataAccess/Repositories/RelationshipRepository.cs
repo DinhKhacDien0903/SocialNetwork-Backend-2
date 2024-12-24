@@ -18,7 +18,7 @@ namespace SocialNetwork.DataAccess.Repositories
         }
 
         public async Task AccepFriendRequestAsync(string userId, string friendId)
-        {
+         {
             try
             {
                 var accUser = await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == friendId && r.FriendID == userId);
@@ -74,79 +74,95 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task CancelFriendAsync(string userId, string friendId)
         {
-            var friend1=await _context.Relationships.FirstOrDefaultAsync(r => r.UserID == userId && r.FriendID == friendId);
-            var friend2=await _context.Relationships.FirstOrDefaultAsync(r => r.UserID == friendId && r.FriendID == userId);
-            if (friend1 != null&& friend2!=null)
+            var friend1 = await _context.Relationships.FirstOrDefaultAsync(r => r.UserID == userId && r.FriendID == friendId);
+            var friend2 = await _context.Relationships.FirstOrDefaultAsync(r => r.UserID == friendId && r.FriendID == userId);
+            if (friend1 != null && friend2 != null)
             {
                 _context.Relationships.Remove(friend1);
                 _context.Relationships.Remove(friend2);
                 await _context.SaveChangesAsync();
             }
+            var notificationUser = await _notificationRepository.FirstOrIdNotification(friendId);
+            if (notificationUser != null)
+            {
+                _context.Notifications.Remove(notificationUser);
+            }
         }
 
         public async Task DeclineFriendRequestAsync(string userId, string friendId)
         {
-            var friend=await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == userId && r.FriendID == friendId);
+            var friend = await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == userId && r.FriendID == friendId);
             if (friend != null)
             {
                 var notificationUser = await _notificationRepository.FirstOrIdNotification(friendId);
-                _context.Notifications.Remove(notificationUser);
-                friend.Status = FriendshipStatus.Declined;
+                //_context.Notifications.Remove(notificationUser);
+                if (notificationUser != null)
+                {
+                    _context.Notifications.Remove(notificationUser);
+                }
+                //friend.Status = FriendshipStatus.Declined;
+                _context.RequestFriends.Remove(friend);
                 await _context.SaveChangesAsync();
             }
+           
         }
         public async Task DeclineFriendAsync(string userId, string friendId)
         {
-            var friend = await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == friendId && r.FriendID == userId);
-
-
+            var friend = await _context.RequestFriends.FirstOrDefaultAsync(r => (r.UserID == friendId && r.FriendID == userId) 
+            || (r.UserID == userId && r.FriendID == friendId));
 
             var notificationUser = await _notificationRepository.FirstOrIdNotification(friendId);
-            var userSendId= notificationUser.SenderId;
-            var userSend= await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == userSendId && r.FriendID == userId);
-            _context.Notifications.Remove(notificationUser);
-            if (friend == null && userSend == null)
+            if (notificationUser != null)
             {
-                throw new Exception("not");
-            }
-           if(friend == null)
-            {
-                userSend.Status = FriendshipStatus.Declined;
-                await _context.SaveChangesAsync();
+                var userSendId = notificationUser.SenderId;
+                _context.Notifications.Remove(notificationUser);
+                var userSend = await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == userSendId && r.FriendID == userId);
+
+                if (friend == null && userSend == null)
+                {
+                    throw new Exception("not");
+                }
+                if (friend == null)
+                {
+                    _context.RequestFriends.Remove(userSend);
+                    //userSend.Status = FriendshipStatus.Declined;
+                    await _context.SaveChangesAsync();
+                }
             }
 
-            friend.Status = FriendshipStatus.Declined;
+            _context.RequestFriends.Remove(friend);
+
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<UserEntity>> GetAllFriendAsync(string userId)
         {
-            var listFriend = await _context.Relationships.Where(x => x.UserID ==userId)
-                .Select(x=>x.Friend).ToListAsync();
+            var listFriend = await _context.Relationships.Where(x => x.UserID == userId)
+                .Select(x => x.Friend).ToListAsync();
             return listFriend;
 
         }
 
         public async Task<IEnumerable<string>> GetFriendIdByUserId(string userId)
         {
-            return await _context.RequestFriends.Where(x => x.UserID == userId && x.Status== FriendshipStatus.Accepted).Select(x => x.FriendID).ToListAsync();/*|| x.FriendID == userId*/
+            return await _context.Relationships.Where(x => x.UserID == userId).Select(x => x.FriendID).ToListAsync();/*|| x.FriendID == userId*/
         }
 
         public async Task<IEnumerable<UserEntity>> GetPendingFriendRequestAsync(string userId)
         {
-            var listSendFriend= await _context.RequestFriends.Where(x=>x.FriendID==userId && x.Status==FriendshipStatus.Pending).Select(x => x.User).ToListAsync();
-            return listSendFriend;  
+            var listSendFriend = await _context.RequestFriends.Where(x => x.FriendID == userId && x.Status == FriendshipStatus.Pending).Select(x => x.User).ToListAsync();
+            return listSendFriend;
         }
 
-       
+
 
         public async Task<string> SendFriendRequestAsync(string userId, string friendId)
         {
-            var requestExit= await _context.RequestFriends.AnyAsync(x=>x.UserID==userId && x.FriendID==friendId && x.Status==FriendshipStatus.Pending);
+            var requestExit = await _context.RequestFriends.AnyAsync(x => x.UserID == userId && x.FriendID == friendId && x.Status == FriendshipStatus.Pending);
             var relationShipExit = await _context.Relationships.AnyAsync(x => x.UserID == userId && x.FriendID == friendId);
             if (requestExit || relationShipExit)
             {
-               return "Not";
+                return "Not";
             }
             var friend = new RequestFriendEntity
             {
@@ -161,14 +177,14 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<IEnumerable<UserEntity>> GetSendFriendRequestAsync(string userId)
         {
-            var listSend=await _context.RequestFriends.Where(x=>x.UserID==userId&& x.Status== FriendshipStatus.Pending).Include(x=>x.Friend).ToListAsync();
+            var listSend = await _context.RequestFriends.Where(x => x.UserID == userId && x.Status == FriendshipStatus.Pending).Include(x => x.Friend).ToListAsync();
             var sendFriend = listSend.Select(x => new UserEntity
             {
                 FirstName = x.Friend.FirstName,
                 LastName = x.Friend.LastName,
                 AvatarUrl = x.Friend.AvatarUrl,
-                Id=x.Friend.Id,
-                
+                Id = x.Friend.Id,
+
             });
             return sendFriend;
         }

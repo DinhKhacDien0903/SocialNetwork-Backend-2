@@ -11,10 +11,13 @@ namespace SocialNetwork.Services.Services
     {
         private readonly IMapper _mapper;
         private readonly INotificationRepository _notificationRepository;
-        public NotificationService(IMapper mapper, INotificationRepository notificationRepository)
+        private readonly IPostHubService _postHubService;
+
+        public NotificationService(IMapper mapper, INotificationRepository notificationRepository, IPostHubService postHubService = null)
         {
             _mapper = mapper;
             _notificationRepository = notificationRepository;
+            _postHubService = postHubService;
         }
 
         public async Task AcceptNotificationAsync(NotificationRequestFriendViewModel notification)
@@ -53,9 +56,13 @@ namespace SocialNetwork.Services.Services
                 Type=x.Type,
                 Id = x.Id,
                 SenderId=x.SenderId,
+                IsRead=false,
             }).ToList();
+
+            await _postHubService.SendGetNotification(friendsRequest);
             return friendsRequest;
            
+            
         }
 
         public Task<IEnumerable<NotificationViewModel>> GetUserNotificationAsync(string userId)

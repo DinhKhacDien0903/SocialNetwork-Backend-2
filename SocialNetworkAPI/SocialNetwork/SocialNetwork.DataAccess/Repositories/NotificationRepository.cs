@@ -52,7 +52,7 @@ namespace SocialNetwork.DataAccess.Repositories
         public async Task<IEnumerable<NotificationEntity>> GetAllFriendRequest(string userId)
         {
             //var user=await _userManager.FindByIdAsync(userId);
-            var allRequest = await _context.Notifications.Where(x => x.ReceiverId == userId).ToListAsync();
+            var allRequest = await _context.Notifications.Where(x => x.ReceiverId == userId&&x.Type!=0).ToListAsync();
 
             foreach (var item in allRequest)
             {

@@ -13,13 +13,16 @@ namespace SocialNetwork.Web.Controllers
         private readonly IUserService _userServices;
         private readonly INotificationService _notificationService;
         private readonly IRelationshipService _relationshipService;
+        private readonly IPostHubService _postHubService;
 
 
-        public UserController(IUserService userServices, INotificationService notificationService = null, IRelationshipService relationshipService = null)
+
+        public UserController(IUserService userServices, INotificationService notificationService = null, IRelationshipService relationshipService = null, IPostHubService postHubService = null)
         {
             _userServices = userServices;
             _notificationService = notificationService;
             _relationshipService = relationshipService;
+            _postHubService = postHubService;
         }
 
         #region
@@ -116,28 +119,6 @@ namespace SocialNetwork.Web.Controllers
         }
 
 
-        // [Authorize]
-        // [HttpGet("notifications")]
-        // public async Task<IActionResult> GetNotification()
-        //{
-        //     try
-        //     {
-        //         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //         var notification = await _notificationService.GetUserNotificationAsync(userId);
-        //         return Ok(new BaseResponse
-        //         {
-        //             Status = 200,
-        //             Message = "Get Notification is success",
-        //             Data = notification
-        //         });
-
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-
-        // }
 
         [Authorize]
         [HttpGet("notificationFriend")]
@@ -205,6 +186,7 @@ namespace SocialNetwork.Web.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             await _relationshipService.CancelFriendAsync(userId, friendId);
+            await  _postHubService.CancelFriend(userId, friendId);
             return Ok(new { Message = "cancel friend request is success" });
         }
 

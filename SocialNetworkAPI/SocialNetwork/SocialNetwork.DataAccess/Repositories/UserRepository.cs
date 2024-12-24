@@ -36,7 +36,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<int> GetTotalFriendAsync(string userId)
         {
-            return await _context.Relationships.Where(x => x.UserID == userId && !x.IsDeleted && x.Status == FriendshipStatus.Accepted).Select(x => x.FriendID).CountAsync();
+            return await _context.Relationships.Where(x => x.UserID == userId).Select(x => x.FriendID).CountAsync();
         }
 
         public async Task<UserEntity> GetUserInfor(string userId)
@@ -51,41 +51,44 @@ namespace SocialNetwork.DataAccess.Repositories
             return userIfor;
         }
 
-        public async Task<IEnumerable<UserEntity>> SearchUserAsync(SearchQuery query, string userId)
+        public async Task<IEnumerable<UserSearchViewModel>> SearchUserAsync(SearchQuery query, string userId)
         {
             var me = await _userManager.FindByIdAsync(userId);
             var user = await _context.Users
-             .Where(x => 
-             x.Id!= me.Id.ToString()&&
+             .Where(x =>
+             x.Id != me.Id.ToString() &&
              (x.FirstName.ToLower().Contains(query.keyWord.ToLower())
-                      || x.LastName.ToLower().Contains(query.keyWord.ToLower())
-                      || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
-                      || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
-                      )
-                      )
+            || x.LastName.ToLower().Contains(query.keyWord.ToLower())
+            || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
+            || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower())))
              .Skip(query.SkipNo)
              .Take(query.TakeNo)
-             //.Select(u => new UserSearchViewModel
-             //{
-             //    FirstName = u.FirstName,
-             //    LastName = u.LastName,
-             //    AvatarUrl = u.AvatarUrl
-             //})
              .ToListAsync();
 
-            //if (user == null || !user.Any())
-            //{
-            //    return 
-            //}
-            var userSearch= user.Select(x=> new UserEntity
-            {
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                AvatarUrl = x.AvatarUrl,
-                Id = x.Id,
+            var listId = user.Select(x => x.Id).ToList();
+            var relationShip = await _context.Relationships.Where(
+                x => x.UserID == me.Id && listId.Contains(x.FriendID) || x.FriendID == me.Id == listId.Contains(x.UserID)).ToListAsync();
 
-            });
-            return userSearch;
+            var results = user.Select(x => 
+            {
+                var isFriend = relationShip.Any
+                (a => a.UserID == me.Id && a.FriendID == x.Id ||
+                a.FriendID == me.Id && a.UserID == x.Id
+                );
+                return new UserSearchViewModel
+                {
+                    Id = x.Id,
+                    LastName = x.LastName,
+                    FirstName = x.FirstName,
+                    AvatarUrl = x.AvatarUrl,
+                    isRelationShip = isFriend,
+                };
+            }
+
+            );
+
+            
+            return results;
         }
 
     public async Task UpdateStatusActiveUser(string userId, bool isActive)

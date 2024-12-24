@@ -17,6 +17,7 @@ namespace SocialNetwork.DTOs.ViewModels
         public string Message {  get; set; } = string.Empty;
 
         public int Type {  get; set; }
+        public bool IsRead { get; set; }
 
         public string Id { get; set; }
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;

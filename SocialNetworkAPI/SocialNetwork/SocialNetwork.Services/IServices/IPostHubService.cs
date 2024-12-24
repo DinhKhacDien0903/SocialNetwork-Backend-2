@@ -15,7 +15,7 @@ namespace SocialNetwork.Services.IServices
 
         Task SendUpdateAsycn(PostRequest updateViewModel);
 
-        Task SendDeleteAsycn(Guid Id);
+        //Task SendDeleteAsycn(Guid Id);
 
         Task SendCommentAsycn(CommentViewModel commentRespone,int number);
 
@@ -31,6 +31,9 @@ namespace SocialNetwork.Services.IServices
 
         Task AcceptFriendNotification(FriendRequestViewmodel model, string friendid);
 
-        Task SendRefusePostAsync(string postId);
+        Task SendRefusePostAsync(string postId); Task CancelFriend(string userId,string friendId);
+
+        Task SendGetNotification(List<FriendRequestViewmodel> model);
+
     }
 }

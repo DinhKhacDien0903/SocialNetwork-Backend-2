@@ -17,5 +17,7 @@ namespace SocialNetwork.DTOs.ViewModels
 
         public string Id {  get; set; }
 
+        public bool isRelationShip {  get; set; }
+
     }
 }

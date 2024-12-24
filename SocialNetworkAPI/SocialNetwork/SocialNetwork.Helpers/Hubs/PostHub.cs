@@ -87,5 +87,17 @@ namespace SocialNetwork.Helpers.Hubs
         {
             await Clients.All.SendAsync("SearchUser");
         }
+
+        public async Task SendGetNotification(List<FriendRequestViewmodel> model)
+        {
+            await Clients.All.SendAsync("GetNotification", model);
+        }
+
+
+        public async Task CancelFriend(string userId, string friendid)
+        {
+            await Clients.User(userId).SendAsync("CancelUser", friendid);
+            await Clients.User(friendid).SendAsync("CancelUser", userId);
+        }
     }
 }

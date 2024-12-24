@@ -28,11 +28,17 @@ namespace SocialNetwork.Web.Controllers
 
   
         [HttpGet("All")]
-        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts()
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts(int pageIndex=1, int pageSize=10)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var posts = await _postService.GetAllPostsAsync(userId);
-            return Ok(posts);
+            var posts = await _postService.GetAllPostsAsync(userId,pageIndex,pageSize);
+            //return Ok(posts);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "get all post success",
+                Data = posts
+            });
         }
 
         [HttpGet("not-approved")]
@@ -55,10 +61,15 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [HttpGet("User")]
-        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId)
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId, int pageIndex, int pageSixe)
         {
-            var posts = await _postService.GetPostsByUserIdAsync(userId);
-            return Ok(posts);
+            var posts = await _postService.GetPostsByUserIdAsync(userId,pageIndex,pageSixe);
+            return Ok(new BaseResponse
+            {
+                Status=200,
+                Message="get all post of user is success",
+                Data = posts
+            });
         }
 
         [HttpGet("{id}")]

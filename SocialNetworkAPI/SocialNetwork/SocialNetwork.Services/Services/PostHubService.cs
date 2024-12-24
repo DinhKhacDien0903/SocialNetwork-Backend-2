@@ -39,10 +39,10 @@ namespace SocialNetwork.Services.Services
             await _hubContext.Clients.All.SendAsync("ReceiveUpdatePost", updateViewModel);
         }
 
-        public async Task SendDeleteAsycn(Guid Id)
-        {
-            await _hubContext.Clients.All.SendAsync("ReceiveDeletePost", Id);
-        }
+        //public async Task SendDeleteAsycn(Guid Id)
+        //{
+        //    await _hubContext.Clients.All.SendAsync("ReceiveDeletePost", Id);
+        //}
 
         public async Task SendCommentAsycn(CommentViewModel commentRespone,int number)
         {
@@ -72,13 +72,7 @@ namespace SocialNetwork.Services.Services
             });
 
         }
-        //public async Task SendNotificationToMultipleUsers(List<string> userIds, NotificationPostViewModel notification)
-        //{
-        //    foreach (var userId in userIds)
-        //    {
-        //        await _hubContext.Clients.User(userId).SendAsync("ReceiveNotification", notification);
-        //    }
-        //}
+      
 
         public async Task SendFriendRequestNotification(FriendRequestViewmodel model,string friendid)
         {
@@ -94,6 +88,17 @@ namespace SocialNetwork.Services.Services
         {
             await _hubContext.Clients.User(friendid).SendAsync("AcceptFriend", model);
 
+        }
+
+        public async Task CancelFriend( string userId, string friendid)
+        {
+            await _hubContext.Clients.User(userId).SendAsync("CancelUser",friendid);
+            await _hubContext.Clients.User(friendid).SendAsync("CancelUser", userId);
+        }
+
+        public async Task SendGetNotification(List<FriendRequestViewmodel> model)
+        {
+            await _hubContext.Clients.All.SendAsync("getNotification", model);
         }
     }
 }

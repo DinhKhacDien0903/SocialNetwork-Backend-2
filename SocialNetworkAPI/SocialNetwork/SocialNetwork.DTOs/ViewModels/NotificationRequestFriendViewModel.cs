@@ -12,6 +12,7 @@ namespace SocialNetwork.DTOs.ViewModels
         public string SenderId { get; set; }
         public string? Messeage { get; set; }
         public int Type {  get; set; }
+        public bool IsRead { get; set; }
 
     }
 }

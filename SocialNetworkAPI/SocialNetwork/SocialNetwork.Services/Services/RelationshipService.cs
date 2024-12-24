@@ -23,23 +23,7 @@ namespace SocialNetwork.Services.Services
 
        
 
-        public  Task CancelFriendAsync(string userId, string friendId)
-        {
-            var friend =  _relationshipRepository.CancelFriendAsync(userId, friendId);
-            return friend;
-        }
-
-        public Task DeclineFriendAsync(string userId, string friendId)
-        {
-            var model=_relationshipRepository.DeclineFriendAsync(userId, friendId);
-            return model;
-        }
-
-        public  Task DeclineFriendRequestAsync(string userId, string friendId)
-        {
-            var friend =  _relationshipRepository.DeclineFriendRequestAsync(userId, friendId);
-            return friend;
-        }
+       
 
         public async Task<IEnumerable<UserSearchViewModel>> GetAllFriendAsync(string userId)
         {
@@ -136,10 +120,31 @@ namespace SocialNetwork.Services.Services
                 Messeage = message,
                 //Type=1,
             };
+            //await _notificationService.GetAllFriendRequest(userId);
             await _notificationService.AcceptNotificationAsync(notification);
             await _postHubService.AcceptFriendNotification(usersend, friendId);
+            await _postHubService.CancelFriend(userId, friendId);       
+        }
 
+        public Task CancelFriendAsync(string userId, string friendId)
+        {
+            var friend = _relationshipRepository.CancelFriendAsync(userId, friendId);
+            return friend;
 
+        }
+
+        public  Task DeclineFriendAsync(string userId, string friendId)
+        {
+            var model = _relationshipRepository.DeclineFriendAsync(userId, friendId);
+             _postHubService.CancelFriend(userId, friendId);
+
+            return model;
+        }
+
+        public Task DeclineFriendRequestAsync(string userId, string friendId)
+        {
+            var friend = _relationshipRepository.DeclineFriendRequestAsync(userId, friendId);
+            return friend;
         }
     }
 }

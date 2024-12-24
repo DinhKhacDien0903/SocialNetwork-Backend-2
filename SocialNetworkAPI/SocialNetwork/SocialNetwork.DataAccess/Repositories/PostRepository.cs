@@ -1,4 +1,5 @@
-﻿using SocialNetwork.DTOs.Request;
+﻿using SocialNetwork.Domain;
+using SocialNetwork.DTOs.Request;
 using SocialNetwork.DTOs.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -29,19 +30,19 @@ namespace SocialNetwork.DataAccess.Repositories
         {
             var postWait = await _context.Posts.Include(x => x.User)
                 .Include(x => x.Images).OrderByDescending(x => x.CreatedAt)
-                .Where(x=>!x.IsDelete)
+                .Where(x => !x.IsDelete)
                 .Select(x => new AdminBrowsePostViewModel
                 {
                     PostID = x.PostID,
-                    UserID=x.UserID,
+                    UserID = x.UserID,
                     Content = x.Content,
-                    LastName=x.User.LastName,
-                    FirstName=x.User.FirstName,
-                    AvatarUrl=x.User.AvatarUrl,
+                    LastName = x.User.LastName,
+                    FirstName = x.User.FirstName,
+                    AvatarUrl = x.User.AvatarUrl,
                     //CreatedAt=x.CreatedAt,
-                    Images = x.Images.Where(x => !x.IsDeleted).Select(x=>new ImagesOfPostViewModel
+                    Images = x.Images.Where(x => !x.IsDeleted).Select(x => new ImagesOfPostViewModel
                     {
-                        ImgUrl = x.ImgUrl,  
+                        ImgUrl = x.ImgUrl,
                     }).ToList()
                 }).ToListAsync();
 
@@ -68,15 +69,11 @@ namespace SocialNetwork.DataAccess.Repositories
                     LastName = x.User.LastName,
                     FirstName = x.User.FirstName,
                     AvatarUrl = x.User.AvatarUrl,
-                    
-
-                    //EmotionTypeID = x.Reactions.Any(x => !x.Reaction.IsDeleted ) ? x.Reactions.First().Reaction.EmotionType.EmotionTypeID : null,
-                    //EmotionName = x.Reactions.Any(x => !x.Reaction.IsDeleted) ? x.Reactions.First().Reaction.EmotionType.EmotionName : null,
-                    UserReaction= x.Reactions.Where(x=>!x.Reaction.IsDeleted&& x.Reaction.UserID==userId)
-                    .Select(x=> new EmotionViewModel
+                    UserReaction = x.Reactions.Where(x => !x.Reaction.IsDeleted && x.Reaction.UserID == userId)
+                    .Select(x => new EmotionViewModel
                     {
-                        EmotionName=x.Reaction.EmotionType.EmotionName,
-                        EmotionTypeID=x.Reaction.EmotionTypeID,
+                        EmotionName = x.Reaction.EmotionType.EmotionName,
+                        EmotionTypeID = x.Reaction.EmotionTypeID,
                     }).FirstOrDefault(),
 
                     Reactions = x.Reactions
@@ -97,22 +94,9 @@ namespace SocialNetwork.DataAccess.Repositories
                     }).ToList(),
                 })
                 .ToListAsync();
-
-
-            //foreach (var post in posts)
-            //{
-            //    Console.WriteLine($"PostID: {post.PostID}, UserLastName: {post.LastName}, UserFirstName: {post.FirstName}");
-            //}
-
             return posts;
         }
 
-
-        //public async Task Update(PostEntity entity)
-        //{
-        //  var up=await _context.Posts.Update(entity);
-        //    await _context.SaveChangesAsync();
-        //}
 
         public async Task SaveChangeAsync()
         {
@@ -133,7 +117,7 @@ namespace SocialNetwork.DataAccess.Repositories
                             .FirstOrDefaultAsync(p => p.PostID == id);
         }
 
-        public async Task Delete(string  postId)
+        public async Task Delete(string postId)
         {
             var post = await GetByIDAsync(postId);
             if (post != null)
@@ -145,6 +129,6 @@ namespace SocialNetwork.DataAccess.Repositories
 
         }
 
-       
+
     }
 }
