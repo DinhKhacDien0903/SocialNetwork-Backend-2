@@ -19,6 +19,11 @@ namespace SocialNetwork.DataAccess.Repositories
             _userManager = userManager;
         }
 
+        public async Task<string> GetAvatarByUserIdAsync(string userId)
+        {
+            return (await _context.Users.FindAsync(userId))?.AvatarUrl;
+        }
+
         public async Task<UserEntity?> GetByUserNameAsync(string userName)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
@@ -55,8 +60,8 @@ namespace SocialNetwork.DataAccess.Repositories
         {
             var me = await _userManager.FindByIdAsync(userId);
             var user = await _context.Users
-             .Where(x => 
-             x.Id!= me.Id.ToString()&&
+             .Where(x =>
+             x.Id != me.Id.ToString() &&
              (x.FirstName.ToLower().Contains(query.keyWord.ToLower())
                       || x.LastName.ToLower().Contains(query.keyWord.ToLower())
                       || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
@@ -77,7 +82,7 @@ namespace SocialNetwork.DataAccess.Repositories
             //{
             //    return 
             //}
-            var userSearch= user.Select(x=> new UserEntity
+            var userSearch = user.Select(x => new UserEntity
             {
                 FirstName = x.FirstName,
                 LastName = x.LastName,
@@ -88,7 +93,7 @@ namespace SocialNetwork.DataAccess.Repositories
             return userSearch;
         }
 
-    public async Task UpdateStatusActiveUser(string userId, bool isActive)
+        public async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -112,7 +117,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
             var user = await query.FirstOrDefaultAsync();
 
-            if(user == null)
+            if (user == null)
             {
                 throw new ArgumentNullException(nameof(userEntity.Id), "User not found");
             }
