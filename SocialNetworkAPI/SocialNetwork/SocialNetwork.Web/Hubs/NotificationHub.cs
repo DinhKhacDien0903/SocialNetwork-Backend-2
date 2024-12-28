@@ -51,6 +51,23 @@ namespace SocialNetwork.Web.Hubs
             await Clients.User(friendId).SendAsync("ReceiveNotification", notifiation);
         }
 
+        public async Task ReadMessageNotification(NotificationRequest param)
+        {
+
+            var sender = await ValidateCurrentAccount();
+
+            try
+            {
+                var notification = await _chatHubService.ReadMessageNotificationAsync(sender.Id, param?.RecieverId, param?.GroupId);
+
+                await Clients.User(sender.Id).SendAsync("ReadMessageNotificationEvent", notification);
+            }
+            catch (Exception c)
+            {
+
+                var x = c.Message;
+            }
+        }
 
         private async Task<IdentityUser> ValidateCurrentAccount()
         {

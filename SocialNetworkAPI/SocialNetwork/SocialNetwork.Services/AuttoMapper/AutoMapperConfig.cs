@@ -55,6 +55,9 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<MessageImageEntity, MessageImageViewModel>();
             CreateMap<GroupChatEntity, GroupChatViewModel>();
             CreateMap<NotificationEntity, NotificationViewModel>();
+            CreateMap<GroupChatMessageEntity, MessageGroupResponse>();
+            CreateMap<GroupChatMessageEntity, GroupChatMessageViewModel>();
+            CreateMap<GroupChatMessageImageEntity, GroupChatMessageImageViewModel>();
 
             //nguoc lai
             CreateMap<UserViewModel, UserEntity>();
@@ -64,6 +67,9 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<MessageImageViewModel, MessageImageEntity>();
             CreateMap<GroupChatViewModel, GroupChatEntity>();
             CreateMap<NotificationViewModel, NotificationEntity>();
+            CreateMap<MessageGroupResponse, GroupChatMessageEntity>();
+            CreateMap<GroupChatMessageViewModel, GroupChatMessageEntity>();
+            CreateMap<GroupChatMessageImageViewModel, GroupChatMessageImageEntity>();
 
         }
     }

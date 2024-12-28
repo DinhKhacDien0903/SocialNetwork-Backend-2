@@ -15,6 +15,7 @@ namespace SocialNetwork.Web.Controllers
         private readonly IGroupChatService _groupChatService;
 
         private readonly IChatHubService _chatHubService;
+
         public ChatController(
             IMessageService messageService,
             IConversationService conversationService,
@@ -36,6 +37,29 @@ namespace SocialNetwork.Web.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
                 var messages = await _messageService.GetAllMessagesAsync(userId, receiverId);
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Get message success",
+                    Data = messages
+                });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("getAllGroupChatMessage")]
+        public async Task<IActionResult> GetAllGroupChatMessageAsync(string groupId)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                var messages = await _messageService.GetAllGroupChatMessagesAsync(userId, groupId);
                 return Ok(new BaseResponse
                 {
                     Status = 200,
