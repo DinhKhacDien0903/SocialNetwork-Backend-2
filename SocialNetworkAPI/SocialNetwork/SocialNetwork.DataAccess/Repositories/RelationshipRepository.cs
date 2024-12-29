@@ -94,7 +94,7 @@ namespace SocialNetwork.DataAccess.Repositories
             var friend = await _context.RequestFriends.FirstOrDefaultAsync(r => r.UserID == userId && r.FriendID == friendId);
             if (friend != null)
             {
-                var notificationUser = await _notificationRepository.FirstOrIdNotification(friendId);
+                var notificationUser = await _notificationRepository.FirstOrIdNotification(userId);
                 //_context.Notifications.Remove(notificationUser);
                 if (notificationUser != null)
                 {

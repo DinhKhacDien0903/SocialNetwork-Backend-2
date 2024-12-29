@@ -112,13 +112,7 @@ namespace SocialNetwork.Services.Services
         {
           var result = new PageResult<UserSearchViewModel>() { CurrentPage = query.PageIndex };
             var user = await _userRepository.SearchUserAsync(query,userId);
-            //var userSearch = user.Select(x=>new UserSearchViewModel
-            //{
-            //    FirstName = x.FirstName,
-            //    LastName = x.LastName,
-            //    AvatarUrl = x.AvatarUrl,
-            //    Id=x.Id,
-            //}).ToList();
+          
             result.TotalCount = user.Count();
             result.Data = user.ToList();
 

@@ -12,16 +12,15 @@ namespace SocialNetwork.Helpers.Hubs
 {
     public class PostHub:Hub
     {
+
         public override async Task OnConnectedAsync()
         {
             await base.OnConnectedAsync();
         }
-
         public override Task OnDisconnectedAsync(Exception exception)
         {
             return base.OnDisconnectedAsync(exception);
         }
-
         public async Task SendPostAsync(PostResponse post)
         {
             try
@@ -33,8 +32,6 @@ namespace SocialNetwork.Helpers.Hubs
                 throw new Exception("Error in sendPost");
             }
         }
-        
-
         public async Task SendRefusePostAsync(string id)
         {
             try
@@ -46,16 +43,10 @@ namespace SocialNetwork.Helpers.Hubs
                 throw new Exception("Error in sendDelete");
             }
         }
-
-
         public async Task RemoveReaction(string postId, string userId)
         {
             await Clients.All.SendAsync("ReceiveRemoveReaction", postId, userId);
         }
-
-
-
-
         public async Task SendCommentAsync(object comment)
         {
             try
@@ -68,17 +59,10 @@ namespace SocialNetwork.Helpers.Hubs
                 throw new Exception("Error in SendCommentAsync", ex);
             }
         }
-
-        //public async Task SendNotification(string usedId, NotificationPostViewModel message)
-        //{
-        //    await Clients.User(usedId).SendAsync("ReceiveNotification", message);
-        //}
-
         public async Task SendFriendRequest(FriendRequestViewmodel model, string friendId)
         {
             await Clients.User(friendId).SendAsync("FriendRequestNotification" ,model);
         }
-
         public async Task SendAcceptRequest(FriendRequestViewmodel model, string friendId)
         {
             await Clients.User(friendId).SendAsync("AcceptFriend", model);
@@ -87,17 +71,18 @@ namespace SocialNetwork.Helpers.Hubs
         {
             await Clients.All.SendAsync("SearchUser");
         }
-
         public async Task SendGetNotification(List<FriendRequestViewmodel> model)
         {
             await Clients.All.SendAsync("GetNotification", model);
         }
-
-
         public async Task CancelFriend(string userId, string friendid)
         {
             await Clients.User(userId).SendAsync("CancelUser", friendid);
             await Clients.User(friendid).SendAsync("CancelUser", userId);
+        }
+        public async Task SendSeedSearch()
+        {
+            await Clients.All.SendAsync("CancelUser");
         }
     }
 }

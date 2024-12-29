@@ -179,7 +179,7 @@ namespace SocialNetwork.Web.Controllers
             return Ok(new { Message = "accep friend request is success" });
         }
 
-
+        //huy kb
         [Authorize]
         [HttpPost("cancel/{friendId}")]
         public async Task<IActionResult> CancelFriend(string friendId)
@@ -191,6 +191,8 @@ namespace SocialNetwork.Web.Controllers
         }
 
 
+
+        // thu hoi
         [Authorize]
         [HttpPost("cancelRequest/{friendId}")]
         public async Task<IActionResult> DeclineFriendRequest(string friendId)
@@ -200,6 +202,9 @@ namespace SocialNetwork.Web.Controllers
             return Ok(new { Message = "decline friend request is success" });
         }
 
+
+
+        //xoa request 
         [Authorize]
         [HttpPost("decline/{friendId}")]
         public async Task<IActionResult> DeclineFriend(string friendId)

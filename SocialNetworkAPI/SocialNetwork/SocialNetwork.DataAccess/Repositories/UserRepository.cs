@@ -51,25 +51,69 @@ namespace SocialNetwork.DataAccess.Repositories
             return userIfor;
         }
 
+        //public async Task<IEnumerable<UserSearchViewModel>> SearchUserAsync(SearchQuery query, string userId)
+        //{
+        //    var me = await _userManager.FindByIdAsync(userId);
+        //    var user = await _context.Users
+        //     .Where(x =>
+        //     x.Id != me.Id.ToString() &&
+        //     (x.FirstName.ToLower().Contains(query.keyWord.ToLower())
+        //    || x.LastName.ToLower().Contains(query.keyWord.ToLower())
+        //    || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
+        //    || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower())))
+        //     .Skip(query.SkipNo)
+        //     .Take(query.TakeNo)
+        //     .ToListAsync();
+
+        //    var listId = user.Select(x => x.Id).ToList();
+        //    var relationShip = await _context.Relationships.Where(
+        //        x => x.UserID == me.Id && listId.Contains(x.FriendID) || x.FriendID == me.Id == listId.Contains(x.UserID)).ToListAsync();
+
+        //    var results = user.Select(x =>
+        //    {
+        //        var isFriend = relationShip.Any
+        //        (a => a.UserID == me.Id && a.FriendID == x.Id ||
+        //        a.FriendID == me.Id && a.UserID == x.Id
+        //        );
+        //        return new UserSearchViewModel
+        //        {
+        //            Id = x.Id,
+        //            LastName = x.LastName,
+        //            FirstName = x.FirstName,
+        //            AvatarUrl = x.AvatarUrl,
+        //            isRelationShip = isFriend,
+        //        };
+        //    });
+
+
+
+        //    return results;
+        //}
+
+
+
+
+
+
+
+
         public async Task<IEnumerable<UserSearchViewModel>> SearchUserAsync(SearchQuery query, string userId)
         {
             var me = await _userManager.FindByIdAsync(userId);
-            var user = await _context.Users
-             .Where(x =>
-             x.Id != me.Id.ToString() &&
-             (x.FirstName.ToLower().Contains(query.keyWord.ToLower())
-            || x.LastName.ToLower().Contains(query.keyWord.ToLower())
-            || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
-            || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower())))
-             .Skip(query.SkipNo)
-             .Take(query.TakeNo)
-             .ToListAsync();
-
+            var user = await _context.Users.Skip(query.SkipNo).Take(query.TakeNo).ToListAsync();
+            if (query.keyWord != null)
+            {
+                user = user.Where(x =>
+                            x.Id != me.Id.ToString() && (x.FirstName.ToLower().Contains(query.keyWord.ToLower())
+                            || x.LastName.ToLower().Contains(query.keyWord.ToLower())
+                            || (x.FirstName.ToLower() + " " + x.LastName.ToLower()).Contains(query.keyWord.ToLower())
+                            || (x.FirstName.ToLower() + x.LastName.ToLower()).Contains(query.keyWord.ToLower()))).ToList();
+            }
             var listId = user.Select(x => x.Id).ToList();
             var relationShip = await _context.Relationships.Where(
                 x => x.UserID == me.Id && listId.Contains(x.FriendID) || x.FriendID == me.Id == listId.Contains(x.UserID)).ToListAsync();
 
-            var results = user.Select(x => 
+            var results = user.Select(x =>
             {
                 var isFriend = relationShip.Any
                 (a => a.UserID == me.Id && a.FriendID == x.Id ||
@@ -83,15 +127,19 @@ namespace SocialNetwork.DataAccess.Repositories
                     AvatarUrl = x.AvatarUrl,
                     isRelationShip = isFriend,
                 };
-            }
+            });
 
-            );
 
-            
+
             return results;
         }
 
-    public async Task UpdateStatusActiveUser(string userId, bool isActive)
+
+
+
+
+
+        public async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -115,7 +163,7 @@ namespace SocialNetwork.DataAccess.Repositories
 
             var user = await query.FirstOrDefaultAsync();
 
-            if(user == null)
+            if (user == null)
             {
                 throw new ArgumentNullException(nameof(userEntity.Id), "User not found");
             }

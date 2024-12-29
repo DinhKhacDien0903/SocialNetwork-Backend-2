@@ -141,9 +141,10 @@ namespace SocialNetwork.Services.Services
             return model;
         }
 
-        public Task DeclineFriendRequestAsync(string userId, string friendId)
+        public  Task DeclineFriendRequestAsync(string userId, string friendId)
         {
             var friend = _relationshipRepository.DeclineFriendRequestAsync(userId, friendId);
+             _postHubService.CancelFriend(userId, friendId);
             return friend;
         }
     }

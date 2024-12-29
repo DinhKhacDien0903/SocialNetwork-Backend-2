@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using SocialNetwork.Helpers.Hubs;
 using SocialNetwork.DTOs.Response;
 using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Services.IServices;
 
 namespace SocialNetwork.Services.Services
 {
@@ -19,12 +20,14 @@ namespace SocialNetwork.Services.Services
     {
         private readonly IHubContext<PostHub> _hubContext;
         private readonly UserManager<UserEntity> _userManager;
+        private readonly IUserService _userService;
 
 
-        public PostHubService(IHubContext<PostHub> hubContext, UserManager<UserEntity> userManager)
+        public PostHubService(IHubContext<PostHub> hubContext, UserManager<UserEntity> userManager, IUserService userService)
         {
             _hubContext = hubContext;
             _userManager = userManager;
+            _userService = userService;
         }
 
 
@@ -38,11 +41,6 @@ namespace SocialNetwork.Services.Services
         {
             await _hubContext.Clients.All.SendAsync("ReceiveUpdatePost", updateViewModel);
         }
-
-        //public async Task SendDeleteAsycn(Guid Id)
-        //{
-        //    await _hubContext.Clients.All.SendAsync("ReceiveDeletePost", Id);
-        //}
 
         public async Task SendCommentAsycn(CommentViewModel commentRespone,int number)
         {
@@ -99,6 +97,14 @@ namespace SocialNetwork.Services.Services
         public async Task SendGetNotification(List<FriendRequestViewmodel> model)
         {
             await _hubContext.Clients.All.SendAsync("getNotification", model);
+        }
+
+        public async Task SendSeedSearch()
+        {
+            var users = await _userService.GetAllUsersAsync();
+
+           
+            await _hubContext.Clients.All.SendAsync("seedSearUser", users);
         }
     }
 }
