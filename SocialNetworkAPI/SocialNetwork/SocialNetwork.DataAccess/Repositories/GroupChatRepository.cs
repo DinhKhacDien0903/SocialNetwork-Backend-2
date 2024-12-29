@@ -54,5 +54,19 @@
 
             return memberIds.Count;
         }
+
+        public async Task UpdateGroupChatAvatar(string GroupchatId, string Avatar, DateTime updateDatetime)
+        {
+            var group = await _context.GroupChats.FindAsync(GroupchatId);
+
+            if(group != null)
+            {
+                group.Avatar = Avatar;
+
+                group.UpdatedAt = updateDatetime;
+
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

@@ -18,5 +18,7 @@ namespace SocialNetwork.Domain.IRepositories
         Task<UserEntity> UpdateUserInforAsync(UserEntity userEntity);
 
         Task<int> GetTotalFriendAsync(string userId);
+
+        Task<string> GetAvatarByUserIdAsync(string userId);
     }
 }

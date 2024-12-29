@@ -19,6 +19,11 @@ namespace SocialNetwork.DataAccess.Repositories
             _userManager = userManager;
         }
 
+        public async Task<string> GetAvatarByUserIdAsync(string userId)
+        {
+            return (await _context.Users.FindAsync(userId))?.AvatarUrl;
+        }
+
         public async Task<UserEntity?> GetByUserNameAsync(string userName)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
@@ -134,12 +139,7 @@ namespace SocialNetwork.DataAccess.Repositories
             return results;
         }
 
-
-
-
-
-
-        public async Task UpdateStatusActiveUser(string userId, bool isActive)
+    public async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
