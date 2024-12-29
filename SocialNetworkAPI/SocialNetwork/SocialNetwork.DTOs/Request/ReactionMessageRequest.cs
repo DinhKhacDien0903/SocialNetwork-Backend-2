@@ -10,5 +10,6 @@
 
         public string? SenderId { get; set; }
 
+        public string? GroupId { get; set; }
     }
 }

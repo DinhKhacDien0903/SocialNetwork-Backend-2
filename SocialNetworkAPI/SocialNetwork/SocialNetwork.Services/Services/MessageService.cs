@@ -17,6 +17,8 @@ namespace SocialNetwork.Services.Services
 
         private readonly IGroupChatMessageImageRepository _groupChatMessageImageRepository;
 
+        private readonly IReactionGroupChatMessageRepository _reactionGroupChatMessageRepository;
+
         private readonly IUserRepository _userRepository;
 
         private readonly IMapper _mapper;
@@ -27,6 +29,7 @@ namespace SocialNetwork.Services.Services
             IReactionMessageRepository reactionMessageRepository,
             IGroupChatMessageRepository groupChatMessageRepository,
             IGroupChatMessageImageRepository groupChatMessageImageRepository,
+            IReactionGroupChatMessageRepository reactionGroupChatMessageRepository,
             IUserRepository userRepository,
             IMapper mapper)
         {
@@ -36,6 +39,7 @@ namespace SocialNetwork.Services.Services
             _reactionMessageRepository = reactionMessageRepository;
             _groupChatMessageRepository = groupChatMessageRepository;
             _groupChatMessageImageRepository = groupChatMessageImageRepository;
+            _reactionGroupChatMessageRepository = reactionGroupChatMessageRepository;
             _userRepository = userRepository;
             _mapper = mapper;
         }
@@ -86,9 +90,9 @@ namespace SocialNetwork.Services.Services
 
                     var images = await _groupChatMessageImageRepository.GetAllImageByMessageId(item.GroupChatMessageID);
 
-                    var reactionId = await _reactionMessageRepository.GetReactionIdByMessageIdAsync(item.GroupChatMessageID);
+                    var reactionId = await _reactionGroupChatMessageRepository.GetReactionIdByMessageIdAsync(item.GroupChatMessageID);
 
-                    var reactions = await _reactionRepository.GetReactionUserByReactionIdAsync(reactionId, userId);
+                    var reactions = await _reactionGroupChatMessageRepository.GetReactionUserByReactionIdAsync(reactionId, userId);
 
                     item.Images = images;
 

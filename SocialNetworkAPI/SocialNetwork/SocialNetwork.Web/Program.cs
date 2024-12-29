@@ -62,6 +62,7 @@ builder.Services.AddScoped(typeof(IGroupChatRepository), typeof(GroupChatReposit
 builder.Services.AddScoped(typeof(INotificationPostRepository), typeof(NotificationPostRepository));
 builder.Services.AddScoped(typeof(IGroupChatMessageRepository), typeof(GroupChatMessageRepository));
 builder.Services.AddScoped(typeof(IGroupChatMessageImageRepository), typeof(GroupChatMessageImageRepository));
+builder.Services.AddScoped(typeof(IReactionGroupChatMessageRepository), typeof(ReactionGroupChatMessageRepository));
 
 
 
@@ -229,9 +230,13 @@ app.MapHub<NotificationHub>("/notification");
 
 app.MapHub<ChatHub>("/chat");
 
+app.MapHub<GroupChatHub>("/groupChatHub");
+
 app.MapHub<PostHub>("/postHub");
 
 app.MapHub<ReactionHub>("/reactionMessage");
+
+app.MapHub<ReactionGroupChatMessageHub>("/reactionGroupChatMessage");
 
 app.Run();
 

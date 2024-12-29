@@ -121,6 +121,13 @@
             return _mapper.Map<NotificationViewModel>(notification);
         }
 
+        public async Task RemoveGroupChatMessage(string messageId)
+        {
+            (await _groupChatMessageRepository.GetByIDAsync(messageId)).IsDeleted = true;
+
+            await _groupChatMessageRepository.SaveChangeAsync();
+        }
+
         public async Task RemoveMessage(string messageId)
         {
             (await _messageRepository.GetByIDAsync(messageId)).IsDeleted = true;
@@ -131,6 +138,17 @@
         public async Task UpdateGroupChatAvatar(UpdateGroupChatRequest param, DateTime updateDatetime)
         {
             await _groupChatRepository.UpdateGroupChatAvatar(param.GroupchatId, param.Avatar, updateDatetime);
+        }
+
+        public async Task UpdateGroupChatMessage(UpdateMessageRequest param, DateTime updateDatetime)
+        {
+            var currentMessage = await _groupChatMessageRepository.GetByIDAsync(param.MessageId);
+
+            currentMessage.Content = param.Content;
+
+            currentMessage.UpdatedAt = updateDatetime;
+
+            await _groupChatMessageRepository.SaveChangeAsync();
         }
 
         public async Task UpdateMessage(UpdateMessageRequest param, DateTime updateDatetime)

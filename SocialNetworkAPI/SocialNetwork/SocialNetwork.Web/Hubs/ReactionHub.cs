@@ -89,7 +89,7 @@ namespace SocialNetwork.Web.Hubs
                 ReactionID = reactionId,
                 EmotionType = param.EmotionType,
                 MessageId = param.MessageId,
-                ReciverId = param.ReciverId,
+                GroupId = param.GroupId,
                 SenderId = param.SenderId,
                 ReactionAt = reactiondate
             };
