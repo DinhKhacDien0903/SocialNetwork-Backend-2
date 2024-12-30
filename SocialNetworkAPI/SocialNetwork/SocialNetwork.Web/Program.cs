@@ -60,8 +60,6 @@ builder.Services.AddScoped(typeof(IReactionMessageRepository), typeof(ReactionMe
 builder.Services.AddScoped(typeof(IConversationRepository), typeof(ConversationRepository));
 builder.Services.AddScoped(typeof(IGroupChatRepository), typeof(GroupChatRepository));
 builder.Services.AddScoped(typeof(INotificationPostRepository), typeof(NotificationPostRepository));
-builder.Services.AddScoped(typeof(IGroupChatMessageRepository), typeof(GroupChatMessageRepository));
-builder.Services.AddScoped(typeof(IGroupChatMessageImageRepository), typeof(GroupChatMessageImageRepository));
 
 
 
