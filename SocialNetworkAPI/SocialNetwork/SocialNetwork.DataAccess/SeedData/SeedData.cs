@@ -77,6 +77,70 @@ namespace SocialNetwork.DataAccess.SeedData
                     }
                 }
 
+                if (!context.Set<GroupChatEntity>().Any())
+                {
+                    var groupChats = new List<GroupChatEntity>();
+                    var groupChatMembers = new List<GroupChatMemberEntity>();
+                    var groupChatMessages = new List<GroupChatMessageEntity>();
+
+                    for (int i= 0; i < 3;i++)
+                    {
+                        var group = new GroupChatEntity
+                        {
+                            GroupChatID = Guid.NewGuid().ToString(),
+                            GroupName = $"Group Chat {i}",
+                            Description = $"Description for group {i}",
+                            Avatar = "https://res.cloudinary.com/dlran3qvj/image/upload/v1732701622/file_1732701619587.jpg"
+                        };
+
+                        groupChats.Add(group);
+                    }
+
+                    await context.GroupChats.AddRangeAsync(groupChats);
+                    await context.SaveChangesAsync();
+
+                    foreach(var group in groupChats)
+                    {
+                       var members = users.Take(3).ToList();
+
+                        foreach(var member in members)
+                        {
+                            groupChatMembers.Add(new GroupChatMemberEntity
+                            {
+                                GroupChatID = group.GroupChatID,
+                                UserID = member.Id,
+                                JoinAt = DateTime.UtcNow,
+                                IsAdmin = false,
+                                IsLeaved = false
+                            });
+                        }
+                    }
+
+                    await context.GroupChatMembers.AddRangeAsync(groupChatMembers);
+                    await context.SaveChangesAsync();
+
+                    var sender = users.FirstOrDefault();
+
+                    foreach(var group in groupChats)
+                    {
+                        for (int i = 0; i < 5; i++)
+                        {
+                            groupChatMessages.Add(new GroupChatMessageEntity
+                            {
+                                GroupChatMessageID = Guid.NewGuid().ToString(),
+                                GroupChatID = group.GroupChatID,
+                                UserID = sender.Id,
+                                Content = $"Message {i} from {sender.UserName} to group {group.GroupName}",
+                                IsDeleted = false,
+                                Symbol = 0
+                            });
+                        }
+                    }
+
+                    await context.GroupChatMessages.AddRangeAsync(groupChatMessages);
+                    await context.SaveChangesAsync();
+                }
+
                 //post initial
                 if (!context.Set<PostEntity>().Any())
                 {
