@@ -77,34 +77,34 @@ namespace SocialNetwork.Services.Services
 
 
 
-                //Friends
-                var friends = await _relationshipRepository.GetFriendIdByUserId(userID);
+                ////Friends
+                //var friends = await _relationshipRepository.GetFriendIdByUserId(userID);
 
-                var friendToNotify = friends.Where(x=>x!=userID).ToList();
+                //var friendToNotify = friends.Where(x=>x!=userID).ToList();
 
-                if (friends.Any())
-                {
-                    // Nội dung thông báo
-                    var content = $"{postEntity.User.FirstName} {postEntity.User.LastName} vừa đăng một bài viết mới.";
-
-
-                    var notification = new NotificationPostViewModel
-                    {
-                        Content = content,
-                        Type = "New_Post",
-                        UserId = userID,
-                        //friendId= friendToNotify,
-                        //PostId = postEntity.PostID,
-                        //CreatedAt = DateTime.UtcNow
-                    };
+                //if (friends.Any())
+                //{
+                //    // Nội dung thông báo
+                //    //var content = $"{postEntity.User.FirstName} {postEntity.User.LastName} vừa đăng một bài viết mới.";
 
 
-                    // Tạo thông báo trong cơ sở dữ liệu
-                    await _notificationservice.CreateNotificationAsync(notification, friendToNotify);
+                //    //var notification = new NotificationPostViewModel
+                //    //{
+                //    //    Content = content,
+                //    //    Type = "New_Post",
+                //    //    UserId = userID,
+                //    //    //friendId= friendToNotify,
+                //    //    //PostId = postEntity.PostID,
+                //    //    //CreatedAt = DateTime.UtcNow
+                //    //};
 
-                    // Gửi thông báo qua SignalR đến danh sách bạn bè
-                    //await _postHubService.SendNotificationToMultipleUsers(friendToNotify, notification);
-                }
+
+                //    //// Tạo thông báo trong cơ sở dữ liệu
+                //    //await _notificationservice.CreateNotificationAsync(notification, friendToNotify);
+
+                //    // Gửi thông báo qua SignalR đến danh sách bạn bè
+                //    //await _postHubService.SendNotificationToMultipleUsers(friendToNotify, notification);
+                //}
 
                 await _postHubService.SendPostAsync(postResponse);
 
@@ -164,25 +164,12 @@ namespace SocialNetwork.Services.Services
         }
 
 
-        //public async Task<PostViewModel> UpdatePostAsync(PostViewModel post)
-        //{
-        //    var postEntity = await _postRepository.GetByIDAsync(post.PostID);
-        //    if (postEntity == null)
-        //    {
-        //        throw new Exception("Không tồn tại bài viết");
-        //    }
-        //    _mapper.Map(post, postEntity);
-        //    _postRepository.Update(postEntity);
-        //    await _postRepository.SaveChangeAsync();
-        //    return _mapper.Map<PostViewModel>(postEntity);
-        //}
-
         public async  Task<PageResult<PostViewModel>> GetPostsByUserIdAsync(string userId,int pageSize,int pageIndex)
         {
             var posts = await _postRepository.GetAllAsync(userId); 
-            var userPosts = posts.Where(p => p.UserID == userId); 
-            var total=posts.Count();
-            var pagePost=posts.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var userPosts = posts.Where(p => p.UserID == userId).ToList(); 
+            var total= userPosts.Count();
+            var pagePost= userPosts.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
             var getPost = new PageResult<PostViewModel>
             {
                 CurrentPage = pageIndex,
