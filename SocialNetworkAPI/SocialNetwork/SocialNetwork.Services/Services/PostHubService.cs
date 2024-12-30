@@ -88,24 +88,24 @@ namespace SocialNetwork.Services.Services
 
         }
 
-        public async Task CancelFriend( string userId, string friendid)
+        public async Task CancelFriend( string userId, string notificationId)
         {
-            await _hubContext.Clients.User(userId).SendAsync("CancelUser",friendid);
-            await _hubContext.Clients.User(friendid).SendAsync("CancelUser", userId);
+            await _hubContext.Clients.User(userId).SendAsync("CancelUser", notificationId);
+            //await _hubContext.Clients.User(friendid).SendAsync("CancelUser", userId);
         }
 
-        public async Task SendGetNotification(List<FriendRequestViewmodel> model)
-        {
-            await _hubContext.Clients.All.SendAsync("getNotification", model);
-        }
+        //public async Task SendGetNotification(List<FriendRequestViewmodel> model)
+        //{
+        //    await _hubContext.Clients.All.SendAsync("getNotification", model);
+        //}
 
-        public async Task SendSeedSearch()
-        {
-            var users = await _userService.GetAllUsersAsync();
+        //public async Task SendSeedSearch()
+        //    {
+        //        var users = await _userService.GetAllUsersAsync();
 
-           
-            await _hubContext.Clients.All.SendAsync("seedSearUser", users);
-        }
+
+        //        await _hubContext.Clients.All.SendAsync("seedSearUser", users);
+        //    }    
     }
 }
 

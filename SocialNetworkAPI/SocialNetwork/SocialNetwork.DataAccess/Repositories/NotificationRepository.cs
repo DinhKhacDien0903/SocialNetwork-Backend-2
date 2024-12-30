@@ -69,6 +69,12 @@ namespace SocialNetwork.DataAccess.Repositories
             }
         }
 
+        public async Task<string> FindNotificationId(string senderid, string receiverid)
+        {
+            var notificationid = await _context.Notifications.Where(x => x.ReceiverId == receiverid && x.SenderId == senderid).Select(x => x.Id).FirstOrDefaultAsync();
+            return notificationid;
+        }
+
         public async Task<NotificationEntity> FirstOrIdNotification(string id)
         {
             var notificationUser = await _context.Notifications.FirstOrDefaultAsync(x => x.SenderId == id);

@@ -59,7 +59,7 @@ namespace SocialNetwork.Services.Services
                 IsRead=false,
             }).ToList();
 
-            await _postHubService.SendGetNotification(friendsRequest);
+            //await _postHubService.SendGetNotification(friendsRequest);
             return friendsRequest;
            
             

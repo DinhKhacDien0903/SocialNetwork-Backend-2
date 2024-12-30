@@ -61,7 +61,7 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [HttpGet("User")]
-        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId, int pageIndex, int pageSixe)
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId, int pageIndex=1, int pageSixe=10)
         {
             var posts = await _postService.GetPostsByUserIdAsync(userId,pageIndex,pageSixe);
             return Ok(new BaseResponse
@@ -96,25 +96,7 @@ namespace SocialNetwork.Web.Controllers
             return CreatedAtAction(nameof(CreatePost), new { postId = createdPost.PostID }, createdPost);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult<PostViewModel>> UpdatePost(string id, [FromBody] PostViewModel postViewModel)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    postViewModel.PostID = id;
-        //    var updatedPost = await _postService.UpdatePostAsync(postViewModel);
-
-        //    if (updatedPost == null)
-        //    {
-        //        return NotFound("Bài viết không tồn tại.");
-        //    }
-
-        //    //await _postHubService.SendUpdateAsycn(updatedPost);
-        //    return Ok(updatedPost);
-        //}
+        
 
        
 

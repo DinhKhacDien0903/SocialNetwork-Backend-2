@@ -12,18 +12,20 @@ namespace SocialNetwork.Services.Services
         private readonly UserManager<UserEntity> _userManager;
         private readonly IMapper _mapper;
         private readonly IPostHubService _postHubService;
-        public RelationshipService(IRelationshipRepository relationshipRepository, IMapper mapper, INotificationService notificationService, UserManager<UserEntity> userManager, IPostHubService postHubService)
+        private readonly INotificationRepository _notificationRepository;
+        public RelationshipService(IRelationshipRepository relationshipRepository, IMapper mapper, INotificationService notificationService, UserManager<UserEntity> userManager, IPostHubService postHubService, INotificationRepository notificationRepository)
         {
             _relationshipRepository = relationshipRepository;
             _mapper = mapper;
             _notificationService = notificationService;
             _userManager = userManager;
             _postHubService = postHubService;
+            _notificationRepository = notificationRepository;
         }
 
-       
 
-       
+
+
 
         public async Task<IEnumerable<UserSearchViewModel>> GetAllFriendAsync(string userId)
         {
@@ -99,8 +101,11 @@ namespace SocialNetwork.Services.Services
             {
                 throw new ArgumentException("Người dùng không tồn tại.", nameof(userId));
             }
+            var notificationId = await _notificationRepository.FindNotificationId( friendId, userId);
 
-             await _relationshipRepository.AccepFriendRequestAsync(userId, friendId);
+            await _postHubService.CancelFriend(userId, notificationId);
+
+            await _relationshipRepository.AccepFriendRequestAsync(userId, friendId);
 
             string message = $"{userinf.LastName} {userinf.FirstName} đã chấp nhận mời kết bạn";
             var usersend = new FriendRequestViewmodel
@@ -120,10 +125,11 @@ namespace SocialNetwork.Services.Services
                 Messeage = message,
                 //Type=1,
             };
-            //await _notificationService.GetAllFriendRequest(userId);
+
             await _notificationService.AcceptNotificationAsync(notification);
+            //await _notificationService.GetAllFriendRequest(userId);
             await _postHubService.AcceptFriendNotification(usersend, friendId);
-            await _postHubService.CancelFriend(userId, friendId);       
+            //await _postHubService.SendGetNotification();
         }
 
         public Task CancelFriendAsync(string userId, string friendId)
@@ -137,7 +143,6 @@ namespace SocialNetwork.Services.Services
         {
             var model = _relationshipRepository.DeclineFriendAsync(userId, friendId);
              _postHubService.CancelFriend(userId, friendId);
-
             return model;
         }
 

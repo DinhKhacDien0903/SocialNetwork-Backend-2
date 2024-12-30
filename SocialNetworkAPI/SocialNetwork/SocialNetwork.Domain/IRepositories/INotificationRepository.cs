@@ -14,5 +14,7 @@ namespace SocialNetwork.Domain.IRepositories
         Task<NotificationEntity> AddOrUpdateAsync(NotificationEntity entity);
 
         Task<bool> IsNotificationExist(string senderId, string reciverId, string groupId = null);
+
+        Task<string> FindNotificationId(string senderid, string receiverid);
     }
 }

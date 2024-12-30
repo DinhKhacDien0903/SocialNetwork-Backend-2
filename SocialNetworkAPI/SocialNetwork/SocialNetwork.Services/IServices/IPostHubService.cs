@@ -27,11 +27,12 @@ namespace SocialNetwork.Services.IServices
 
         Task AcceptFriendNotification(FriendRequestViewmodel model, string friendid);
 
-        Task SendRefusePostAsync(string postId); Task CancelFriend(string userId, string friendId);
+        Task SendRefusePostAsync(string postId);
+        Task CancelFriend(string userId, string notificationId);
 
-        Task SendGetNotification(List<FriendRequestViewmodel> model);
+        //Task SendGetNotification(string notificationID);
 
-        Task SendSeedSearch();
+        //Task SendSeedSearch();
 
     }
 }
