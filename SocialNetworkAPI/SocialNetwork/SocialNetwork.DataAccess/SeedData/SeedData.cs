@@ -175,7 +175,7 @@ namespace SocialNetwork.DataAccess.SeedData
                                 {
                                     ImagesOfPostID = Guid.NewGuid().ToString(),
                                     PostID = post.PostID,
-                                    ImgUrl = $"https://example.com/image{k}_{post.PostID}.jpg",
+                                    ImgUrl = "https://res.cloudinary.com/dlran3qvj/image/upload/v1732701622/file_1732701619587.jpg",
                                     IsDeleted = false
                                 });
                             }

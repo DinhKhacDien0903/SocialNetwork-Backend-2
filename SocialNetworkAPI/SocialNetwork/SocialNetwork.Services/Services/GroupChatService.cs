@@ -35,6 +35,11 @@ namespace SocialNetwork.Services.Services
             return _mapper.Map<GroupChatViewModel>(groupChat);
         }
 
+        public async Task LeaveGroupChatAsync(string userId, string groupId)
+        {
+            await _groupChatRepository.LeaveGroupChatAsync(userId, groupId);
+        }
+
         public bool ValidateGroupChat(GroupChatViewModel groupChat)
         {
             return _groupChatRepository.IsGroupNameExist(groupChat.GroupName);

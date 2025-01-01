@@ -228,5 +228,29 @@ namespace SocialNetwork.Web.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [Authorize]
+        [HttpPut("leaveGroupChat")]
+        public async Task<IActionResult> LeaveGroupChatAsync(string groupId)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                await _groupChatService.LeaveGroupChatAsync(userId, groupId);
+
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Create Group Chat success",
+                    Data = groupId
+                });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

@@ -30,11 +30,11 @@
 
         public bool IsGroupNameExist(string groupName)
         {
-            var x = _context.GroupChats.Any(x => x.GroupName.ToLower() == groupName.ToLower()); 
+            var x = _context.GroupChats.Any(x => x.GroupName.ToLower() == groupName.ToLower());
 
             return _context.GroupChats.Any(x => x.GroupName.ToLower() == groupName.ToLower());
         }
-        
+
         public async Task<int> AddGroupChatMembers(string userId, string groupChatId, List<string> memberIds)
         {
             var listMember = new List<GroupChatMemberEntity>();
@@ -59,7 +59,7 @@
         {
             var group = await _context.GroupChats.FindAsync(GroupchatId);
 
-            if(group != null)
+            if (group != null)
             {
                 group.Avatar = Avatar;
 
@@ -67,6 +67,29 @@
 
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task LeaveGroupChatAsync(string userId, string groupId)
+        {
+            var groupChatMember = await _context.GroupChatMembers
+                .Where(x => x.GroupChatID == groupId && x.UserID == userId)
+                .FirstOrDefaultAsync();
+
+            groupChatMember.IsLeaved = true;
+
+            if (groupChatMember.IsAdmin == true)
+            {
+                var members = await _context.GroupChatMembers
+                                    .Where(x => x.GroupChatID == groupId && x.IsLeaved == false && x.UserID != userId)
+                                    .ToListAsync();
+
+                if (members.Count != 0)
+                {
+                    members[0].IsAdmin = true;
+                }
+            }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
