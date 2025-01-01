@@ -54,12 +54,12 @@ namespace SocialNetwork.DataAccess.Repositories
         {
             try
             {
-                bool notificationExit = await _context.Notifications.AnyAsync(x => x.ReceiverId == entity.ReceiverId && x.SenderId == entity.SenderId);
-                if (!notificationExit)
-                {
+                //bool notificationExit = await _context.Notifications.AnyAsync(x => x.ReceiverId == entity.ReceiverId && x.SenderId == entity.SenderId);
+                //if (!notificationExit)
+                //{
                     await _context.Notifications.AddAsync(entity);
                     await _context.SaveChangesAsync();
-                }
+               // }
 
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ namespace SocialNetwork.DataAccess.Repositories
         public async Task<IEnumerable<NotificationEntity>> GetAllFriendRequest(string userId)
         {
             //var user=await _userManager.FindByIdAsync(userId);
-            var allRequest = await _context.Notifications.Where(x => x.ReceiverId == userId&&x.Type!=0).ToListAsync();
+            var allRequest = await _context.Notifications.Where(x => x.ReceiverId == userId&&x.Type!=0 && !x.IsRead ).ToListAsync();
 
             foreach (var item in allRequest)
             {

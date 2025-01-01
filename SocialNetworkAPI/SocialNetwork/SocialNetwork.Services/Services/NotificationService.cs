@@ -24,7 +24,7 @@ namespace SocialNetwork.Services.Services
         {
             var notificationEntity = _mapper.Map<NotificationEntity>(notification);
             notificationEntity.Id = Guid.NewGuid().ToString();
-            notificationEntity.Type = 2;
+            notificationEntity.Type = 3;
             await _notificationRepository.AcceptNotificationAsync(notificationEntity);
         }
 
@@ -33,7 +33,7 @@ namespace SocialNetwork.Services.Services
             
            var notificationEntity=  _mapper.Map<NotificationEntity>(model);
             notificationEntity.Id=Guid.NewGuid().ToString();
-            notificationEntity.Type = 1;
+            //notificationEntity.Type = 1;
             await _notificationRepository.AddSendFriendAsync(notificationEntity);
         }
 
@@ -46,7 +46,7 @@ namespace SocialNetwork.Services.Services
         {
             var allRequest = await _notificationRepository.GetAllFriendRequest(userId);
             var friendsRequest = allRequest
-                 .Where(x =>  x.Sender != null)
+                 .Where(x =>  x.Sender != null && x.Type > 1)
                 .Select(x => new FriendRequestViewmodel()
             {
                 LastName = x.Sender.LastName,
@@ -71,9 +71,15 @@ namespace SocialNetwork.Services.Services
 
         }
 
-        public Task MarkNotificationAsync(string id)
+        public async Task MarkNotificationAsync(string id)
         {
-            throw new NotImplementedException();
+            var notification = await _notificationRepository.GetByIDAsync(id);
+
+            notification.IsRead = true;
+
+            _notificationRepository.Update(notification);
+
+            await _notificationRepository.SaveChangeAsync();
         }
     }
 }

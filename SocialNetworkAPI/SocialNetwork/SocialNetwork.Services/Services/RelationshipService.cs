@@ -81,7 +81,7 @@ namespace SocialNetwork.Services.Services
                     SenderId = userId,
                     ReceiverId = friendId,
                     Messeage = message,
-                    //Type=1,
+                    Type=2,
                 };
                 await _notificationService.AddNotificationAsync(notification);
 

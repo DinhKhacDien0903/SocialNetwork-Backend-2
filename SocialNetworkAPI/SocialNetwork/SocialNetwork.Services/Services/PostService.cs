@@ -49,7 +49,6 @@ namespace SocialNetwork.Services.Services
                         throw new Exception("User not found.");
                     }
                     Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
-
                     await _postRepository.AddAsync(postEntity);
                     await _postRepository.SaveChangeAsync();
 

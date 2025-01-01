@@ -150,12 +150,10 @@ namespace SocialNetwork.Web.Controllers
 
         }
 
-
-        [Authorize]
-        [HttpPut("{id}/mark-read")]
-        public async Task<IActionResult> MarkAsRead(string id)
+        [HttpPut("readNotification")]
+        public async Task<IActionResult> ReadNotification([FromQuery] string notificationId)
         {
-            await _notificationService.MarkNotificationAsync(id);
+            await _notificationService.MarkNotificationAsync(notificationId);
             return Ok(new { Success = true });
         }
         #endregion
