@@ -6,5 +6,6 @@
         bool IsGroupNameExist(string groupName);
 
         Task UpdateGroupChatAvatar(string GroupchatId, string Avatar, DateTime updateDatetime);
+        Task LeaveGroupChatAsync(string userId, string groupId);
     }
 }
