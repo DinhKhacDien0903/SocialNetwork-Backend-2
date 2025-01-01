@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Domain;
+using SocialNetwork.Domain.Entities;
 using SocialNetwork.DTOs.Authorize;
 using SocialNetwork.DTOs.ViewModels;
 using System.Security.Claims;
@@ -14,15 +16,17 @@ namespace SocialNetwork.Web.Controllers
         private readonly INotificationService _notificationService;
         private readonly IRelationshipService _relationshipService;
         private readonly IPostHubService _postHubService;
+        private readonly UserManager<UserEntity> _userManager;
 
 
 
-        public UserController(IUserService userServices, INotificationService notificationService = null, IRelationshipService relationshipService = null, IPostHubService postHubService = null)
+        public UserController(IUserService userServices, UserManager<UserEntity> userManager, INotificationService notificationService = null, IRelationshipService relationshipService = null, IPostHubService postHubService = null)
         {
             _userServices = userServices;
             _notificationService = notificationService;
             _relationshipService = relationshipService;
             _postHubService = postHubService;
+            _userManager = userManager;
         }
 
         #region
@@ -58,9 +62,12 @@ namespace SocialNetwork.Web.Controllers
             if(string.IsNullOrEmpty(userId))
             {
                 userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }   
+            }
+            var userEntity = await _userManager.FindByIdAsync(userId);
 
             var user = await _userServices.GetUserInforAsync(userId);
+
+            user.Role = (await _userManager.GetRolesAsync(userEntity)).FirstOrDefault();
 
             return Ok(new BaseResponse
             {

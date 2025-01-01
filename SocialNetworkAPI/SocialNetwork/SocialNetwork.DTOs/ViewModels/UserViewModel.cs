@@ -26,5 +26,7 @@
         public string? DateOfBirthFormatted => DateOfBirth?.ToString("yyyy-MM-dd");
 
         public int? totalOfFirend { get; set; } = 0;
+
+        public string? Role { get; set; }
     }
 }

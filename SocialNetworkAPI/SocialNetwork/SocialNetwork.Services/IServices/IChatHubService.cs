@@ -16,7 +16,10 @@
 
         Task RemoveMessage(string messageId);
 
+        Task RemoveGroupChatMessage(string messageId);
         Task UpdateMessage(UpdateMessageRequest param, DateTime updateDatetime);
+
+        Task UpdateGroupChatMessage(UpdateMessageRequest param, DateTime updateDatetime);
 
         Task UpdateGroupChatAvatar(UpdateGroupChatRequest param, DateTime updateDatetime);
 

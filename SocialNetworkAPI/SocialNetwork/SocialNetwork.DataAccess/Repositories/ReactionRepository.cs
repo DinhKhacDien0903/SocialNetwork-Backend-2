@@ -28,13 +28,26 @@ namespace SocialNetwork.DataAccess.Repositories
 
         public async Task<ReactionEntity> GetReactionIdByMessageIdAndUserId(ReactionMessageRequest param)
         {
-            var result = from reaction in _context.Reactions
-                         join reactionMessage in _context.ReactionMessages
-                         on reaction.ReactionID equals reactionMessage.ReactionID
-                         where reaction.UserID.Equals(param.SenderId) && reactionMessage.MessageID.Equals(param.MessageId)
-                         select reaction;
+            if(param.GroupId == null)
+            {
+                var result = from reaction in _context.Reactions
+                             join reactionMessage in _context.ReactionMessages
+                             on reaction.ReactionID equals reactionMessage.ReactionID
+                             where reaction.UserID.Equals(param.SenderId) && reactionMessage.MessageID.Equals(param.MessageId)
+                             select reaction;
 
-            return await result.FirstOrDefaultAsync();
+                return await result.FirstOrDefaultAsync();
+            }
+            else
+            {
+                var result = from reaction in _context.Reactions
+                             join reactionMessage in _context.ReactionGroupChatMessages
+                             on reaction.ReactionID equals reactionMessage.ReactionID
+                             where reaction.UserID.Equals(param.SenderId) && reactionMessage.GroupChatMessageID.Equals(param.MessageId)
+                             select reaction;
+
+                return await result.FirstOrDefaultAsync();
+            }
         }
 
         //optional

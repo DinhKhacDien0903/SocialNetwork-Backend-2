@@ -47,7 +47,15 @@ namespace SocialNetwork.DataAccess.SeedData
                     if (result.Succeeded)
                     {
                         users.Add(user);
-                        await userManager.AddToRoleAsync(user, "User");
+                        if(i == 1)
+                        {
+                            await userManager.AddToRoleAsync(user, "Admin");
+                        }
+                        else
+                        {
+                            await userManager.AddToRoleAsync(user, "User");
+                        }
+
                     }
                 }
 

@@ -139,7 +139,7 @@ namespace SocialNetwork.DataAccess.Repositories
             return results;
         }
 
-    public async Task UpdateStatusActiveUser(string userId, bool isActive)
+        public async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             var user = await _userManager.FindByIdAsync(userId);
 

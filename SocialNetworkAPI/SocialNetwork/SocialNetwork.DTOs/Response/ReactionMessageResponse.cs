@@ -15,5 +15,7 @@
         public DateTime? ReactionAt { get; set; }
 
         public bool? IsRemove { get; set; }
+
+        public string? GroupId { get; set; }
     }
 }

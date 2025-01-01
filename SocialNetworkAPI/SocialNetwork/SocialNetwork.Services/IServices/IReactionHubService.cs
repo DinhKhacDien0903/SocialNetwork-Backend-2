@@ -4,6 +4,7 @@
     {
         Task<string> AddOrUpdateReaction(ReactionMessageRequest param);
 
+        Task<string> AddOrUpdateReactionGroupChatMessage(ReactionMessageRequest param);
         Task RemoveReactionByReactionIdAync(string reactionId);
     }
 }
