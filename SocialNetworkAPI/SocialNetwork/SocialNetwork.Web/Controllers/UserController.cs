@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Domain;
+using SocialNetwork.Domain.Entities;
 using SocialNetwork.DTOs.Authorize;
+using SocialNetwork.DTOs.ViewModels;
 using System.Security.Claims;
 
 namespace SocialNetwork.Web.Controllers
@@ -9,10 +13,23 @@ namespace SocialNetwork.Web.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userServices;
-        public UserController(IUserService userServices)
+        private readonly INotificationService _notificationService;
+        private readonly IRelationshipService _relationshipService;
+        private readonly IPostHubService _postHubService;
+        private readonly UserManager<UserEntity> _userManager;
+
+
+
+        public UserController(IUserService userServices, UserManager<UserEntity> userManager, INotificationService notificationService = null, IRelationshipService relationshipService = null, IPostHubService postHubService = null)
         {
             _userServices = userServices;
+            _notificationService = notificationService;
+            _relationshipService = relationshipService;
+            _postHubService = postHubService;
+            _userManager = userManager;
         }
+
+        #region
 
         [Authorize(Roles = ApplicationRoleModel.User)]
         [HttpGet("getUsers")]
@@ -38,16 +55,19 @@ namespace SocialNetwork.Web.Controllers
 
         [Authorize]
         [HttpGet("getInfor")]
-        public async Task<IActionResult> GetUserInfor()
+        public async Task<IActionResult> GetUserInfor(string? userId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if(userId == null)
+            if(string.IsNullOrEmpty(userId))
             {
-                return Unauthorized("You must login to get your informations");
-            }   
+                userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            }
+            var userEntity = await _userManager.FindByIdAsync(userId);
 
             var user = await _userServices.GetUserInforAsync(userId);
+
+            user.Role = (await _userManager.GetRolesAsync(userEntity)).FirstOrDefault();
 
             return Ok(new BaseResponse
             {
@@ -78,6 +98,192 @@ namespace SocialNetwork.Web.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+        #endregion
+
+
+
+        #region
+        [Authorize]
+        [HttpGet("SearchUser")]
+        public async Task<IActionResult> GetSearchUserAsync([FromQuery] SearchQuery userSearch)
+       {
+            try
+            {
+                var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _userServices.SearchUserByNameAsync(userSearch,userId);
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Lấy thông tin người dùng tìm kiếm thành công",
+                    Data = user
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
+
+        [Authorize]
+        [HttpGet("notificationFriend")]
+        public async Task<IActionResult> GetNotificationFriend()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var notification = await _notificationService.GetAllFriendRequest(userId);
+                return Ok(new BaseResponse
+                {
+                    Status = 200,
+                    Message = "Get Notification is success",
+                    Data = notification
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpPut("readNotification")]
+        public async Task<IActionResult> ReadNotification([FromQuery] string notificationId)
+        {
+            await _notificationService.MarkNotificationAsync(notificationId);
+            return Ok(new { Success = true });
+        }
+        #endregion
+
+
+
+        #region
+        [Authorize]
+        [HttpPost("Send")]
+        public async Task<IActionResult> SendFriendRequest([FromBody] string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var friendInf= await _relationshipService.SendFriendRequest(userId, friendId); 
+            return Ok(new BaseResponse
+            {
+                Status=200,
+                Message="send friend request success",
+                Data = friendInf
+            });
+        }
+
+        [Authorize]
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptFriendRequest([FromBody] string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.AccepFriendRequestAsync(userId, friendId);
+            return Ok(new { Message = "accep friend request is success" });
+        }
+
+        //huy kb
+        [Authorize]
+        [HttpPost("cancel/{friendId}")]
+        public async Task<IActionResult> CancelFriend(string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.CancelFriendAsync(userId, friendId);
+            await  _postHubService.CancelFriend(userId, friendId);
+            return Ok(new { Message = "cancel friend request is success" });
+        }
+
+
+
+        // thu hoi
+        [Authorize]
+        [HttpPost("cancelRequest/{friendId}")]
+        public async Task<IActionResult> DeclineFriendRequest(string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.DeclineFriendRequestAsync(userId, friendId);
+            return Ok(new { Message = "decline friend request is success" });
+        }
+
+
+
+        //xoa request 
+        [Authorize]
+        [HttpPost("decline/{friendId}")]
+        public async Task<IActionResult> DeclineFriend(string friendId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _relationshipService.DeclineFriendAsync(userId, friendId);
+            return Ok(new { Message = "decline friend request is success" });
+        }
+
+        [Authorize]
+        [HttpGet("friends")]
+        public async Task<IActionResult> GetAllFriend()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var friend=await _relationshipService.GetAllFriendAsync(userId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message="get all friend is success",
+                Data = friend
+            });  
+        }
+
+
+        [Authorize]
+        [HttpGet("request")]
+        public async Task<IActionResult> GetAllPedingFriend()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var friend = await _relationshipService.GetPendingFriendRequestAsync(userId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "get all peding friend is success",
+                Data = friend
+            });
+        }
+
+        [Authorize]
+        [HttpGet("sendRequest")]
+        public async Task<IActionResult> GetAllSendRequestFriend()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var sendRequest= await _relationshipService.GetSendFriendRequestAsync(userId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "get all send request is success",
+                Data = sendRequest
+            });
+        }
+        #endregion
+
+        [Authorize(Roles = ApplicationRoleModel.User)]
+        [HttpPut("updateInfor")]
+        public async Task<IActionResult> UpdateUserInfor(UserViewModel request)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized("You must login to update your informations");
+            }
+
+            request.Id = userId;
+
+            var user = await _userServices.UpdateUserInforAsync(request);
+
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "Get user infor success",
+                Data = user
+            });
         }
     }
 }

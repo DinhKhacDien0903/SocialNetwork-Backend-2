@@ -8,9 +8,8 @@ namespace SocialNetwork.DTOs.ViewModels
 {
     public class ImagesOfPostViewModel
     {
-        public Guid PostID { get; set; }
+        //public Guid PostID { get; set; }
         public string ImgUrl { get; set; }
-        public bool IsDeleted { get; set; }=false;
        
     }
 }

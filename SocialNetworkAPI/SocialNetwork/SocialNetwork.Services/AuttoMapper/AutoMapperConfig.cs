@@ -1,4 +1,5 @@
-﻿using SocialNetwork.DTOs.Response;
+﻿using SocialNetwork.DataAccess.Repositories;
+using SocialNetwork.DTOs.Response;
 using SocialNetwork.DTOs.ViewModels;
 
 namespace SocialNetwork.Services.AuttoMapper
@@ -7,20 +8,43 @@ namespace SocialNetwork.Services.AuttoMapper
     {
         public AutoMapperConfig()
         {
-            //CreateMap<UserEntity, UserViewModel>();
-            //CreateMap<UserViewModel, UserEntity>();
+            //notification
+            CreateMap<NotificationRequestFriendViewModel,NotificationEntity>().ReverseMap();
 
+
+            //post
             CreateMap<PostEntity, PostViewModel>().ReverseMap();
             CreateMap<PostEntity, PostRequest>().ReverseMap();
-            //CreateMap<PostViewModel,PostRequest>.ReverseMap();
-            
+            CreateMap<PostEntity, PostResponse>().ReverseMap();
+
+            //image
             CreateMap<ImagesOfPostEntity, ImagesOfPostViewModel>().ReverseMap();
 
-            CreateMap<PostViewModel, PostEntity>()
-            .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+            //comment
+            CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
+            CreateMap<CommentEntity, CommentRequest>().ReverseMap();
+            CreateMap<CommentEntity, CommentViewModel>().ReverseMap();
+            CreateMap<CommentViewModel,CommentRequest>().ReverseMap();
+            CreateMap<CommentViewModel, CommentViewModel>().ReverseMap();
 
-            CreateMap<ImagesOfPostViewModel, ImagesOfPostEntity>();
-            CreateMap<CommentViewModel,CommentEntity>().ReverseMap();
+
+            //reactionPost
+            CreateMap<ReactionPostEntity, ReactionPostViewModel>().ReverseMap();
+            CreateMap<ReactionPostEntity, ReactionRequest>().ReverseMap();
+            CreateMap<EmotionRequest,EmotionTypeEntity>().ReverseMap();
+
+            //reaction
+            CreateMap<ReactionEntity, ReactionRequest>().ReverseMap();
+            CreateMap<ReactionPostViewModel, ReactionEntity>().ReverseMap();
+            CreateMap<ReactionRepository,ReactionPostEntity>().ReverseMap();
+
+            //User
+            CreateMap<UserEntity, UserSearchViewModel>().ReverseMap();
+
+            //relationship
+            CreateMap<UserSearchViewModel,UserEntity>().ReverseMap();
+            CreateMap<UserSearchViewModel,RelationshipEntity>().ReverseMap();
+
 
             //xuoi
 
@@ -29,6 +53,11 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<UserEntity, FriendViewModel>();
             CreateMap<MessagesEntity, MessagePersonResponse>();
             CreateMap<MessageImageEntity, MessageImageViewModel>();
+            CreateMap<GroupChatEntity, GroupChatViewModel>();
+            CreateMap<NotificationEntity, NotificationViewModel>();
+            CreateMap<GroupChatMessageEntity, MessageGroupResponse>();
+            CreateMap<GroupChatMessageEntity, GroupChatMessageViewModel>();
+            CreateMap<GroupChatMessageImageEntity, GroupChatMessageImageViewModel>();
 
             //nguoc lai
             CreateMap<UserViewModel, UserEntity>();
@@ -36,6 +65,12 @@ namespace SocialNetwork.Services.AuttoMapper
             CreateMap<FriendViewModel, UserEntity>();
             CreateMap<MessagePersonResponse, MessagesEntity>();
             CreateMap<MessageImageViewModel, MessageImageEntity>();
+            CreateMap<GroupChatViewModel, GroupChatEntity>();
+            CreateMap<NotificationViewModel, NotificationEntity>();
+            CreateMap<MessageGroupResponse, GroupChatMessageEntity>();
+            CreateMap<GroupChatMessageViewModel, GroupChatMessageEntity>();
+            CreateMap<GroupChatMessageImageViewModel, GroupChatMessageImageEntity>();
+
         }
     }
 }

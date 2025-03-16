@@ -78,24 +78,41 @@ namespace SocialNetwork.Web.Hubs
             return user;
         }
 
-        public async Task AddReactionToMessage(ReactionMessageRequest param)
+        public async Task<string> AddOrUpdateReactionToMessage(ReactionMessageRequest param)
         {
-            var sender = await _userManager.GetUserAsync(Context.User);
+            var reactiondate = DateTime.UtcNow;
 
-            var reactiondate = DateTime.UtcNow.AddHours(7);
-
-            await _reactionHubService.AddReaction(param, sender.Id);
+            var reactionId = await _reactionHubService.AddOrUpdateReaction(param);
 
             var reciverReactionResponse = new ReactionMessageResponse
             {
+                ReactionID = reactionId,
                 EmotionType = param.EmotionType,
                 MessageId = param.MessageId,
-                ReciverId = param.ReciverId,
-                SenderId = sender.Id,
+                GroupId = param.GroupId,
+                SenderId = param.SenderId,
                 ReactionAt = reactiondate
             };
 
-            await Clients.User(param.ReciverId).SendAsync("ReceiveReaction", reciverReactionResponse);
+            await Clients.User(param.ReciverId).SendAsync("ReceiveReactionMessage", reciverReactionResponse);
+
+            return reactionId;
+        }
+
+        public async Task RemoveReactionToMessage(ReactionMessageRequest param, string reactionId)
+        {
+
+            await _reactionHubService.RemoveReactionByReactionIdAync(reactionId);
+
+            var reciverReactionResponse = new ReactionMessageResponse
+            {
+                ReactionID = reactionId,
+                MessageId = param.MessageId,
+                ReciverId = param.ReciverId,
+                IsRemove = true
+            };
+
+            await Clients.User(param.ReciverId).SendAsync("ReceiveReactionMessage", reciverReactionResponse);
         }
 
     }

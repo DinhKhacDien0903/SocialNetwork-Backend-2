@@ -1,4 +1,5 @@
 ﻿using SocialNetwork.DTOs.Request;
+using SocialNetwork.DTOs.ViewModels;
 
 namespace SocialNetwork.Domain.IRepositories
 {
@@ -11,5 +12,13 @@ namespace SocialNetwork.Domain.IRepositories
         Task UpdateStatusActiveUser(string userId, bool isActive);
 
         Task<UserEntity> GetUserInfor(string userId);
+
+        Task<IEnumerable<UserSearchViewModel>> SearchUserAsync(SearchQuery query,string userId);
+
+        Task<UserEntity> UpdateUserInforAsync(UserEntity userEntity);
+
+        Task<int> GetTotalFriendAsync(string userId);
+
+        Task<string> GetAvatarByUserIdAsync(string userId);
     }
 }

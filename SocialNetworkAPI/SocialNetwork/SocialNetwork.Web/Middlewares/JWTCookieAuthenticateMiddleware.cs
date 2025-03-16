@@ -11,7 +11,7 @@ namespace SocialNetwork.Web.Middlewares
         }
 
         public async Task Invoke(HttpContext context, IServiceProvider serviceProvider)
-        {
+       {
             var authorService = serviceProvider.GetRequiredService<IAuthorService>();
 
             var accessToken = context.Request.Cookies["access_token"];

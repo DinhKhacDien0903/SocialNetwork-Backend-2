@@ -8,16 +8,16 @@
         [Required]
         public string UserID { get; set; }
 
-        [Required]
-        public string Content { get; set; }
+        //[Required]
+        public string? Content { get; set; }
 
         public bool IsDelete { get; set; } = false;
 
         [ForeignKey("UserID")]
         public UserEntity? User { get; set; }
 
-        public ICollection<ImagesOfPostEntity> Images { get; set; } = new List<ImagesOfPostEntity>();
-
-
+        public ICollection<ImagesOfPostEntity> Images { get; set; } /*= new List<ImagesOfPostEntity>();*/
+        public ICollection<ReactionPostEntity> Reactions { get; set; } = new List<ReactionPostEntity>();
+        public ICollection<CommentEntity> Comments { get; set; } = new List<CommentEntity>();
     }
 }

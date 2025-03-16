@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Domain;
+using SocialNetwork.DTOs.Response;
+using SocialNetwork.Services.IServices;
+using System.Security.Claims;
 
 namespace SocialNetwork.Services.Services
 {
@@ -12,49 +12,103 @@ namespace SocialNetwork.Services.Services
     {
         private readonly IPostRepository _postRepository ;
         private readonly IMapper _mapper ;
+        private readonly UserManager<UserEntity> _userManager;
+        private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<ImagesOfPostEntity> _imageRepository;
-        public PostService(IPostRepository postRepository, IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper)
+        private readonly INotificationPostService _notificationservice;
+        private readonly IRelationshipRepository _relationshipRepository;
+        private readonly IPostHubService _postHubService;
+        public PostService(IPostRepository postRepository,
+            UserManager<UserEntity> userManager, IUserRepository userRepository
+            , IBaseRepository<ImagesOfPostEntity> imageRepository, IMapper mapper, INotificationPostService notificationservice, IRelationshipRepository relationshipRepository, IPostHubService postHubService)
         {
-            _postRepository = postRepository; 
+            _userManager = userManager;
+            _userRepository = userRepository;
+            _postRepository = postRepository;
             _imageRepository = imageRepository;
             _mapper = mapper;
+            _notificationservice = notificationservice;
+            _relationshipRepository = relationshipRepository;
+            _postHubService = postHubService;
         }
-        public async Task<PostRequest> CreatePostAsync(PostRequest postRequest)
+
+
+
+
+        public async Task<PostResponse> CreatePostAsync(PostRequest postRequest, string userID)
         {
-            if (string.IsNullOrWhiteSpace(postRequest.Content))
-            {
-                throw new ArgumentException("Content cannot be null or empty.", nameof(postRequest.Content));
-            }
 
             try
             {
-                var postEntity = _mapper.Map<PostEntity>(postRequest);
-
-                Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
-
-                await _postRepository.AddAsync(postEntity);
-                await _postRepository.SaveChangeAsync();
-
-                if (postRequest.Images != null && postRequest.Images.Count > 0)
-                {
-                    foreach (var image in postRequest.Images)
+                    var postEntity = _mapper.Map<PostEntity>(postRequest);
+                    postEntity.PostID = Guid.NewGuid().ToString(); 
+                    postEntity.UserID = userID;
+                    postEntity.User = await _userRepository.GetByIDAsync(userID);
+                    if (postEntity.User == null)
                     {
-                        if (string.IsNullOrWhiteSpace(image.ImgUrl))
+                        throw new Exception("User not found.");
+                    }
+                    Console.WriteLine($"Creating Post - PostID: {postEntity.PostID}, Content: {postEntity.Content}");
+                    await _postRepository.AddAsync(postEntity);
+                    await _postRepository.SaveChangeAsync();
+
+                    if (postRequest.Images != null && postRequest.Images.Count > 0)
+                    {
+                        foreach (var image in postRequest.Images)
                         {
-                            throw new ArgumentException("Image URL cannot be null or empty.");
-                        }
+                            if (string.IsNullOrWhiteSpace(image.ImgUrl))
+                            {
+                                throw new ArgumentException("Image URL cannot be null or empty.");
+                            }
 
                         var imageEntity = _mapper.Map<ImagesOfPostEntity>(image);
-                        imageEntity.PostID = postEntity.PostID; 
+                        
+                        imageEntity.PostID = postEntity.PostID;
 
-                        Console.WriteLine($"Adding Image - PostID: {imageEntity.PostID}, ImgUrl: {imageEntity.ImgUrl}");
-
-                        await _imageRepository.AddAsync(imageEntity);
+                        }
                     }
-                    await _imageRepository.SaveChangeAsync();
-                }
 
-                return _mapper.Map<PostRequest>(postEntity);
+
+                    var postResponse = _mapper.Map<PostResponse>(postEntity);
+                    postResponse.FirstName = postEntity.User?.FirstName;
+                    postResponse.LastName = postEntity.User?.LastName;
+                    postRequest.Images = postResponse.Images;
+
+
+
+                ////Friends
+                //var friends = await _relationshipRepository.GetFriendIdByUserId(userID);
+
+                //var friendToNotify = friends.Where(x=>x!=userID).ToList();
+
+                //if (friends.Any())
+                //{
+                //    // Nội dung thông báo
+                //    //var content = $"{postEntity.User.FirstName} {postEntity.User.LastName} vừa đăng một bài viết mới.";
+
+
+                //    //var notification = new NotificationPostViewModel
+                //    //{
+                //    //    Content = content,
+                //    //    Type = "New_Post",
+                //    //    UserId = userID,
+                //    //    //friendId= friendToNotify,
+                //    //    //PostId = postEntity.PostID,
+                //    //    //CreatedAt = DateTime.UtcNow
+                //    //};
+
+
+                //    //// Tạo thông báo trong cơ sở dữ liệu
+                //    //await _notificationservice.CreateNotificationAsync(notification, friendToNotify);
+
+                //    // Gửi thông báo qua SignalR đến danh sách bạn bè
+                //    //await _postHubService.SendNotificationToMultipleUsers(friendToNotify, notification);
+                //}
+
+                await _postHubService.SendPostAsync(postResponse);
+
+
+                return postResponse;
             }
             catch (DbUpdateException dbEx)
             {
@@ -72,58 +126,62 @@ namespace SocialNetwork.Services.Services
 
 
 
-
-
-        public async Task<bool> DeletePostAsync(Guid postId)
+        public async Task<bool> DeletePostAsync(string postId)
         {
-            var postEntity = await _postRepository.GetByIDAsync(postId);
-            if (postEntity == null)
-            {
-                throw new Exception("Không có bài viết tương ứng với postId");
-            }
-            postEntity.IsDelete = true;
-            _postRepository.Update(postEntity);
-            await _postRepository.SaveChangeAsync();
+           await  _postRepository.Delete(postId);
+            await _postHubService.SendRefusePostAsync(postId);
             return true;
         }
 
-        public async Task<IEnumerable<PostViewModel>> GetAllPostsAsync()
+    
+
+        public async Task<PageResult<PostViewModel>> GetAllPostsAsync(string userId, int pageIndex, int pageSize)
         {
-            var posts = await _postRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<PostViewModel>>(posts);
+
+            var posts = await _postRepository.GetAllAsync(userId);
+
+            var total= posts.Count();
+            var pagePost= posts.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var getPost = new PageResult<PostViewModel>
+            {
+                CurrentPage = pageIndex,
+                TotalCount = total,
+                Data = pagePost,
+            };
+            return getPost;
+
         }
 
-        public async Task<PostViewModel> GetPostByIdAsync(Guid postId)
+        public async Task<PostViewModel> GetPostByIdAsync(string postId)
         {
-            // Truyền vào ID mà không cần chuyển đổi thành chuỗi
             var post = await _postRepository.GetByIDAsync(postId);
             if (post == null)
             {
-                // Thay vì ném ngoại lệ, bạn có thể trả về null
                 return null;
             }
             return _mapper.Map<PostViewModel>(post);
         }
 
 
-        public async Task<PostViewModel> UpdatePostAsync(PostViewModel post)
+        public async  Task<PageResult<PostViewModel>> GetPostsByUserIdAsync(string userId,int pageSize,int pageIndex)
         {
-            var postEntity = await _postRepository.GetByIDAsync(post.PostID);
-            if (postEntity == null)
+            var posts = await _postRepository.GetAllAsync(userId); 
+            var userPosts = posts.Where(p => p.UserID == userId).ToList(); 
+            var total= userPosts.Count();
+            var pagePost= userPosts.Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var getPost = new PageResult<PostViewModel>
             {
-                throw new Exception("Không tồn tại bài viết");
-            }
-            _mapper.Map(post, postEntity);
-            _postRepository.Update(postEntity);
-            await _postRepository.SaveChangeAsync();
-            return _mapper.Map<PostViewModel>(postEntity);
+                CurrentPage = pageIndex,
+                TotalCount = total,
+                Data = pagePost,
+            };
+            return getPost;
         }
 
-        public async Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId)
+        public Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync()
         {
-            var posts = await _postRepository.GetAllAsync(); // Thay thế bằng phương thức phù hợp để lấy bài viết theo UserID
-            var userPosts = posts.Where(p => p.UserID == userId); // Lọc bài viết theo UserID
-            return _mapper.Map<IEnumerable<PostViewModel>>(userPosts);
+            var postWait=_postRepository.GetAdminBrowseAsync();
+            return postWait;
         }
     }
 }

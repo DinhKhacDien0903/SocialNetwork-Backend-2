@@ -5,30 +5,31 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SocialNetwork.DTOs.Response;
 
 namespace SocialNetwork.DTOs.ViewModels
 {
     public class CommentViewModel
     {
-        public Guid CommentID { get; set; }
+        public string CommentID { get; set; }
 
-        public string UserID { get; set; }
+        public string PostID { get; set; }
 
-        public Guid PostID { get; set; }
-
-        public Guid? ParentCommentID { get; set; }
+        public string? ParentCommentID { get; set; }
 
         public string Content { get; set; }
 
-        public bool IsDelete { get; set; } = false;
+        public string FirstName { get; set; }
 
-        public DateTime CreatedAt { get; set; } 
+        public string LastName { get; set; }
 
-        public DateTime? UpdatedAt { get; set; } 
+        public string? AvatarUrl { get; set; }
 
-        public string UserName {  get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-       public List<CommentViewModel> Replies {  get; set; }=new List<CommentViewModel>();
+        public List<CommentViewModel> Children { get; set; } = new List<CommentViewModel>();
+
+        //public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }

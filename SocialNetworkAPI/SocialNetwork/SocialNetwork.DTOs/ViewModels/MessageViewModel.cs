@@ -2,6 +2,7 @@
 {
     public class MessageViewModel
     {
+        public string MessageID { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
 
         public string SenderID { get; set; } = string.Empty;
@@ -14,5 +15,6 @@
 
         public List<string> Images { get; set; } = new List<string>();
 
+        public static MessageViewModel Empty => new();
     }
 }

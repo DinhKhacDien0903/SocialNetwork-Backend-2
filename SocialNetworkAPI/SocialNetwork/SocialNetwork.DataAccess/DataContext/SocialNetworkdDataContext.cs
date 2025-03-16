@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using SocialNetwork.Domain.Entities;
-using System.Xml.Linq;
 
 namespace SocialNetwork.DataAccess.DataContext
 {
@@ -9,31 +7,24 @@ namespace SocialNetwork.DataAccess.DataContext
         public SocialNetworkdDataContext(DbContextOptions<SocialNetworkdDataContext> options) : base(options)
         {
         }
-
-        //public DbSet<UserEntity> Users { get; set; }
-        //public DbSet<UserInforEntity> UserInfors { get; set; }
         public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
-        //public DbSet<RoleEntity> Roles { get; set; }
-        //public DbSet<UserRoleEntity> UserRoles { get; set; }
         public DbSet<RelationshipEntity> Relationships { get; set; }
         public DbSet<RequestFriendEntity> RequestFriends { get; set; }
         public DbSet<PostEntity> Posts { get; set; }
         public DbSet<ImagesOfPostEntity> ImagesOfPosts { get; set; }
         public DbSet<CommentEntity> Comments { get; set; }
         public DbSet<MessagesEntity> Messages { get; set; }
-        public DbSet<MessageStatusEntity> MessageStatuses { get; set; }
         public DbSet<MessageImageEntity> MessageImages { get; set; }
         public DbSet<GroupChatEntity> GroupChats { get; set; }
         public DbSet<GroupChatMemberEntity> GroupChatMembers { get; set; }
         public DbSet<GroupChatMessageEntity> GroupChatMessages { get; set; }
-        public DbSet<GroupChatMessageStatusEntity> GroupChatMessageStatuses { get; set; }
         public DbSet<GroupChatMessageImageEntity> GroupChatMessageImages { get; set; }
         public DbSet<EmotionTypeEntity> EmotionTypes { get; set; }
         public DbSet<ReactionEntity> Reactions { get; set; }
         public DbSet<ReactionPostEntity> ReactionPosts { get; set; }
-        public DbSet<ReactionCommentEntity> ReactionComments { get; set; }
         public DbSet<ReactionMessageEntity> ReactionMessages { get; set; }
         public DbSet<ReactionGroupChatMessageEntity> ReactionGroupChatMessages { get; set; }
+        public DbSet<NotificationEntity> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,15 +61,15 @@ namespace SocialNetwork.DataAccess.DataContext
         .HasKey(rf => rf.RequestFriendID);
 
             modelBuilder.Entity<RequestFriendEntity>()
-                .HasOne(rf => rf.Sender)
+                .HasOne(rf => rf.Friend)
                 .WithMany() // Nếu không có collection
-                .HasForeignKey(rf => rf.SenderID)
+                .HasForeignKey(rf => rf.FriendID)
                 .OnDelete(DeleteBehavior.Restrict); // Hoặc SetNull nếu cần
 
             modelBuilder.Entity<RequestFriendEntity>()
-                .HasOne(rf => rf.Receiver)
+                .HasOne(rf => rf.User)
                 .WithMany() // Nếu không có collection
-                .HasForeignKey(rf => rf.ReceiverID)
+                .HasForeignKey(rf => rf.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
 
 
@@ -95,21 +86,6 @@ namespace SocialNetwork.DataAccess.DataContext
                 .HasOne(gcmi => gcmi.User)
                 .WithMany() // Nếu không có collection
                 .HasForeignKey(gcmi => gcmi.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<GroupChatMessageStatusEntity>()
-       .HasKey(gcms => new { gcms.GroupChatMessageID, gcms.UserID });
-
-            modelBuilder.Entity<GroupChatMessageStatusEntity>()
-                .HasOne(gcms => gcms.GroupChatMessage)
-                .WithMany() // Nếu không có collection
-                .HasForeignKey(gcms => gcms.GroupChatMessageID)
-                .OnDelete(DeleteBehavior.Cascade); // Giữ Cascade ở đây nếu cần
-
-            modelBuilder.Entity<GroupChatMessageStatusEntity>()
-                .HasOne(gcms => gcms.User)
-                .WithMany() // Nếu không có collection
-                .HasForeignKey(gcms => gcms.UserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CommentEntity>(entity =>
@@ -131,12 +107,16 @@ namespace SocialNetwork.DataAccess.DataContext
 
                 // Configure self-referencing relationship for ParentComment
                 entity.HasOne(c => c.ParentComment)
-                      .WithMany(c => c.Replies)
+                      .WithMany(c => c.Children)
                       .HasForeignKey(c => c.ParentCommentID)
                       .OnDelete(DeleteBehavior.NoAction);  // No cascade delete for parent-child relationship
             });
+            // modelBuilder.Entity<ReactionEntity>()
+            //.HasKey(r => r.ReactionID); // Đảm bảo rằng ReactionID là khóa chính
 
-
+            // modelBuilder.Entity<ReactionEntity>()
+            //     .Property(r => r.ReactionID)
+            //     .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<ReactionGroupChatMessageEntity>(entity =>
             {
@@ -180,45 +160,60 @@ namespace SocialNetwork.DataAccess.DataContext
                 // Composite primary key
                 entity.HasKey(rm => new { rm.ReactionID, rm.MessageID });
 
-                // Foreign key relationship with ReactionEntity - No action
+                // Foreign key relationship with ReactionEntity - Cascade delete
                 entity.HasOne(rm => rm.Reaction)
                       .WithMany()
                       .HasForeignKey(rm => rm.ReactionID)
-                      .OnDelete(DeleteBehavior.NoAction);  // No action on delete
+                      .OnDelete(DeleteBehavior.Cascade);  // Cascade delete on Reaction deletion
 
-                // Foreign key relationship with MessageEntity - Cascade delete
+                // Foreign key relationship with MessageEntity - No action
                 entity.HasOne(rm => rm.Message)
                       .WithMany()
                       .HasForeignKey(rm => rm.MessageID)
-                      .OnDelete(DeleteBehavior.Cascade);  // Cascade delete on Message deletion
+                      .OnDelete(DeleteBehavior.NoAction);  // No action on Message deletion
             });
 
-
-            modelBuilder.Entity<ReactionCommentEntity>(entity =>
+            modelBuilder.Entity<NotificationEntity>(entity =>
             {
-                // Composite primary key
-                entity.HasKey(rc => new { rc.ReactionID, rc.CommentID });
+                entity.HasKey(n => n.Id);
 
-                // Foreign key relationship with ReactionEntity - No action
-                entity.HasOne(rc => rc.Reaction)
-                      .WithMany()
-                      .HasForeignKey(rc => rc.ReactionID)
-                      .OnDelete(DeleteBehavior.NoAction);  // No action on delete
+                entity.HasOne(n => n.GroupChat)
+                       .WithMany()
+                       .HasForeignKey(n => n.GroupId)
+                       .OnDelete(DeleteBehavior.NoAction);
 
-                // Foreign key relationship with CommentEntity - Cascade delete
-                entity.HasOne(rc => rc.Comment)
-                      .WithMany()
-                      .HasForeignKey(rc => rc.CommentID)
-                      .OnDelete(DeleteBehavior.Cascade);  // Cascade delete on Comment deletion
+                entity.HasOne(n => n.Sender)
+                       .WithMany()
+                       .HasForeignKey(n => n.SenderId)
+                       .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(n => n.Receiver)
+                       .WithMany()
+                       .HasForeignKey(n => n.ReceiverId)
+                       .OnDelete(DeleteBehavior.NoAction);
             });
+                
 
+            //modelBuilder.Entity<ImagesOfPostEntity>(entity =>
+            //{
+            //    entity.HasKey(e => e.ImagesOfPostID);
+            //    entity.Property(e => e.ImagesOfPostID).ValueGeneratedNever(); // Hoặc GeneratedOnAdd nếu database tự sinh
+            //    entity.HasOne<PostEntity>()
+            //          .WithMany(p => p.Images)
+            //          .HasForeignKey(e => e.PostID)
+            //          .OnDelete(DeleteBehavior.Cascade);
+            //});
+            modelBuilder.Entity<ReactionPostEntity>()
+          .HasOne(rp => rp.Post)
+          .WithMany(p => p.Reactions)
+          .HasForeignKey(rp => rp.PostID)
+          .OnDelete(DeleteBehavior.Cascade);
 
-
-
-
-
-            modelBuilder.Entity<UserRoleEntity>()
-                .HasKey(ur => new { ur.UserID, ur.RoleID });
+            modelBuilder.Entity<ReactionPostEntity>()
+                .HasOne(rp => rp.Reaction)
+                .WithMany()
+                .HasForeignKey(rp => rp.ReactionID)
+                .OnDelete(DeleteBehavior.NoAction); // Đặt 
 
             modelBuilder.Entity<RelationshipEntity>()
                 .HasKey(r => new { r.UserID, r.FriendID });
@@ -229,17 +224,12 @@ namespace SocialNetwork.DataAccess.DataContext
             modelBuilder.Entity<ReactionPostEntity>()
                 .HasKey(rp => new { rp.ReactionID, rp.PostID });
 
-            modelBuilder.Entity<ReactionCommentEntity>()
-                .HasKey(rc => new { rc.ReactionID, rc.CommentID });
 
             modelBuilder.Entity<ReactionMessageEntity>()
                 .HasKey(rm => new { rm.ReactionID, rm.MessageID });
 
             modelBuilder.Entity<ReactionGroupChatMessageEntity>()
                 .HasKey(rgcm => new { rgcm.ReactionID, rgcm.GroupChatMessageID });
-
-            modelBuilder.Entity<GroupChatMessageStatusEntity>()
-               .HasKey(g => new { g.GroupChatMessageID, g.UserID});
 
             base.OnModelCreating(modelBuilder);
 

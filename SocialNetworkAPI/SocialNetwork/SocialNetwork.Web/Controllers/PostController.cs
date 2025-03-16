@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SocialNetwork.Domain.Entities;
+using SocialNetwork.DTOs.Request;
 using SocialNetwork.DTOs.ViewModels;
+using System.Security.Claims;
 
 namespace SocialNetwork.Web.Controllers
 {
@@ -9,23 +13,67 @@ namespace SocialNetwork.Web.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IReactionPostService _reactionPostService;
+        private readonly IPostHubService _postHubService;
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService,
+             IReactionPostService reactionPostService,
+            IPostHubService postHubService)
         {
             _postService = postService;
+            _reactionPostService = reactionPostService;
+            _postHubService = postHubService;
         }
 
-        // Lấy tất cả các bài viết
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts()
+
+  
+        [HttpGet("All")]
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetAllPosts(int pageIndex=1, int pageSize=10)
         {
-            var posts = await _postService.GetAllPostsAsync();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var posts = await _postService.GetAllPostsAsync(userId,pageIndex,pageSize);
+            return Ok(posts);
+            //return Ok(new BaseResponse
+            //{
+            //    Status = 200,
+            //    Message = "get all post success",
+            //    Data = posts
+            //});
+        }
+
+        [HttpGet("not-approved")]
+        public async Task<ActionResult<IEnumerable<AdminBrowsePostViewModel>>> GetAllPostsAdmin()
+        {   
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var posts = await _postService.GetAdminBrowseAsync();
             return Ok(posts);
         }
 
-        // Lấy bài viết theo ID
+        [HttpPost("deletePost/{postId}")]
+        public async Task<ActionResult> DeletePost(string postId)
+        {
+            var result=await _postService.DeletePostAsync(postId);
+            return Ok(new BaseResponse
+            {
+                Status = 200,
+                Message = "delete post is success"
+            });
+        }
+
+        [HttpGet("User")]
+        public async Task<ActionResult<IEnumerable<PostViewModel>>> GetPostsByUserIdAsync([FromQuery]string userId, int pageIndex=1, int pageSixe=10)
+        {
+            var posts = await _postService.GetPostsByUserIdAsync(userId, pageSixe,pageIndex);
+            return Ok(new BaseResponse
+            {
+                Status=200,
+                Message="get all post of user is success",
+                Data = posts
+            });
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<PostViewModel>> GetPostById(Guid id)
+        public async Task<ActionResult<PostViewModel>> GetPostById(string id)
         {
             var post = await _postService.GetPostByIdAsync(id);
             if (post == null)
@@ -36,49 +84,58 @@ namespace SocialNetwork.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PostRequest>> CreatePost(PostRequest postViewModel)
+        public async Task<ActionResult<PostResponse>> CreatePost( PostRequest postViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            var createdPost = await _postService.CreatePostAsync(postViewModel);
-            return Ok(createdPost);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var createdPost = await _postService.CreatePostAsync(postViewModel, userId);
+            //await _postHubService.SendPostAsync(createdPost);
+            return CreatedAtAction(nameof(CreatePost), new { postId = createdPost.PostID }, createdPost);
         }
 
+        
 
+       
 
-        // Cập nhật bài viết
-        [HttpPut("{id}")]
-        public async Task<ActionResult<PostViewModel>> UpdatePost(Guid id, [FromBody] PostViewModel postViewModel)
+        /// <summary>
+        /// Emotion
+        /// </summary>
+        /// <returns></returns>
+
+        [HttpGet("AllEmotion")]
+        public async Task<ActionResult<IEnumerable<EmotionRequest>>> GetAllEmotion()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            postViewModel.PostID = id; // Đảm bảo ID trong URL và body khớp nhau
-            var updatedPost = await _postService.UpdatePostAsync(postViewModel);
-            if (updatedPost == null)
-            {
-                return NotFound("Bài viết không tồn tại.");
-            }
-
-            return Ok(updatedPost);
+            var emotions = await _reactionPostService.GetAllEmotionTypesAsync();
+            return Ok(emotions);
         }
 
-        // Xóa bài viết (soft delete)
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePost(Guid id)
+        [HttpPut("emotion/{postId}")]
+        public async Task<IActionResult> AddEmotion(string postId, EmotionRequest emotionRequest)
         {
-            var result = await _postService.DeletePostAsync(id);
-            if (!result)
-            {
-                return NotFound("Bài viết không tồn tại.");
-            }
 
-            return NoContent();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var result = await _reactionPostService.AddReactionAsync(postId, userId, emotionRequest.EmotionTypeID);
+
+            if (result == null)
+            {
+                return BadRequest("error add reaction");
+            }
+            return Ok(result);
+        }
+
+        [HttpDelete("emotion/{postId}")]
+
+        public async Task<IActionResult> CancelReleaseEmotion(string postId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var result = await _reactionPostService.RemoveReactionAsync(postId, userId);
+            if (!result) return BadRequest("Failed to delete reaction");
+            return Ok(new { PostID = postId, UserID = userId });
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SocialNetwork.DTOs.Response;
+using SocialNetwork.DTOs.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,13 +8,16 @@ using System.Threading.Tasks;
 
 namespace SocialNetwork.Domain.IRepositories
 {
-    public interface ICommentRepositories:IBaseRepository<CommentEntity>
+    public interface ICommentRepositories
     {
-        Task<IEnumerable<CommentEntity>> GetCommentsByPostIdAsync(Guid postId);
-        Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(Guid parentCommentId);
-        Task<CommentEntity> AddCommentAsync(CommentEntity commentEntity);
-        Task DeleteAsycn (Guid commentId);
-        Task<CommentEntity> UpdateAsycn(CommentEntity comment);
-        Task<CommentEntity> GetCommentByIdAsync(Guid commentId);
+        Task<IEnumerable<CommentEntity>> GetAllAsync();
+        Task<CommentResultViewModel> GetCommentsByPostIdAsync(string postId);
+        //Task<IEnumerable<CommentEntity>> GetRepliesByCommentIdAsync(string parentCommentId);
+        Task<CommentEntity> GetCommentByIdAsync(string commentId);
+        Task AddCommentAsync(CommentEntity comment);
+        Task DeleteCommentAsync(string commentId);
+        Task UpdateCommentAsync(CommentEntity comment);
+        Task<int> GetCommentCountByPostIdAsync(string postId);
+        Task<int> GetCountComment(string postId);
     }
 }

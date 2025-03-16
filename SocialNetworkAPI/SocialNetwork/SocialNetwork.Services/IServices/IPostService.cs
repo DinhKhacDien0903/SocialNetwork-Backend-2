@@ -1,4 +1,6 @@
-﻿using SocialNetwork.DTOs.Request;
+﻿using SocialNetwork.Domain;
+using SocialNetwork.DTOs.Request;
+using SocialNetwork.DTOs.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +11,19 @@ namespace SocialNetwork.Services.IServices
 {
     public interface IPostService
     {
-        Task<IEnumerable<PostViewModel>> GetAllPostsAsync();
+        Task<PageResult<PostViewModel>> GetAllPostsAsync(string userId, int pageSize, int pageIndex);
 
-        Task<PostViewModel> GetPostByIdAsync(Guid postId);
+        Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync();
 
-        Task<PostRequest> CreatePostAsync(PostRequest post);
+        Task<PostViewModel> GetPostByIdAsync(string postId);
 
-        Task<PostViewModel> UpdatePostAsync(PostViewModel post);
+        Task<PostResponse> CreatePostAsync(PostRequest post,string userID);
 
-        Task<bool> DeletePostAsync(Guid postId);
+        //Task<PostViewModel> UpdatePostAsync(PostViewModel post);
 
-        Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId);
+        Task<bool> DeletePostAsync(string postId);
+
+        Task<PageResult<PostViewModel>> GetPostsByUserIdAsync(string userId, int pageSize, int pageIndex);
     }
 
 }

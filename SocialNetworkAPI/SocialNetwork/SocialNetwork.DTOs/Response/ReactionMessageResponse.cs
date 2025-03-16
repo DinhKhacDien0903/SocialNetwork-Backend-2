@@ -2,6 +2,8 @@
 {
     public class ReactionMessageResponse
     {
+        public string? ReactionID { get; set; }
+
         public string? MessageId { get; set; }
 
         public string? EmotionType { get; set; }
@@ -11,5 +13,9 @@
         public string? SenderId { get; set; }
 
         public DateTime? ReactionAt { get; set; }
+
+        public bool? IsRemove { get; set; }
+
+        public string? GroupId { get; set; }
     }
 }

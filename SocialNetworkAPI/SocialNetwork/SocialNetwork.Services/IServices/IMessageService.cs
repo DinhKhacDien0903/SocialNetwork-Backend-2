@@ -5,5 +5,6 @@ namespace SocialNetwork.Services.IServices
     public interface IMessageService
     {
         Task<IEnumerable<MessagePersonResponse>> GetAllMessagesAsync(string userId, string receiverId);
+        Task<IEnumerable<MessageGroupResponse>> GetAllGroupChatMessagesAsync(string userId, string groupId);
     }
 }

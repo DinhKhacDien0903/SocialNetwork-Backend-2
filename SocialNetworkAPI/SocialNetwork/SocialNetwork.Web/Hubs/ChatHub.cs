@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 using SocialNetwork.Domain.Entities;
 using SocialNetwork.DTOs.ViewModels;
 
@@ -8,14 +9,22 @@ namespace SocialNetwork.Web.Hubs
     public class ChatHub : Hub
     {
         private readonly UserManager<UserEntity> _userManager;  
+
         private readonly IChatHubService _chatHubService;
+
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
+
         private const int MAX_MESSAGE_LENGTH = 500;
+
+        private const string MESSAGE_NOTIFICATION = "You have a new message";
         public ChatHub(
             UserManager<UserEntity> userManager,
-            IChatHubService chatHubService)
+            IChatHubService chatHubService,
+            IHubContext<NotificationHub> notificationHubContext)
         {
             _userManager = userManager;
             _chatHubService = chatHubService;
+            _notificationHubContext = notificationHubContext;
         }
 
         public override async Task OnConnectedAsync()
@@ -51,29 +60,68 @@ namespace SocialNetwork.Web.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<string> SendMessageToPerson(SendMessageToPersonRequest param)
+
+     #region'Chat Person'
+        public async Task<MessageViewModel> SendMessageToPerson(SendMessageToPersonRequest param)
         {
+            
             var sender = await ValidateCurrentAccount();
 
             var reciver = await _userManager.FindByIdAsync(param.ReciverId);
+
+            //var curentMessage = await _chatHubService.IsMessageExist(param.)
 
             param.Content = param.Content.Trim();
 
             if ( !await ValidateMessage(param, reciver.Id))
             {
-                return string.Empty;
+                return MessageViewModel.Empty;
             }
 
-            var messageId = await SaveMessage(sender.Id, param);
+            var message = await SaveMessage(sender.Id, param);
 
             if (param.Images.Any())
             {
-                await SaveMessageImages(messageId, param.Images);
+                await SaveMessageImages(message.MessageID, param.Images);
             }
 
-            await NotifyReceiver(param.ReciverId, CreateMessageResponse(messageId, param));
+            await NotifyReceiverAsync(param.ReciverId, CreateMessageResponse(message, param));
 
-            return messageId;
+            try
+            {
+                var isNotificationExist = await _chatHubService.IsNotificationExist(sender.Id, param.ReciverId);
+
+                if (!isNotificationExist)
+                {
+                    var notification = await SaveNotificationToUser(sender.Id, param.ReciverId, MESSAGE_NOTIFICATION);
+
+                    await _notificationHubContext.Clients.User(param.ReciverId).SendAsync("ReceiveNotification", notification);
+                }
+            }
+            catch(Exception c)
+            {
+
+                var x = c.Message;
+            }
+            return message;
+        }
+
+        public async Task ReadMessageNotification(NotificationRequest param)
+        {
+
+            var sender = await ValidateCurrentAccount();
+
+            try
+            {
+                var notification = await _chatHubService.ReadMessageNotificationAsync(sender.Id, param?.RecieverId, param?.GroupId);
+
+                await _notificationHubContext.Clients.User(sender.Id).SendAsync("ReadMessageNotification", notification);
+            }
+            catch (Exception c)
+            {
+
+                var x = c.Message;
+            }
         }
 
         public async Task OnUserTyping(string reciverId)
@@ -89,6 +137,45 @@ namespace SocialNetwork.Web.Hubs
         private async Task UpdateStatusActiveUser(string userId, bool isActive)
         {
             await _chatHubService.UpdateStatusActiveUser(userId, isActive);
+        }
+
+        public async Task RemoveMessage(string messageId, string reciverId)
+        {
+            if (!string.IsNullOrEmpty(messageId))
+            {
+                await _chatHubService.RemoveMessage(messageId);
+
+                var response = new MessagePersonResponse
+                {
+                    MessageID = messageId,
+                    IsDelete = true
+                };
+
+                await NotifyReceiverAsync(reciverId, response);
+            }
+        }
+
+
+        public async Task<string> UpdateMessage(UpdateMessageRequest param)
+        {
+            if(!string.IsNullOrEmpty(param.MessageId) && !string.IsNullOrEmpty(param.Content))
+            {
+                var updateDatetime = DateTime.UtcNow;
+
+                await _chatHubService.UpdateMessage(param, updateDatetime);
+
+                var response = new MessagePersonResponse
+                {
+                    MessageID = param.MessageId,
+                    Content = param.Content,
+                    UpdateAt = updateDatetime,
+                    ReactionByUser = param.ReactionByUser
+                };
+
+                await NotifyReceiverAsync(param.ReciverId, response);
+
+            }
+            return param.MessageId;
         }
 
         private async Task<IdentityUser> ValidateCurrentAccount()
@@ -139,14 +226,16 @@ namespace SocialNetwork.Web.Hubs
             return content?.Length > MAX_MESSAGE_LENGTH;
         }
 
-        private async Task<string> SaveMessage(string senderId, SendMessageToPersonRequest request)
+        private async Task<MessageViewModel> SaveMessage(string senderId, SendMessageToPersonRequest request)
         {
+            var sendDatetime = DateTime.UtcNow;
+
             var messageViewModel = new MessageViewModel
             {
                 SenderID = senderId,
                 ReciverID = request.ReciverId,
                 Content = request.Content,
-                CreatedAt = DateTime.UtcNow.AddHours(7),
+                CreatedAt = sendDatetime,
                 Images = request.Images,
                 Symbol = request.Symbol
             };
@@ -166,21 +255,139 @@ namespace SocialNetwork.Web.Hubs
             await _chatHubService.AddMessageImagesAsync(messageImages);
         }
 
-        private MessagePersonResponse CreateMessageResponse(string messageId, SendMessageToPersonRequest request)
+        private MessagePersonResponse CreateMessageResponse(MessageViewModel message, SendMessageToPersonRequest request)
         {
             return new MessagePersonResponse
             {
-                MessageID = messageId,
+                SenderID = message.SenderID,
+                MessageID = message.MessageID,
                 Content = request.Content,
                 Images = request.Images,
-                SendDate = DateTime.UtcNow.AddHours(7),
+                CreatedAt = message.CreatedAt,
                 Symbol = request.Symbol
             };
         }
 
-        private async Task NotifyReceiver(string receiverId, MessagePersonResponse response)
+        private async Task NotifyReceiverAsync(string receiverId, MessagePersonResponse response)
         {
             await Clients.User(receiverId).SendAsync("ReceiveSpecitificMessage", response);
         }
+
+        private async Task<NotificationViewModel> SaveNotificationToUser(string senderId, string friendId, string message)
+        {
+            var sendDatetime = DateTime.UtcNow;
+
+            var notificationViewModel = new NotificationViewModel
+            {
+                SenderId = senderId,
+                ReceiverId = friendId,
+                Messeage = message,
+                CreatedAt = sendDatetime,
+                UpdatedAt = sendDatetime,
+                Type = 0
+            };
+
+            return await _chatHubService.AddNotificationToUserAsync(notificationViewModel);
+        }
+        #endregion
+
+        #region'Group chat'
+        public async Task<GroupChatMessageViewModel> SendMessageToGroup(SendMessageToGroupRequest param)
+        {
+            var sender = await ValidateCurrentAccount();
+
+            param.Content = param.Content.Trim();
+
+            var message = await SaveMessageToGroup(sender.Id, param);
+
+            if (param.Images.Any())
+            {
+                await SaveMessageImagesGroupChat(message.GroupChatMessageID, param.Images, sender.Id);
+            }
+
+            await NotifyGroupReceiverAsync(param.GroupChatId, CreateGroupChatMessageResponse(message));
+
+            //try
+            //{
+            //    var isNotificationExist = await _chatHubService.IsNotificationExist(sender.Id, param.ReciverId);
+
+            //    if (!isNotificationExist)
+            //    {
+            //        var notification = await SaveNotificationToUser(sender.Id, param.ReciverId, MESSAGE_NOTIFICATION);
+
+            //        await _notificationHubContext.Clients.User(param.ReciverId).SendAsync("ReceiveNotification", notification);
+            //    }
+            //}
+            //catch (Exception c)
+            //{
+
+            //    var x = c.Message;
+            //}
+            return message;
+        }
+
+        public async Task<string> UpdateGroupChatAvatar(UpdateGroupChatRequest param)
+        {
+            if (!string.IsNullOrEmpty(param.Avatar) && !string.IsNullOrEmpty(param.GroupchatId))
+            {
+                var updateDatetime = DateTime.UtcNow;
+
+                await _chatHubService.UpdateGroupChatAvatar(param, updateDatetime);
+
+                //await NotifyReceiverAsync(param.GroupchatId, param);
+
+            }
+            return param.Avatar;
+        }
+
+        private MessageGroupResponse CreateGroupChatMessageResponse(GroupChatMessageViewModel message)
+        {
+            return new MessageGroupResponse
+            {
+                UserID = message.UserID,
+                GroupChatID = message.GroupChatID,
+                GroupChatMessageID = message.GroupChatMessageID,
+                Content = message.Content,
+                CreatedAt = message.CreatedAt,
+                Images = message.Images,
+                Symbol = message.Symbol
+            };
+        }
+
+        private async Task<GroupChatMessageViewModel> SaveMessageToGroup(string senderId, SendMessageToGroupRequest request)
+        {
+            var sendDatetime = DateTime.UtcNow;
+
+            var messageViewModel = new GroupChatMessageViewModel
+            {
+                UserID = senderId,
+                GroupChatID = request.GroupChatId,
+                Content = request.Content,
+                CreatedAt = sendDatetime,
+                Images = request.Images,
+                Symbol = request.Symbol
+            };
+
+            return await _chatHubService.AddMessageGroupAsync(messageViewModel);
+        }
+
+        private async Task NotifyGroupReceiverAsync(string groupId, MessageGroupResponse response)
+        {
+            await Clients.Group(groupId).SendAsync("ReceiveSpecitificGroupChatMessage", response);
+        }
+
+        private async Task SaveMessageImagesGroupChat(string messageId, List<string> images, string senderId)
+        {
+            var messageImages = images.Select(image => new GroupChatMessageImageViewModel
+            {
+                GroupChatMessageImageID = Guid.NewGuid().ToString(),
+                GroupChatMessageID = messageId,
+                ImageUrl = image,
+                UserID = senderId
+            }).ToList();
+
+            await _chatHubService.AddMessageImagesGroupChatAsync(messageImages);
+        }
+        #endregion
     }
 }

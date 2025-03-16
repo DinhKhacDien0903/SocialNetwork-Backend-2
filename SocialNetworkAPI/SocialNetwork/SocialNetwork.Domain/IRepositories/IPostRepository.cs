@@ -1,4 +1,5 @@
 ﻿using SocialNetwork.DTOs.Request;
+using SocialNetwork.DTOs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,19 @@ namespace SocialNetwork.Domain.IRepositories
 {
     public interface IPostRepository
     {
-        Task<IEnumerable<PostEntity>> GetAllAsync();
+        Task<IEnumerable<PostViewModel>> GetAllAsync(string userid);
+        Task<IEnumerable<AdminBrowsePostViewModel>> GetAdminBrowseAsync();
 
-        Task<PostEntity> GetByIDAsync(Guid id);
+        Task<PostEntity> GetByIDAsync(string id);
 
         Task AddAsync(PostEntity entity);
 
-        void Update(PostEntity entity);
+        //Task Update(PostEntity entity);
 
-        void Delete(PostEntity Entity);
+        Task Delete(string postId);
 
         Task SaveChangeAsync();
 
-        Task<IEnumerable<PostEntity>> GetPostsByUserIdAsync(string userId);
-        Task<PostEntity> GetPostWithImagesAsync(Guid postId);
+        //Task<IEnumerable<PostViewModel>> GetPostsByUserIdAsync(string userId);
     }
 }

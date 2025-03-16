@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Domain;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SocialNetwork.Services.Services
 {
@@ -55,9 +57,21 @@ namespace SocialNetwork.Services.Services
 
         public async Task<UserViewModel> GetUserInforAsync(string userId)
         {
-            var userEntity = await _userRepository.GetUserInfor(userId);
+            try
+            {
+                var userEntity = await _userRepository.GetUserInfor(userId);
 
-            return _mapper.Map<UserViewModel>(userEntity);
+                var userVM = _mapper.Map<UserViewModel>(userEntity);
+
+                userVM.totalOfFirend = await _userRepository.GetTotalFriendAsync(userId);
+
+                return userVM;
+
+            }catch(Exception e)
+            {
+                var x = e.Message;
+                return null;
+            }
         }
 
         public string HashPassWord(string password)
@@ -92,6 +106,26 @@ namespace SocialNetwork.Services.Services
             }
 
             return result;
+        }
+
+        public async Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query,string userId)
+        {
+          var result = new PageResult<UserSearchViewModel>() { CurrentPage = query.PageIndex };
+            var user = await _userRepository.SearchUserAsync(query,userId);
+          
+            result.TotalCount = user.Count();
+            result.Data = user.ToList();
+
+            return result;
+        }
+
+        public async Task<UserViewModel> UpdateUserInforAsync(UserViewModel user)
+        {
+            var userEntity = _mapper.Map<UserEntity>(user);
+
+            await _userRepository.UpdateUserInforAsync(userEntity);
+
+            return user;
         }
     }
 }

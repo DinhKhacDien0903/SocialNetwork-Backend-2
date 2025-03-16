@@ -250,7 +250,8 @@ namespace SocialNetwork.Services.Services
             {
                 UserName = signUpRequest.UserName,
                 Email = signUpRequest.Email,
-                PhoneNumber = signUpRequest.PhoneNumber
+                FirstName = signUpRequest.FirstName,
+                LastName = signUpRequest.LastName,
             };
 
             var result =  await _userManager.CreateAsync(user, signUpRequest.Password);
@@ -296,7 +297,12 @@ namespace SocialNetwork.Services.Services
                 throw new Exception("HttpContext is not available.");
             }
 
-            httpContext.Response.Cookies.Delete(name);
+            httpContext.Response.Cookies.Delete(name, new CookieOptions
+            {
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                HttpOnly = true,
+            });
         }
 
         public async Task UpdateStatusActiveUser(string userId, bool isActive)

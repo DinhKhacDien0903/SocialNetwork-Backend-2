@@ -1,4 +1,5 @@
-﻿using SocialNetwork.DTOs.Authorize;
+﻿using SocialNetwork.Domain;
+using SocialNetwork.DTOs.Authorize;
 
 namespace SocialNetwork.Services.IServices
 {
@@ -17,5 +18,9 @@ namespace SocialNetwork.Services.IServices
         Task<UserViewModel>GetUserInforAsync(string userId);
 
         Task<IEnumerable<FriendViewModel>> GetFriendOnlinesAsync(string userId);
+
+        Task<PageResult<UserSearchViewModel>> SearchUserByNameAsync(SearchQuery query,string userId);
+
+        Task<UserViewModel> UpdateUserInforAsync(UserViewModel user);
     }
 }
